@@ -47,11 +47,8 @@ public class JsonParser {
     }
 
     public String getCatalogFilename(JsonObject catalogThreadJson){
-        if (catalogThreadJson.get(CATALOG_FILENAME) != null){
-            return catalogThreadJson.get(CATALOG_FILENAME).getAsString();
-        } else {
-            return null;
-        }
+        JsonElement fileName = catalogThreadJson.get(CATALOG_FILENAME);
+        return fileName != null ? fileName.getAsString() : null;
     }
 
     public Integer getCatalogSticky(JsonObject catalogThreadJson){
@@ -61,20 +58,15 @@ public class JsonParser {
     public Integer getCatalogLocked(JsonObject catalogThreadJson){
         return catalogThreadJson.get(CATALOG_LOCKED).getAsInt();
     }
+
     public String getCatalogSub(JsonObject catalogThreadJson){
-        if (catalogThreadJson.get(CATALOG_SUB) != null){
-            return catalogThreadJson.get(CATALOG_SUB).getAsString();
-        }else {
-            return null;
-        }
+       JsonElement sub = catalogThreadJson.get(CATALOG_SUB);
+       return sub != null ? sub.getAsString() : null;
     }
 
     public String getCatalogCom(JsonObject catalogThreadJson){
-        if(catalogThreadJson.get(CATALOG_COM) != null){
-            return catalogThreadJson.get(CATALOG_COM).getAsString();
-        } else {
-            return null;
-        }
+        JsonElement com = catalogThreadJson.get(CATALOG_COM);
+        return com != null ? com.getAsString() : null;
     }
 
     public Integer getCatalogReplies(JsonObject catalogThreadJson){
@@ -88,27 +80,18 @@ public class JsonParser {
     }
 
     public String getCatalogTim(JsonObject catalogThreadJson){
-        if (catalogThreadJson.get(CATALOG_TIM) != null){
-            return catalogThreadJson.get(CATALOG_TIM).getAsString();
-        } else {
-            return null;
-        }
+        JsonElement tim = catalogThreadJson.get(CATALOG_TIM);
+        return tim != null ? tim.getAsString() : null;
     }
 
     public String getCatalogExt(JsonObject catalogThreadJson){
-        if (catalogThreadJson.get(CATALOG_EXT) != null){
-            return catalogThreadJson.get(CATALOG_EXT).getAsString();
-        } else {
-            return null;
-        }
+        JsonElement ext = catalogThreadJson.get(CATALOG_EXT);
+        return ext != null ? ext.getAsString() : null;
     }
 
     public String getCatalogEmbed(JsonObject threadJson){
-        if (threadJson.get(CATALOG_EMBED) != null){
-            return threadJson.get(CATALOG_EMBED).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement embed = threadJson.get(CATALOG_EMBED);
+        return embed != null ? embed.getAsString() : null;
     }
 
 
@@ -133,11 +116,7 @@ public class JsonParser {
 
     public String getThreadResto(JsonObject threadJson){
         String resto = threadJson.get(THREAD_RESTO).getAsString();
-        if (resto.equals("0")){
-            return getThreadNo(threadJson);
-        } else {
-            return resto;
-        }
+        return  resto.equals("0") ? getThreadNo(threadJson) : resto;
     }
 
     public String getThreadNo(JsonObject threadJson){
@@ -145,59 +124,38 @@ public class JsonParser {
     }
 
     public String getThreadFilename(JsonObject threadJson){
-        if (threadJson.get(THREAD_FILENAME) != null){
-            return threadJson.get(THREAD_FILENAME).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement fileName = threadJson.get(THREAD_FILENAME);
+        return fileName != null ? fileName.getAsString() : null;
     }
 
     public String getThreadTim(JsonObject threadJson){
-        if (threadJson.get(THREAD_TIM) != null){
-            return threadJson.get(THREAD_TIM).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement tim = threadJson.get(THREAD_TIM);
+        return tim != null ? tim.getAsString() : null;
     }
 
     public String getThreadExt(JsonObject threadJson){
-        if (threadJson.get(THREAD_EXT) != null){
-            return threadJson.get(THREAD_EXT).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement ext = threadJson.get(THREAD_EXT);
+        return ext != null ? ext.getAsString() : null;
     }
 
     public String getThreadSub(JsonObject threadJson){
-        if (threadJson.get(THREAD_SUB) != null){
-            return threadJson.get(THREAD_SUB).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement sub = threadJson.get(THREAD_SUB);
+        return sub != null ? sub.getAsString() : null;
     }
 
     public String getThreadCom(JsonObject threadJson){
-        if (threadJson.get(THREAD_COM) != null){
-            return threadJson.get(THREAD_COM).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement com = threadJson.get(THREAD_COM);
+        return com != null ? com.getAsString() :null;
     }
 
     public String getThreadName(JsonObject threadJson){
-        if (threadJson.get(THREAD_NAME) != null){
-            return threadJson.get(THREAD_NAME).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement name = threadJson.get(THREAD_NAME);
+        return name != null ? name.getAsString() : null;
     }
 
     public String getThreadTrip(JsonObject threadJson){
-        if (threadJson.get(THREAD_TRIP) != null){
-            return threadJson.get(THREAD_TRIP).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement trip = threadJson.get(THREAD_TRIP);
+        return trip != null ? trip.getAsString() : null;
     }
 
     public String getThreadTime(JsonObject threadJson){
@@ -205,19 +163,13 @@ public class JsonParser {
     }
 
     public String getThreadLastModified(JsonObject threadJson){
-        if (threadJson.get(THREAD_LAST_MODIFIED) != null){
-            return threadJson.get(THREAD_LAST_MODIFIED).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement lastModified = threadJson.get(THREAD_LAST_MODIFIED);
+        return lastModified != null ? lastModified.getAsString() : null;
     }
 
     public String getThreadId(JsonObject threadJson){
-        if (threadJson.get(THREAD_ID) != null){
-            return threadJson.get(THREAD_ID).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement id = threadJson.get(THREAD_ID);
+        return id != null ? id.getAsString() : null;
     }
 
     public void checkExtraFiles(String label, ArrayList<String> value, JsonObject threadJson){
@@ -231,26 +183,17 @@ public class JsonParser {
     }
 
     public String getThreadEmbed(JsonObject threadJson){
-        if (threadJson.get(THREAD_EMBED) != null){
-            return threadJson.get(THREAD_EMBED).getAsString();
-        }else {
-            return null;
-        }
+        JsonElement embed = threadJson.get(THREAD_EMBED);
+        return embed != null ? embed.getAsString() : null;
     }
 
     public String getThreadImageHeight(JsonObject threadJson) {
-        if (threadJson.get(THREAD_IMAGE_HEIGHT) != null){
-            return threadJson.get(THREAD_IMAGE_HEIGHT).getAsString();
-        }else {
-            return "0";
-        }
+        JsonElement imageHeight = threadJson.get(THREAD_IMAGE_HEIGHT);
+        return imageHeight != null ? imageHeight.getAsString() : "0";
     }
 
     public String getThreadImageWidth(JsonObject threadJson) {
-        if (threadJson.get(THREAD_IMAGE_WIDTH) != null){
-            return threadJson.get(THREAD_IMAGE_WIDTH).getAsString();
-        }else {
-            return "0";
-        }
+        JsonElement imageWidth = threadJson.get(THREAD_IMAGE_WIDTH);
+        return imageWidth != null ? imageWidth.getAsString() : "0";
     }
 }
