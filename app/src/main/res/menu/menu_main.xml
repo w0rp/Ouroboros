@@ -1,0 +1,32 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/action_search"
+        android:orderInCategory="110"
+        android:title="Search"
+        android:icon="@drawable/ic_search_black_24dp"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        android:visible="false"
+        />
+
+    <item android:id="@+id/action_refresh"
+        android:orderInCategory="120"
+        android:title="Refresh"
+        android:icon="@drawable/ic_refresh_black_48dp"
+        app:showAsAction="collapseActionView|ifRoom"
+        android:visible="false"/>
+
+    <item android:id="@+id/action_reply"
+        android:orderInCategory="130"
+        android:title="Reply"
+        android:icon="@drawable/ic_reply_black_48dp"
+        app:showAsAction="collapseActionView|ifRoom"
+        android:visible="false"/>
+
+    <item android:id="@+id/action_scroll_bottom" android:title="Scroll"
+        android:orderInCategory="140" app:showAsAction="never" android:visible="false"/>
+
+</menu>

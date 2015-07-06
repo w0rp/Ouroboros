@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    card_view:cardBackgroundColor="@color/cardview_light_background"
+    card_view:cardElevation="1dp"
+    card_view:cardUseCompatPadding="true"
+    card_view:cardCornerRadius="4dp"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/catalog_picture"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher"/>
+        <RelativeLayout
+            android:id="@+id/catalog_text_layout"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_below="@+id/catalog_picture">
+            <TextView
+                android:id="@+id/catalog_sub_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+            <TextView
+                android:id="@+id/catalog_com_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/catalog_sub_text"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/thread_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/catalog_text_layout">
+            <TextView
+                android:id="@+id/catalog_reply_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/reply_count_mock_text"
+                />
+            <TextView
+                android:id="@+id/catalog_image_reply_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="@string/image_reply_count_mock_text"
+                />
+        </RelativeLayout>
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
+

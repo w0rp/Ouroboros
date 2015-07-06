@@ -1,0 +1,79 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.luorrak.ouroboros.catalog.NavigationDrawerFragment"
+    android:background="#EEE"
+    android:clickable="true">
+
+    <ImageView
+        android:id="@+id/navigation_logo"
+        android:layout_width="280dp"
+        android:layout_height="140dp"
+        android:src="@drawable/infinitechanlogo"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/navigation_logo"
+        android:id="@+id/navigation_board_layout">
+
+        <TextView
+            android:id="@+id/navigation_board_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Boards"
+            />
+
+        <Button
+            android:id="@+id/navigation_button_add_board"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"/>
+    </RelativeLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/navigation_boardlist"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@+id/navigation_board_layout"/>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/navigation_watchlist_layout"
+        android:layout_below="@+id/navigation_boardlist">
+        <TextView
+            android:id="@+id/navigation_watchlist_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Watchlist"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/navigation_app_info"
+        android:layout_below="@id/navigation_watchlist_layout">
+        <Button
+            android:id="@+id/navigation_button_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"/>
+        <Button
+            android:id="@+id/navigation_button_licences"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Licences"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_below="@+id/navigation_button_settings"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
