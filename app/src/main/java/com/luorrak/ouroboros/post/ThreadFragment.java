@@ -3,6 +3,7 @@ package com.luorrak.ouroboros.post;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import com.luorrak.ouroboros.activities.PostCommentActivity;
 import com.luorrak.ouroboros.api.JsonParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.ChanUrls;
+import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -88,6 +90,11 @@ public class ThreadFragment extends Fragment{
                     return 300;
                 }
             };
+
+            Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
+            setActionBarTitle(cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_SUB)));
+            cursor.close();
+
             threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getActivity().getFragmentManager(), boardName, getActivity());
             threadAdapter.setHasStableIds(true);
             threadAdapter.hasStableIds();
@@ -165,6 +172,10 @@ public class ThreadFragment extends Fragment{
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setActionBarTitle(String title){
+        getActivity().setTitle(title);
     }
 
     // Loading Data ////////////////////////////////////////////////////////////////////////////////

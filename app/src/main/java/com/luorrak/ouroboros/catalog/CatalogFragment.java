@@ -91,6 +91,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
 
         View view = inflater.inflate(R.layout.fragment_catalog, container, false);
+        setActionBarTitle("/" + boardName + "/");
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.catalogList);
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
@@ -161,6 +162,10 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void setActionBarTitle(String title){
+        getActivity().setTitle(title);
     }
 
     // Life Cycle //////////////////////////////////////////////////////////////////////////////////
