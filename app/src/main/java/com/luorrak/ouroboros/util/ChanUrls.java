@@ -29,6 +29,7 @@ public class ChanUrls {
     public static final String IMAGE_THUMBNAIL_DIRECTORY = "thumb";
     public static final String IMAGE_DIRECTORY = "src"; //http(s)://siteurl/board/src/tim.ext
     public static final String POST_ENDPOINT = "post.php";
+    public static final String DNSBL_ENDPOINT = "dnsbls_bypass.php"; //https://8ch.net/dnsbls_bypass.php
 
     public static String getCatalogUrl(String boardName){
         Uri.Builder builder = new Uri.Builder();
@@ -93,6 +94,28 @@ public class ChanUrls {
                 .appendPath(boardName)
                 .appendPath(THREAD_FOLDER)
                 .appendPath(no + ".html")
+                .build();
+        return builder.toString();
+    }
+
+    public static String getDnsblUrl(){
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(SCHEME) //https://8ch.net/dnsbls_bypass.php
+                .authority(DOMAIN_NAME)
+                .appendPath(DNSBL_ENDPOINT)
+                .build();
+        return builder.toString();
+    }
+
+    public static String getCaptchaEntrypoint(){
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(SCHEME) //http://8ch.net/8chan-captcha/entrypoint.php?mode=get&extra=abcdefghijklmnopqrstuvwxyz&nojs=true
+                .authority(DOMAIN_NAME)
+                .appendPath("8chan-captcha")
+                .appendPath("entrypoint.php")
+                .appendQueryParameter("mode", "get")
+                .appendQueryParameter("extra", "abcdefghijklmnopqrstuvwxyz")
+                .appendQueryParameter("nojs", "true")
                 .build();
         return builder.toString();
     }

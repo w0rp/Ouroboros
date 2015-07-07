@@ -34,4 +34,6 @@ public class Reply{
     public String fileName = "";
     public String password = "";
     public boolean spoilerImage = false;
+    public String captchaText = "";
+    public String captchaCookie = "";
 }

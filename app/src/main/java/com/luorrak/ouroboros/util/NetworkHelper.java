@@ -3,15 +3,31 @@ package com.luorrak.ouroboros.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.body.Part;
+import com.koushikdutta.async.http.body.StringPart;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
+import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.JsonParser;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Ouroboros - An 8chan browser
@@ -32,121 +48,171 @@ import com.luorrak.ouroboros.api.JsonParser;
  */
 public class NetworkHelper {
     public final String LOG_TAG = NetworkHelper.class.getSimpleName();
-
+    private boolean needDNSBLCaptcha = false;
+    private boolean genericCaptcha = false;
+    private Reply reply;
     public void postReply(final Context context, Reply reply, final SharedPreferences sharedPreferences,
                           final JsonParser jsonParser, final InfiniteDbHelper infiniteDbHelper){
+        this.reply = reply;
         String postUrl = ChanUrls.getReplyUrl();
         String referalUrl = ChanUrls.getThreadHtmlUrl(reply.board, reply.resto);
 
         Log.d(LOG_TAG, "Resto " + reply.resto);
-        if (!reply.resto.equals("0")){
-            Ion.with(context)
-                    .load(postUrl)
-                    .setLogging(LOG_TAG, Log.DEBUG)
-                    .setHeader("Referer", referalUrl)
-                    .setMultipartParameter("name", reply.name)
-                    .setMultipartParameter("email", reply.email)
-                    .setMultipartParameter("subject", reply.subject)
-                    .setMultipartParameter("post", "New Reply")
-                    .setMultipartParameter("body", reply.comment)
-                    .setMultipartParameter("board", reply.board)
-                    .setMultipartParameter("thread", reply.resto) //only if new thread else nothing
-                    .setMultipartParameter("password", reply.password)
-                    .setMultipartParameter("json_response", "1")
-                    .asJsonObject()
-                    .withResponse()
-                    .setCallback(new FutureCallback<Response<JsonObject>>() {
-                        @Override
-                        public void onCompleted(Exception e, Response<JsonObject> jsonObjectResponse) {
-                            String boardName;
-                            String userPostNo;
 
-                            if (e != null){
-                                Toast toast = Toast.makeText(context, "An error has occured " + e.toString(), Toast.LENGTH_SHORT);
-                                toast.show();
-                                return;
-                            }
-
-                            //Temp measure to check for captcha before code is built
-                            if (jsonObjectResponse.getHeaders().code() == 200 && !jsonObjectResponse.getResult().toString().contains("CAPTCHA")){
-                                Toast toast = Toast.makeText(context, "Data posted successfully", Toast.LENGTH_SHORT);
-                                toast.show();
-
-                                boardName = jsonParser.getSubmittedBoardName(jsonObjectResponse.getResult());
-                                userPostNo = jsonParser.getUserPostNo(jsonObjectResponse.getResult());
-
-                                infiniteDbHelper.insertUserPostEntry(boardName, userPostNo);
-
-                                sharedPreferences.edit().remove(SaveReplyText.nameEditTextKey)
-                                        .remove(SaveReplyText.emailEditTextKey)
-                                        .remove(SaveReplyText.subjectEditTextKey)
-                                        .remove(SaveReplyText.commentEditTextKey)
-                                        .apply();
-
-                                ((Activity) context).finish();
-                            } else {
-                                Log.d(LOG_TAG, "Failed Post " + jsonObjectResponse.getResult().toString());
-                                Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
-                                toast.show();
-                            }
-                        }
-                    });
+        ArrayList<Part> parameters = new ArrayList<Part>();
+        parameters.add(new StringPart("board", reply.board));
+        parameters.add(new StringPart("name", reply.name));
+        parameters.add(new StringPart("email", reply.email));
+        parameters.add(new StringPart("subject", reply.subject));
+        parameters.add(new StringPart("body", reply.comment));
+        parameters.add(new StringPart("password", reply.password));
+        parameters.add(new StringPart("json_response", "1"));
+        parameters.add(new StringPart("captcha_text", reply.captchaText));
+        parameters.add(new StringPart("captcha_cookie", reply.captchaCookie));
+        if (reply.resto.equals("0")){
+            parameters.add(new StringPart("page", "1"));
+            parameters.add(new StringPart("post", "New Topic"));
         } else {
-            Ion.with(context)
-                    .load(postUrl)
-                    .setLogging(LOG_TAG, Log.DEBUG)
-                    .setHeader("Referer", referalUrl)
-                    .setMultipartParameter("board", reply.board)
-                    .setMultipartParameter("page", "1")
-                    .setMultipartParameter("name", reply.name)
-                    .setMultipartParameter("email", reply.email)
-                    .setMultipartParameter("subject", reply.subject)
-                    .setMultipartParameter("post", "New Topic")
-                    .setMultipartParameter("body", reply.comment)
-                    .setMultipartParameter("password", reply.password)
-                    .setMultipartParameter("json_response", "1")
-                    .asJsonObject()
-                    .withResponse()
-                    .setCallback(new FutureCallback<Response<JsonObject>>() {
-                        @Override
-                        public void onCompleted(Exception e, Response<JsonObject> jsonObjectResponse) {
-                            String boardName;
-                            String userPostNo;
+            parameters.add(new StringPart("post", "New Reply"));
+            parameters.add(new StringPart("thread", reply.resto)); //only if new thread else nothing
+        } if (needDNSBLCaptcha){
 
-                            if (e != null){
-                                Toast toast = Toast.makeText(context, "An error has occured " + e.toString(), Toast.LENGTH_SHORT);
+        } else if (genericCaptcha){
+            genericCaptcha = false;
+        }
+        Ion.with(context)
+                .load(postUrl)
+                .setHeader("Referer", referalUrl)
+                .addMultipartParts(parameters)
+                .asJsonObject()
+                .withResponse()
+                .setCallback(new FutureCallback<Response<JsonObject>>() {
+                    @Override
+                    public void onCompleted(Exception e, Response<JsonObject> jsonObjectResponse) {
+                        String boardName;
+                        String userPostNo;
+                        if (e != null){
+                            Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
+                            toast.show();
+                            return;
+                        }
+                        if (jsonObjectResponse.getHeaders().code() == 200){
+                            captchaTest(jsonObjectResponse.getResult());
+                            if (needDNSBLCaptcha){
+                                Toast toast = Toast.makeText(context, "Please fill out DNSBL Captcha", Toast.LENGTH_SHORT);
                                 toast.show();
+
+                                EditText captchaText = (EditText) ((Activity) context).findViewById(R.id.post_comment_captcha_editText); //messy
+                                captchaText.setVisibility(View.VISIBLE);
+
+                                getDnsblCaptcha(context);
+                                return;
+                            } else if (genericCaptcha){
+                                Toast toast = Toast.makeText(context, "Please fill out Captcha", Toast.LENGTH_SHORT);
+                                toast.show();
+
+                                EditText captchaText = (EditText) ((Activity) context).findViewById(R.id.post_comment_captcha_editText); //messy
+                                captchaText.setVisibility(View.VISIBLE);
+
+                                getCaptcha(context);
                                 return;
                             }
 
-                            //Temp measure to check for captcha before code is built
-                            if (jsonObjectResponse.getHeaders().code() == 200 && !jsonObjectResponse.getResult().toString().contains("CAPTCHA")){
-                                Toast toast = Toast.makeText(context, "Data posted successfully", Toast.LENGTH_SHORT);
-                                toast.show();
+                            Toast toast = Toast.makeText(context, "Data posted successfully", Toast.LENGTH_SHORT);
+                            toast.show();
 
-                                boardName = jsonParser.getSubmittedBoardName(jsonObjectResponse.getResult());
-                                userPostNo = jsonParser.getUserPostNo(jsonObjectResponse.getResult());
+                            boardName = jsonParser.getSubmittedBoardName(jsonObjectResponse.getResult());
+                            userPostNo = jsonParser.getUserPostNo(jsonObjectResponse.getResult());
 
-                                infiniteDbHelper.insertUserPostEntry(boardName, userPostNo);
+                            infiniteDbHelper.insertUserPostEntry(boardName, userPostNo);
 
-                                sharedPreferences.edit().remove(SaveReplyText.nameEditTextKey)
-                                        .remove(SaveReplyText.emailEditTextKey)
-                                        .remove(SaveReplyText.subjectEditTextKey)
-                                        .remove(SaveReplyText.commentEditTextKey)
-                                        .apply();
+                            sharedPreferences.edit().remove(SaveReplyText.nameEditTextKey)
+                                    .remove(SaveReplyText.emailEditTextKey)
+                                    .remove(SaveReplyText.subjectEditTextKey)
+                                    .remove(SaveReplyText.commentEditTextKey)
+                                    .apply();
 
-                                ((Activity) context).finish();
-                            } else {
-                                Log.d(LOG_TAG, "Failed Post " + jsonObjectResponse.getResult().toString());
-                                Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
-                                toast.show();
-                            }
+                            ((Activity) context).finish();
+                        } else {
+                            //Something has gone wrong in a way I don't know yet
+                            Log.d(LOG_TAG, "Failed Post " + jsonObjectResponse.getResult().toString());
+                            Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
+                            toast.show();
                         }
-                    });
-        }
 
+                    }
+                });
     }
 
+    private void getCaptcha(final Context context) {
+        Ion.with(context)
+                .load(ChanUrls.getCaptchaEntrypoint())
+                .asString()
+                .setCallback(new FutureCallback<String>() {
+                    @Override
+                    public void onCompleted(Exception e, String rawHTML) {
+                        if (e != null){
+                            Toast toast = Toast.makeText(context, "Error retrieving CAPTCHA", Toast.LENGTH_SHORT);
+                            toast.show();
+                            return;
+                        }
+                        ImageView captchaImage = (ImageView) ((Activity) context).findViewById(R.id.post_comment_captcha_image); //messy
+                        captchaImage.setVisibility(View.VISIBLE);
+                        Document captchaHtml = Jsoup.parse(rawHTML);
+
+                        Pattern cookieIdPattern = Pattern.compile("CAPTCHA ID: (?:(?!<).)*");
+                        Matcher matcher = cookieIdPattern.matcher(rawHTML);
+
+                        captchaImage.setTag(matcher.find() ? matcher.group(0) : "");
+                        String strBase64Image = captchaHtml.select("body > img").attr("src");
+                        String strBase64ImageBytes = strBase64Image.substring(strBase64Image.indexOf(",") + 1);
+                        byte[] decodedbytes = Base64.decode(strBase64ImageBytes, Base64.DEFAULT);
+                        Bitmap decodeImage = BitmapFactory.decodeByteArray(decodedbytes, 0, decodedbytes.length);
+                        captchaImage.setImageBitmap(decodeImage);
+                    }
+                });
+    }
+
+    public String captchaTest(JsonObject jsonObject) {
+        JsonElement error = jsonObject.get("error");
+
+        if (error == null){
+            return null;
+        } else if (error.getAsString().contains("dnsbls_bypass.php")){
+            needDNSBLCaptcha = true;
+            return "needDNSBLCaptcha";
+        } else if (error.getAsString().contains("entrypoint.php")){
+            genericCaptcha = true;
+            return "Captcha";
+        } else {
+            return null;
+        }
+    }
+
+    public void getDnsblCaptcha(final Context context){
+        Ion.with(context)
+                .load(ChanUrls.getDnsblUrl())
+                .asString()
+                .setCallback(new FutureCallback<String>() {
+                    @Override
+                    public void onCompleted(Exception e, String rawHTML) {
+                        if (e != null){
+                            Toast toast = Toast.makeText(context, "Error retrieving DNSBL CAPTCHA", Toast.LENGTH_SHORT);
+                            toast.show();
+                            return;
+                        }
+
+                        ImageView captchaImage = (ImageView) ((Activity) context).findViewById(R.id.post_comment_captcha_image); //messy
+                        captchaImage.setVisibility(View.VISIBLE);
+                        Document dnsblHtml = Jsoup.parse(rawHTML);
+                        String strBase64Image = dnsblHtml.select("body > form > img").attr("src");
+                        String strBase64ImageBytes = strBase64Image.substring(strBase64Image.indexOf(",") + 1);
+                        byte[] decodedbytes = Base64.decode(strBase64ImageBytes, Base64.DEFAULT);
+                        Bitmap decodeImage = BitmapFactory.decodeByteArray(decodedbytes, 0, decodedbytes.length);
+                        captchaImage.setImageBitmap(decodeImage);
+                    }
+                });
+    }
     public void getImageGenric(ImageView imageView, String imageUrl) {
         Ion.with(imageView)
                 .smartSize(true)

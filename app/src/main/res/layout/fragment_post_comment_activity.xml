@@ -36,5 +36,18 @@
             android:hint="Enter your comment"
             android:id="@+id/post_comment_editText_comment"
             android:layout_below="@+id/post_comment_editText_subject"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:id="@+id/post_comment_captcha_image"
+            android:layout_below="@+id/post_comment_editText_comment"
+            android:visibility="gone"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/post_comment_captcha_editText"
+            android:hint="Please Enter Captcha Text"
+            android:layout_below="@+id/post_comment_captcha_image"
+            android:visibility="gone"/>
     </RelativeLayout>
 </LinearLayout>

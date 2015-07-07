@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.JsonParser;
@@ -111,6 +112,8 @@ public class PostCommentActivityFragment extends Fragment {
             EditText emailText = (EditText) getActivity().findViewById(R.id.post_comment_editText_email);
             EditText subjectText = (EditText) getActivity().findViewById(R.id.post_comment_editText_subject);
             EditText commentText = (EditText) getActivity().findViewById(R.id.post_comment_editText_comment);
+            EditText captchaText = (EditText) getActivity().findViewById(R.id.post_comment_captcha_editText);
+            ImageView captchaImage = (ImageView) getActivity().findViewById(R.id.post_comment_captcha_image);
 
             Random random = new Random();
             Reply reply = new Reply();
@@ -119,6 +122,11 @@ public class PostCommentActivityFragment extends Fragment {
             reply.email = emailText.getText().toString();
             reply.subject = subjectText.getText().toString();
             reply.comment = commentText.getText().toString();
+            reply.captchaText = captchaText.getText().toString();
+
+            if (captchaImage.getTag() != null){
+                reply.captchaCookie = captchaImage.getTag().toString().substring(12);
+            }
             reply.resto = resto;
             reply.board = boardName;
             ArrayList<FilePart> fileParts = new ArrayList<FilePart>(); //for later
