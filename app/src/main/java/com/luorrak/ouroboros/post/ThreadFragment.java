@@ -19,6 +19,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.activities.PostCommentActivity;
 import com.luorrak.ouroboros.api.JsonParser;
@@ -26,11 +31,6 @@ import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
 
 /**
  * Ouroboros - An 8chan browser
@@ -90,10 +90,6 @@ public class ThreadFragment extends Fragment{
                     return 300;
                 }
             };
-
-            Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
-            setActionBarTitle(cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_SUB)));
-            cursor.close();
 
             threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getActivity().getFragmentManager(), boardName, getActivity());
             threadAdapter.setHasStableIds(true);
@@ -244,6 +240,11 @@ public class ThreadFragment extends Fragment{
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
+            String threadSubject = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_SUB));
+            setActionBarTitle(threadSubject != null ? threadSubject : "/" + boardName + "/" + resto);
+            cursor.close();
+
             threadAdapter.changeCursor(infiniteDbHelper.getThreadCursor(resto));
         }
     }
