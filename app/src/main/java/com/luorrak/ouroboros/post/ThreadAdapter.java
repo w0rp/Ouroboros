@@ -107,6 +107,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         threadViewHolder.threadName.setVisibility(View.GONE);
         threadViewHolder.threadTripcode.setVisibility(View.GONE);
         threadViewHolder.threadNo.setVisibility(View.GONE);
+        threadViewHolder.id.setVisibility(View.GONE);
         threadViewHolder.threadSub.setVisibility(View.GONE);
         threadViewHolder.threadCom.setVisibility(View.GONE);
         threadViewHolder.threadEmail.setVisibility(View.GONE);
