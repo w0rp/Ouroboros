@@ -47,7 +47,7 @@ public class PostCommentActivityFragment extends Fragment {
     String boardName;
     String replyNo;
     SharedPreferences sharedPreferences;
-
+    NetworkHelper networkHelper;
     public PostCommentActivityFragment() {
     }
 
@@ -57,7 +57,8 @@ public class PostCommentActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_post_comment_activity, container, false);
         setActionBarTitle("Post a comment");
 
-         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        networkHelper = new NetworkHelper();
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         resto = getActivity().getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
         boardName = getActivity().getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
@@ -125,7 +126,7 @@ public class PostCommentActivityFragment extends Fragment {
             reply.captchaText = captchaText.getText().toString();
 
             if (captchaImage.getTag() != null){
-                reply.captchaCookie = captchaImage.getTag().toString().substring(12);
+                reply.captchaCookie = captchaImage.getTag().toString();
             }
             reply.resto = resto;
             reply.board = boardName;
@@ -134,7 +135,6 @@ public class PostCommentActivityFragment extends Fragment {
             reply.password = Long.toHexString(random.nextLong());
 
             //Add networking call to post data.
-            NetworkHelper networkHelper = new NetworkHelper();
             networkHelper.postReply(getActivity(), reply, sharedPreferences, new JsonParser(), new InfiniteDbHelper(getActivity()));
         }
         return super.onOptionsItemSelected(item);

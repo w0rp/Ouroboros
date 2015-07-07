@@ -57,8 +57,20 @@ public class NetworkHelper {
         String postUrl = ChanUrls.getReplyUrl();
         String referalUrl = ChanUrls.getThreadHtmlUrl(reply.board, reply.resto);
 
-        Log.d(LOG_TAG, "Resto " + reply.resto);
-
+        if (needDNSBLCaptcha) {
+            ArrayList<Part> dnsblparameters = new ArrayList<Part>();
+            needDNSBLCaptcha = false;
+            dnsblparameters.add(new StringPart("captcha_text", reply.captchaText));
+            dnsblparameters.add(new StringPart("captcha_cookie", reply.captchaCookie));
+            reply.captchaText = "";
+            reply.captchaCookie = "";
+            Ion.with(context)
+                    .load(ChanUrls.getDnsblUrl())
+                    .addMultipartParts(dnsblparameters)
+                    .asString()
+                    .tryGet();
+            needDNSBLCaptcha = false;
+        }
         ArrayList<Part> parameters = new ArrayList<Part>();
         parameters.add(new StringPart("board", reply.board));
         parameters.add(new StringPart("name", reply.name));
@@ -69,17 +81,18 @@ public class NetworkHelper {
         parameters.add(new StringPart("json_response", "1"));
         parameters.add(new StringPart("captcha_text", reply.captchaText));
         parameters.add(new StringPart("captcha_cookie", reply.captchaCookie));
-        if (reply.resto.equals("0")){
+        if (reply.resto.equals("0")) {
             parameters.add(new StringPart("page", "1"));
             parameters.add(new StringPart("post", "New Topic"));
         } else {
             parameters.add(new StringPart("post", "New Reply"));
             parameters.add(new StringPart("thread", reply.resto)); //only if new thread else nothing
-        } if (needDNSBLCaptcha){
+        }
 
-        } else if (genericCaptcha){
+        if (genericCaptcha) {
             genericCaptcha = false;
         }
+
         Ion.with(context)
                 .load(postUrl)
                 .setHeader("Referer", referalUrl)
@@ -163,7 +176,7 @@ public class NetworkHelper {
                         Pattern cookieIdPattern = Pattern.compile("CAPTCHA ID: (?:(?!<).)*");
                         Matcher matcher = cookieIdPattern.matcher(rawHTML);
 
-                        captchaImage.setTag(matcher.find() ? matcher.group(0) : "");
+                        captchaImage.setTag(matcher.find() ? matcher.group(0).substring(12) : "");
                         String strBase64Image = captchaHtml.select("body > img").attr("src");
                         String strBase64ImageBytes = strBase64Image.substring(strBase64Image.indexOf(",") + 1);
                         byte[] decodedbytes = Base64.decode(strBase64ImageBytes, Base64.DEFAULT);
@@ -204,7 +217,9 @@ public class NetworkHelper {
 
                         ImageView captchaImage = (ImageView) ((Activity) context).findViewById(R.id.post_comment_captcha_image); //messy
                         captchaImage.setVisibility(View.VISIBLE);
+
                         Document dnsblHtml = Jsoup.parse(rawHTML);
+                        captchaImage.setTag(dnsblHtml.select("body > form > input.captcha_cookie").attr("value"));
                         String strBase64Image = dnsblHtml.select("body > form > img").attr("src");
                         String strBase64ImageBytes = strBase64Image.substring(strBase64Image.indexOf(",") + 1);
                         byte[] decodedbytes = Base64.decode(strBase64ImageBytes, Base64.DEFAULT);
