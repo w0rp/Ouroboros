@@ -103,7 +103,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                     CatalogEntry.TABLE_NAME, //table name
                     null, //columns to search
                     CatalogEntry.COLUMN_CATALOG_COM + " LIKE ? OR " + CatalogEntry.COLUMN_CATALOG_SUB + " LIKE ?", //where clause
-                    new String[] {"%" + searchString + "%"}, //where arguements
+                    new String[] {"%" + searchString + "%", "%" + searchString + "%"}, //where arguements
                     null, //Group by
                     null, //having
                     null,
