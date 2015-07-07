@@ -32,7 +32,7 @@ import com.luorrak.ouroboros.util.DbContract.ThreadEntry;
 public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     private final String LOG_TAG = InfiniteDbHelper.class.getSimpleName();
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "cache.db";
     SQLiteDatabase db = getWritableDatabase();
 
@@ -100,7 +100,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
             cursor = db.query(
                     CatalogEntry.TABLE_NAME, //table name
                     null, //columns to search
-                    CatalogEntry.COLUMN_CATALOG_COM + " LIKE ?", //where clause
+                    CatalogEntry.COLUMN_CATALOG_COM + " LIKE ? OR " + CatalogEntry.COLUMN_CATALOG_SUB + " LIKE ?", //where clause
                     new String[] {"%" + searchString + "%"}, //where arguements
                     null, //Group by
                     null, //having
@@ -122,7 +122,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     // Thread Helper Functions /////////////////////////////////////////////////////////////////////
 
     public boolean insertThreadEntry(String board, String resto, String no, String filename, String tims, String exts,
-                                     String sub, String com, String name, String trip, String time, String last_modified,
+                                     String sub, String com, String email, String name, String trip, String time, String last_modified,
                                      String id, String embed, String imageHeight, String imageWidth){
         long newRowId;
 
@@ -135,6 +135,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         values.put(ThreadEntry.COLUMN_THREAD_EXTS, exts);
         values.put(ThreadEntry.COLUMN_THREAD_SUB, sub);
         values.put(ThreadEntry.COLUMN_THREAD_COM, com);
+        values.put(ThreadEntry.COLUMN_THREAD_EMAIL, email);
         values.put(ThreadEntry.COLUMN_THREAD_NAME, name);
         values.put(ThreadEntry.COLUMN_THREAD_TRIP, trip);
         values.put(ThreadEntry.COLUMN_THREAD_TIME, time);
@@ -275,7 +276,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        final String SQL_CREATE_BOARD_TABLE = "CREATE TABLE " + BoardEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_BOARD_TABLE = "CREATE TABLE IF NOT EXISTS " + BoardEntry.TABLE_NAME + " (" +
                 BoardEntry._ID + " INTEGER PRIMARY KEY, " +
                 BoardEntry.COLUMN_BOARDS + " TEXT UNIQUE NOT NULL);";
 
@@ -315,6 +316,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 ThreadEntry.COLUMN_THREAD_EXTS + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_SUB + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_COM + " TEXT, " +
+                ThreadEntry.COLUMN_THREAD_EMAIL + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_NAME + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_TRIP + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_TIME + " TEXT NOT NULL, " +
@@ -341,6 +343,8 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + CatalogEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ThreadEntry.TABLE_NAME);
+
+        onCreate(db);
     }
 
 }

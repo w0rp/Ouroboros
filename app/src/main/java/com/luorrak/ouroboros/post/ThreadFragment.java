@@ -217,6 +217,7 @@ public class ThreadFragment extends Fragment{
                         jsonParser.getThreadExt(post),
                         jsonParser.getThreadSub(post),
                         jsonParser.getThreadCom(post),
+                        jsonParser.getThreadEmail(post),
                         jsonParser.getThreadName(post),
                         jsonParser.getThreadTrip(post),
                         jsonParser.getThreadTime(post),

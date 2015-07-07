@@ -62,11 +62,20 @@
                     android:layout_alignRight="@+id/thread_name"
                     android:layout_alignParentTop="true"/>
                 <TextView
+                    android:id="@+id/thread_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="(SAGE)"
+                    android:textColor="@color/sage"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"/>
+                <TextView
                     android:id="@+id/thread_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
-                    android:layout_below="@+id/thread_name_holder"/>
+                    android:layout_below="@+id/thread_name_holder"
+                    android:text="12adrf"/>
             </LinearLayout>
             <TextView
                 android:id="@+id/thread_post_no"

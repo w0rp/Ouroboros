@@ -105,6 +105,7 @@ public class JsonParser {
     private final String THREAD_EXTRA_FILES = "extra_files";
     private final String THREAD_SUB = "sub";
     private final String THREAD_COM = "com";
+    private final String THREAD_EMAIL = "email";
     private final String THREAD_NAME = "name";
     private final String THREAD_TRIP = "trip";
     private final String THREAD_TIME = "time";
@@ -146,6 +147,11 @@ public class JsonParser {
     public String getThreadCom(JsonObject threadJson){
         JsonElement com = threadJson.get(THREAD_COM);
         return com != null ? com.getAsString() :null;
+    }
+
+    public String getThreadEmail(JsonObject threadJson){
+        JsonElement email = threadJson.get(THREAD_EMAIL);
+        return email != null ? email.getAsString() :null;
     }
 
     public String getThreadName(JsonObject threadJson){

@@ -85,6 +85,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         String id;
         String sub;
         String com;
+        String email;
         long threadTime;
         final String tim;
         final String ext;
@@ -108,6 +109,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         threadViewHolder.threadNo.setVisibility(View.GONE);
         threadViewHolder.threadSub.setVisibility(View.GONE);
         threadViewHolder.threadCom.setVisibility(View.GONE);
+        threadViewHolder.threadEmail.setVisibility(View.GONE);
         threadViewHolder.threadTime.setVisibility(View.GONE);
         threadViewHolder.threadReplies.setVisibility(View.GONE);
         threadViewHolder.videoPlayButton.setVisibility(View.GONE);
@@ -117,6 +119,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         no = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NO));
         sub = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_SUB));
         com = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_COM));
+        email = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EMAIL));
         threadTime = cursor.getLong(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIME));
         tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
         ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
@@ -159,6 +162,10 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             );
             threadViewHolder.threadCom.setVisibility(View.VISIBLE);
             threadViewHolder.threadCom.setText(spannableCom);
+        }
+
+        if (email != null && email.equals("sage")){
+            threadViewHolder.threadEmail.setVisibility(View.VISIBLE);
         }
 
         threadViewHolder.threadTime.setText(
@@ -368,6 +375,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         public TextView id;
         public TextView threadSub;
         public TextView threadCom;
+        public TextView threadEmail;
         public TextView threadTime;
         public Button threadReplies;
         public ImageView videoPlayButton;
@@ -382,6 +390,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             id = (TextView) itemView.findViewById(R.id.thread_id);
             threadSub = (TextView) itemView.findViewById(R.id.thread_sub_text);
             threadCom = (TextView) itemView.findViewById(R.id.thread_com_text);
+            threadEmail = (TextView) itemView.findViewById(R.id.thread_email);
             threadTime = (TextView) itemView.findViewById(R.id.thread_time);
             threadReplies = (Button) itemView.findViewById(R.id.thread_view_replies_button);
             videoPlayButton = (ImageView) itemView.findViewById(R.id.thread_video_play_button);

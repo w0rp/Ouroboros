@@ -145,6 +145,12 @@ public class DbContract {
          */
         public static final String COLUMN_THREAD_COM = "com";
         /*
+        post email
+        WARNING: Can have any type of text
+        Type: String
+        */
+        public static final String COLUMN_THREAD_EMAIL = "email";
+        /*
         Name of poster
         WARNING: can be null
         Type: String
