@@ -99,7 +99,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         catalogAdapter = new CatalogAdapter(
                 infiniteDbHelper.getCatalogCursor(),
                 getActivity().getFragmentManager(),
-                boardName);
+                boardName, infiniteDbHelper);
 
             recyclerView.setAdapter(catalogAdapter);
 

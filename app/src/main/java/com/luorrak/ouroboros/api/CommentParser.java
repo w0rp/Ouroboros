@@ -20,6 +20,7 @@ import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.post.CardDialogFragment;
 import com.luorrak.ouroboros.post.ExternalNavigationWarningFragment;
 import com.luorrak.ouroboros.post.InterThreadNavigationWarningFragment;
+import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.SpoilerSpan;
 
 import org.jsoup.Jsoup;
@@ -58,7 +59,7 @@ public class CommentParser {
         return coloredId;
     }
 
-    public Spannable parseCom(String rawCom, String currentBoard, String resto, FragmentManager fragmentManager){
+    public Spannable parseCom(String rawCom, String currentBoard, String resto, FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper){
 
         Document doc = Jsoup.parseBodyFragment(rawCom);
         List<Node> comLineArray = doc.body().childNodes();
@@ -85,7 +86,7 @@ public class CommentParser {
 
                         Element e = (Element) node;
                         if (node.nodeName().equals("a")){
-                            greenText = TextUtils.concat(greenText, parseAnchor(e, currentBoard, resto, fragmentManager));
+                            greenText = TextUtils.concat(greenText, parseAnchor(e, currentBoard, resto, fragmentManager, infiniteDbHelper));
                             continue;
                         }
                         greenText = TextUtils.concat(greenText, e.text());
@@ -95,7 +96,7 @@ public class CommentParser {
                     processedText = TextUtils.concat(processedText, greenText);
                 }else {
                     for (Node node : comLine.childNodes()){
-                        CharSequence parsedNode = parseNode(node, currentBoard, resto, fragmentManager);
+                        CharSequence parsedNode = parseNode(node, currentBoard, resto, fragmentManager, infiniteDbHelper);
                         processedText = TextUtils.concat(processedText, parsedNode);
                     }
                     processedText = TextUtils.concat(processedText, "\n");
@@ -114,7 +115,7 @@ public class CommentParser {
         return greenText;
     }
 
-    private CharSequence parseNode(Node node, String currentBoard, String resto, FragmentManager fragmentManager) {
+    private CharSequence parseNode(Node node, String currentBoard, String resto, FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper) {
         if (node instanceof TextNode){
             return Html.fromHtml(Html.fromHtml(node.toString()).toString());
             //return node.toString();
@@ -179,7 +180,7 @@ public class CommentParser {
                 Element a = (Element) node;
 
                 //Links need to be parsed
-                return parseAnchor(a, currentBoard, resto, fragmentManager);
+                return parseAnchor(a, currentBoard, resto, fragmentManager, infiniteDbHelper);
             }
             default: {
                 if (node instanceof Element){
@@ -190,7 +191,7 @@ public class CommentParser {
         return node.toString();
     }
 
-    private CharSequence parseAnchor(Element anchor, final String currentBoard, String resto, final FragmentManager fragmentManager){
+    private CharSequence parseAnchor(Element anchor, final String currentBoard, String resto, final FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper){
 
         final String linkUrl = anchor.attr("href");
         if (linkUrl.contains("http")){
@@ -209,7 +210,8 @@ public class CommentParser {
 
         } else if (linkUrl.contains(resto)){
             //same thread
-            SpannableString sameThread = new SpannableString(anchor.text());
+            String anchorText = infiniteDbHelper.isNoUserPost(currentBoard, linkUrl.split("#")[1]) ? anchor.text() + " (You)" : anchor.text();
+            SpannableString sameThread = new SpannableString(anchorText);
             ClickableSpan clickableSameThreadLink = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {

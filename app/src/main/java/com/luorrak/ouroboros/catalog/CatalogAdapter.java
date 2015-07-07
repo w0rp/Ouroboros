@@ -19,6 +19,7 @@ import com.luorrak.ouroboros.post.ThreadActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
+import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.Util;
 
@@ -51,11 +52,12 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
     CommentParser commentParser = new CommentParser();
     private FragmentManager fragmentManager;
     String boardName;
-    public CatalogAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName) {
+    InfiniteDbHelper infiniteDbHelper;
+    public CatalogAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName, InfiniteDbHelper infiniteDbHelper) {
         super(cursor);
         this.fragmentManager = fragmentManager;
         this.boardName = boardName;
-
+        this.infiniteDbHelper = infiniteDbHelper;
     }
 
     @Override
@@ -91,7 +93,8 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
                     com,
                     "v",
                     "1", //dummy data as link is unclickable
-                    fragmentManager
+                    fragmentManager,
+                    infiniteDbHelper
             ));
         } else {
             catalogViewHolder.catalogComText.setVisibility(View.GONE);

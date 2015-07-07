@@ -162,7 +162,8 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             Spannable spannableCom = commentParser.parseCom(com,
                     boardName,
                     cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_RESTO)),
-                    fragmentManager
+                    fragmentManager,
+                    infiniteDbHelper
             );
             threadViewHolder.threadCom.setVisibility(View.VISIBLE);
             threadViewHolder.threadCom.setText(spannableCom);
