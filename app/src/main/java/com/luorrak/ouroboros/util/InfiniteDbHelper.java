@@ -3,6 +3,7 @@ package com.luorrak.ouroboros.util;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -11,6 +12,7 @@ import android.util.Log;
 import com.luorrak.ouroboros.util.DbContract.BoardEntry;
 import com.luorrak.ouroboros.util.DbContract.CatalogEntry;
 import com.luorrak.ouroboros.util.DbContract.ThreadEntry;
+import com.luorrak.ouroboros.util.DbContract.UserPosts;
 
 /**
  * Ouroboros - An 8chan browser
@@ -271,6 +273,33 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         return board_key;
     }
 
+    // User Posts Functions ////////////////////////////////////////////////////////////////////////
+
+    public void insertUserPostEntry(String board, String no){
+
+        ContentValues values = new ContentValues();
+        values.put(UserPosts.COLUMN_BOARDS, board);
+        values.put(UserPosts.COLUMN_NO, no);
+
+        try {
+            db.insertOrThrow(
+                    UserPosts.TABLE_NAME,
+                    null,
+                    values
+            );
+        } catch (SQLException e){
+            Log.e(LOG_TAG, "Error Inserting row into " + UserPosts.TABLE_NAME);
+        }
+    }
+
+    public boolean isNoUserPost(String boardName, String no) {
+       return DatabaseUtils.queryNumEntries(
+                db, //Database
+                UserPosts.TABLE_NAME, //Table name
+                UserPosts.COLUMN_BOARDS + "=? AND " + UserPosts.COLUMN_NO + "=?", //where clause
+                new String[] {boardName, no}) > 0; // selection
+    }
+
     // Database Lifecycle Functions ////////////////////////////////////////////////////////////////
 
     @Override
@@ -330,6 +359,12 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 " UNIQUE (" + ThreadEntry.COLUMN_THREAD_NO + ", " + ThreadEntry.COLUMN_BOARD_NAME +
                 ") ON CONFLICT IGNORE);";
 
+        final String SQL_CREATE_USER_POSTS_TABLE = "CREATE TABLE IF NOT EXISTS " + UserPosts.TABLE_NAME + " (" +
+                UserPosts._ID + " INTEGER PRIMARY KEY, " +
+
+                UserPosts.COLUMN_BOARDS + " TEXT NOT NULL, " +
+                UserPosts.COLUMN_NO + " TEXT NOT NULL);";
+
         Log.d(LOG_TAG, "SQL STRINGS");
         Log.d(LOG_TAG, SQL_CREATE_BOARD_TABLE);
         Log.d(LOG_TAG, SQL_CREATE_CATALOG_TABLE);
@@ -337,6 +372,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         db.execSQL(SQL_CREATE_BOARD_TABLE);
         db.execSQL(SQL_CREATE_CATALOG_TABLE);
         db.execSQL(SQL_CREATE_THREAD_TABLE);
+        db.execSQL(SQL_CREATE_USER_POSTS_TABLE);
     }
 
     @Override

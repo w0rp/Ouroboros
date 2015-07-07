@@ -182,4 +182,13 @@ public class DbContract {
         public static final String COLUMN_THREAD_EMBED = "embed";
 
     }
+
+    public static final class UserPosts implements BaseColumns{
+        public static final String TABLE_NAME = "userposts";
+
+        //name of the board
+        public static final String COLUMN_BOARDS = "board_name";
+
+        public static final String COLUMN_NO = "user_post_no";
+    }
 }

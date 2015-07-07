@@ -7,9 +7,11 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
+import com.luorrak.ouroboros.api.JsonParser;
 
 /**
  * Ouroboros - An 8chan browser
@@ -31,7 +33,8 @@ import com.koushikdutta.ion.Response;
 public class NetworkHelper {
     public final String LOG_TAG = NetworkHelper.class.getSimpleName();
 
-    public void postReply(final Context context, Reply reply, final SharedPreferences sharedPreferences){
+    public void postReply(final Context context, Reply reply, final SharedPreferences sharedPreferences,
+                          final JsonParser jsonParser, final InfiniteDbHelper infiniteDbHelper){
         String postUrl = ChanUrls.getReplyUrl();
         String referalUrl = ChanUrls.getThreadHtmlUrl(reply.board, reply.resto);
 
@@ -50,23 +53,39 @@ public class NetworkHelper {
                     .setMultipartParameter("thread", reply.resto) //only if new thread else nothing
                     .setMultipartParameter("password", reply.password)
                     .setMultipartParameter("json_response", "1")
-                    .asString()
+                    .asJsonObject()
                     .withResponse()
-                    .setCallback(new FutureCallback<Response<String>>() {
+                    .setCallback(new FutureCallback<Response<JsonObject>>() {
                         @Override
-                        public void onCompleted(Exception e, Response<String> stringResponse) {
-                            if (stringResponse.getHeaders().code() == 200 && !stringResponse.getResult().contains("CAPTCHA")) {
+                        public void onCompleted(Exception e, Response<JsonObject> jsonObjectResponse) {
+                            String boardName;
+                            String userPostNo;
+
+                            if (e != null){
+                                Toast toast = Toast.makeText(context, "An error has occured " + e.toString(), Toast.LENGTH_SHORT);
+                                toast.show();
+                                return;
+                            }
+
+                            //Temp measure to check for captcha before code is built
+                            if (jsonObjectResponse.getHeaders().code() == 200 && !jsonObjectResponse.getResult().toString().contains("CAPTCHA")){
                                 Toast toast = Toast.makeText(context, "Data posted successfully", Toast.LENGTH_SHORT);
                                 toast.show();
-                                Log.d(LOG_TAG, "Headers " + stringResponse.getHeaders().toString());
-                                Log.d(LOG_TAG, "Body " + stringResponse.getResult());
+
+                                boardName = jsonParser.getSubmittedBoardName(jsonObjectResponse.getResult());
+                                userPostNo = jsonParser.getUserPostNo(jsonObjectResponse.getResult());
+
+                                infiniteDbHelper.insertUserPostEntry(boardName, userPostNo);
+
                                 sharedPreferences.edit().remove(SaveReplyText.nameEditTextKey)
                                         .remove(SaveReplyText.emailEditTextKey)
                                         .remove(SaveReplyText.subjectEditTextKey)
                                         .remove(SaveReplyText.commentEditTextKey)
                                         .apply();
+
                                 ((Activity) context).finish();
                             } else {
+                                Log.d(LOG_TAG, "Failed Post " + jsonObjectResponse.getResult().toString());
                                 Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
                                 toast.show();
                             }
@@ -86,26 +105,39 @@ public class NetworkHelper {
                     .setMultipartParameter("body", reply.comment)
                     .setMultipartParameter("password", reply.password)
                     .setMultipartParameter("json_response", "1")
-                    .asString()
+                    .asJsonObject()
                     .withResponse()
-                    .setCallback(new FutureCallback<Response<String>>() {
+                    .setCallback(new FutureCallback<Response<JsonObject>>() {
                         @Override
-                        public void onCompleted(Exception e, Response<String> stringResponse) {
-                            Log.d(LOG_TAG, "I MADE IT");
-                            if (stringResponse.getHeaders().code() == 200 && !stringResponse.getResult().contains("CAPTCHA")) {
+                        public void onCompleted(Exception e, Response<JsonObject> jsonObjectResponse) {
+                            String boardName;
+                            String userPostNo;
+
+                            if (e != null){
+                                Toast toast = Toast.makeText(context, "An error has occured " + e.toString(), Toast.LENGTH_SHORT);
+                                toast.show();
+                                return;
+                            }
+
+                            //Temp measure to check for captcha before code is built
+                            if (jsonObjectResponse.getHeaders().code() == 200 && !jsonObjectResponse.getResult().toString().contains("CAPTCHA")){
                                 Toast toast = Toast.makeText(context, "Data posted successfully", Toast.LENGTH_SHORT);
                                 toast.show();
-                                Log.d(LOG_TAG, "Headers " + stringResponse.getHeaders().toString());
-                                Log.d(LOG_TAG, "Body " + stringResponse.getResult());
-                                Log.d(LOG_TAG, "Request " + stringResponse.getRequest().toString());
+
+                                boardName = jsonParser.getSubmittedBoardName(jsonObjectResponse.getResult());
+                                userPostNo = jsonParser.getUserPostNo(jsonObjectResponse.getResult());
+
+                                infiniteDbHelper.insertUserPostEntry(boardName, userPostNo);
+
                                 sharedPreferences.edit().remove(SaveReplyText.nameEditTextKey)
                                         .remove(SaveReplyText.emailEditTextKey)
                                         .remove(SaveReplyText.subjectEditTextKey)
                                         .remove(SaveReplyText.commentEditTextKey)
                                         .apply();
-                                ((Activity) context).finish();
 
+                                ((Activity) context).finish();
                             } else {
+                                Log.d(LOG_TAG, "Failed Post " + jsonObjectResponse.getResult().toString());
                                 Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
                                 toast.show();
                             }

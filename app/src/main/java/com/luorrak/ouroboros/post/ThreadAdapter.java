@@ -134,6 +134,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         String replies = String.valueOf(repliesCursor.getCount());
         repliesCursor.close();
 
+        if (infiniteDbHelper.isNoUserPost(boardName, no)){
+            name = "(You) " + name;
+        }
         threadViewHolder.threadName.setText(name);
         threadViewHolder.threadName.setVisibility(View.VISIBLE);
 

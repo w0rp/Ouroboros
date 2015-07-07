@@ -13,7 +13,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.api.JsonParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
+import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.Reply;
 import com.luorrak.ouroboros.util.SaveReplyText;
@@ -125,7 +127,7 @@ public class PostCommentActivityFragment extends Fragment {
 
             //Add networking call to post data.
             NetworkHelper networkHelper = new NetworkHelper();
-            networkHelper.postReply(getActivity(), reply, sharedPreferences);
+            networkHelper.postReply(getActivity(), reply, sharedPreferences, new JsonParser(), new InfiniteDbHelper(getActivity()));
         }
         return super.onOptionsItemSelected(item);
     }

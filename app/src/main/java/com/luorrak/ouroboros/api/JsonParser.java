@@ -1,5 +1,7 @@
 package com.luorrak.ouroboros.api;
 
+import android.util.Log;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -201,5 +203,25 @@ public class JsonParser {
     public String getThreadImageWidth(JsonObject threadJson) {
         JsonElement imageWidth = threadJson.get(THREAD_IMAGE_WIDTH);
         return imageWidth != null ? imageWidth.getAsString() : "0";
+    }
+
+    // Reply Responses /////////////////////////////////////////////////////////////////////////////
+
+    //Successful post
+    private final String RESPONSE_REDIRECT_URL = "redirect";
+    private final String RESPONSE_NO = "id";
+
+    public String getSubmittedBoardName(JsonObject responseJson) {
+        JsonElement redirect = responseJson.get(RESPONSE_REDIRECT_URL); // \/test\/res\/1234.html#4321
+        String boardName = redirect.getAsString().split("/")[1];
+        Log.d(LOG_TAG, "Response path " + boardName);
+        return boardName;
+    }
+
+    public String getUserPostNo(JsonObject responseJson) {
+        JsonElement id = responseJson.get(RESPONSE_NO); // \/test\/res\/1234.html#4321
+        String userPostNo = id.getAsString();
+        Log.d(LOG_TAG, "Response userPostNo " + userPostNo);
+        return userPostNo;
     }
 }
