@@ -147,8 +147,8 @@ public class NetworkHelper {
 
                             ((Activity) context).finish();
                         } else {
-                            //Something has gone wrong in a way I don't know yet
-                            Log.d(LOG_TAG, "Failed Post " + jsonObjectResponse.getResult().toString());
+                            //There is a crash here sometimes.
+                            Log.e(LOG_TAG, "Failed Post " + jsonObjectResponse.getHeaders().message() + " code " + jsonObjectResponse.getHeaders().code());
                             Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
                             toast.show();
                         }
