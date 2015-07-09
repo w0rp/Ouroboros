@@ -77,10 +77,15 @@ public class ThreadFragment extends Fragment{
 
         View view = inflater.inflate(R.layout.fragment_thread, container, false);
         view.setBackgroundColor(Color.rgb(249, 249, 249));
-        if (getArguments() != null){
+        if (getArguments() != null) {
             resto = getArguments().getString("resto");
             boardName = getArguments().getString("boardName");
+        } else if (savedInstanceState != null) {
+            resto = savedInstanceState.getString("resto");
+            boardName = getArguments().getString("boardName");
+        }
 
+        if (boardName != null){
             getThread(resto, boardName);
 
             recyclerView = (RecyclerView) view.findViewById(R.id.postList);
@@ -97,6 +102,7 @@ public class ThreadFragment extends Fragment{
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(threadAdapter);
         }
+
         handler = new Handler();
         startStatusCheck();
         return view;
@@ -120,6 +126,8 @@ public class ThreadFragment extends Fragment{
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("SavedLayout", layoutManager.onSaveInstanceState());
+        outState.putString("boardName", boardName);
+        outState.putString("resto", resto);
         super.onSaveInstanceState(outState);
     }
 
