@@ -47,21 +47,33 @@ public class ThreadNetworkFragment extends Fragment {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        if(insertThreadIntoDatabaseTask != null && insertThreadIntoDatabaseTask.getStatus() == AsyncTask.Status.RUNNING){
+            insertThreadIntoDatabaseTask.cancel(true);
+        }
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.activity = activity;
         if (insertThreadIntoDatabaseTask != null){
-            insertThreadIntoDatabaseTask.onAttach(activity);;
+            insertThreadIntoDatabaseTask.onAttach(activity);
         }
 
     }
 
     @Override
     public void onDetach() {
-        super.onDetach();
         if (insertThreadIntoDatabaseTask != null){
             insertThreadIntoDatabaseTask.onDetach();
         }
+        super.onDetach();
+    }
+
+    public void cancelTask(){
+        insertThreadIntoDatabaseTask.cancel(true);
     }
 
     public class InsertThreadIntoDatabaseTask extends AsyncTask<JsonObject, Void, Void> {
@@ -83,7 +95,7 @@ public class ThreadNetworkFragment extends Fragment {
             this.activity = null;
         }
 
-        public void onAttach(Activity activity){;
+        public void onAttach(Activity activity){
             this.activity = activity;
         }
 
@@ -92,6 +104,7 @@ public class ThreadNetworkFragment extends Fragment {
             JsonParser jsonParser = new JsonParser();
             JsonArray posts = params[0].getAsJsonArray("posts");
             for (JsonElement postElement : posts) {
+                if (isCancelled()) break;
                 JsonObject post = postElement.getAsJsonObject();
 
                 infiniteDbHelper.insertThreadEntry(
