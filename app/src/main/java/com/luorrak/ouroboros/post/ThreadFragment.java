@@ -56,6 +56,7 @@ public class ThreadFragment extends Fragment{
     private RecyclerView recyclerView;
     private ThreadAdapter threadAdapter;
     private LinearLayoutManager layoutManager;
+    private ThreadNetworkFragment networkFragment;
     String resto;
     String boardName;
     private Handler handler;
@@ -84,7 +85,10 @@ public class ThreadFragment extends Fragment{
             resto = savedInstanceState.getString("resto");
             boardName = getArguments().getString("boardName");
         }
-
+        if (networkFragment == null) {
+            networkFragment = new ThreadNetworkFragment();
+            getFragmentManager().beginTransaction().add(networkFragment, "Thread_Task").commit();
+        }
         if (boardName != null){
             getThread(resto, boardName);
 
@@ -206,55 +210,13 @@ public class ThreadFragment extends Fragment{
                     public void onCompleted(Exception e, JsonObject jsonObject) {
 
                         if (e == null) {
-                            new InsertThreadIntoDatabase().execute(jsonObject);
+                            networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadAdapter);
+                            //new InsertThreadIntoDatabase().execute(jsonObject);
                         } else {
                             Log.d(LOG_TAG, "Error inserting thred into db");
                         }
                     }
                 });
-    }
-
-    public class InsertThreadIntoDatabase extends AsyncTask<JsonObject, Void, Void>{
-
-        @Override
-        protected Void doInBackground(JsonObject... params) {
-            JsonParser jsonParser = new JsonParser();
-            JsonArray posts = params[0].getAsJsonArray("posts");
-            for (JsonElement postElement : posts) {
-                JsonObject post = postElement.getAsJsonObject();
-
-                infiniteDbHelper.insertThreadEntry(
-                        boardName,
-                        jsonParser.getThreadResto(post),
-                        jsonParser.getThreadNo(post),
-                        jsonParser.getThreadFilename(post),
-                        jsonParser.getThreadTim(post),
-                        jsonParser.getThreadExt(post),
-                        jsonParser.getThreadSub(post),
-                        jsonParser.getThreadCom(post),
-                        jsonParser.getThreadEmail(post),
-                        jsonParser.getThreadName(post),
-                        jsonParser.getThreadTrip(post),
-                        jsonParser.getThreadTime(post),
-                        jsonParser.getThreadLastModified(post),
-                        jsonParser.getThreadId(post),
-                        jsonParser.getThreadEmbed(post),
-                        jsonParser.getThreadImageHeight(post),
-                        jsonParser.getThreadImageWidth(post)
-                );
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
-            String threadSubject = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_SUB));
-            setActionBarTitle(threadSubject != null ? threadSubject : "/" + boardName + "/" + resto);
-            cursor.close();
-
-            threadAdapter.changeCursor(infiniteDbHelper.getThreadCursor(resto));
-        }
     }
 
     Runnable statusCheck = new Runnable() {
