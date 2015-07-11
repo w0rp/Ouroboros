@@ -30,13 +30,16 @@ import com.luorrak.ouroboros.R;
 
 public class CatalogActivity extends AppCompatActivity {
     private final String LOG_TAG = CatalogActivity.class.getSimpleName();
+    private String board;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
 
-        String board = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
+        if (savedInstanceState == null){
+            board = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
@@ -51,11 +54,6 @@ public class CatalogActivity extends AppCompatActivity {
             CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
-        } else {
-            CatalogFragment catalogFragment = new CatalogFragment();
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.add(R.id.activity_catalog_fragment_container, catalogFragment);
-            transaction.commit();
         }
     }
 

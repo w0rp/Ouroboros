@@ -73,7 +73,6 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
         String replyCount = String.valueOf(cursor.getInt(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_REPLIES)));
         String imageReplyCount = String.valueOf(cursor.getInt(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_IMAGES)));
         String embed = cursor.getString(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_EMBED));
-        Log.d(LOG_TAG, "Embed " + embed);
 
         //Catalog has no buisness parsing what wont be seen. Keeps heavily formatted threads from clogging up UI thread to much.
         if (com.length() > 500){
@@ -110,7 +109,6 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
         } else if (embed != null){
             youtubeData = Util.parseYoutube(embed);
             imageUrl = "https://" + youtubeData[1];
-            Log.d(LOG_TAG, "Youtube URL " + imageUrl);
             networkHelper.getImageNoCrossfade(catalogViewHolder.catalog_picture, imageUrl);
         } else {
             catalogViewHolder.catalog_picture.setImageDrawable(null);

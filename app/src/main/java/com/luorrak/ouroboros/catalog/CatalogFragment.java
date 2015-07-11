@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -56,10 +57,12 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private final String LOG_TAG = CatalogFragment.class.getSimpleName();
     private CatalogAdapter catalogAdapter;
-    SwipeRefreshLayout swipeRefreshLayout;
+    private GridLayoutManager layoutManager;
+    private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private String boardName = null;
     private InfiniteDbHelper infiniteDbHelper;
-
+    private CatalogNetworkFragment networkFragment;
 
     public CatalogFragment() {
     }
@@ -76,42 +79,45 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         infiniteDbHelper = new InfiniteDbHelper(getActivity());
-        infiniteDbHelper.deleteCatalogCache();
-        Bundle arguments = getArguments();
-        if (savedInstanceState != null){
-            boardName = savedInstanceState.getString("boardName");
-        }
-
-        if (arguments != null) {
-            setHasOptionsMenu(true);
-            boardName = getArguments().getString("boardName");
-        }
-        if (boardName == null){
-            return inflater.inflate(R.layout.blank_catalog, container, false);
-        }
-
         View view = inflater.inflate(R.layout.fragment_catalog, container, false);
-        setActionBarTitle("/" + boardName + "/");
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.catalogList);
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
+        recyclerView = (RecyclerView) view.findViewById(R.id.catalogList);
+        layoutManager = new GridLayoutManager(getActivity(), 2);
         recyclerView.setLayoutManager(layoutManager);
+
+        //if not first load
+        if (savedInstanceState != null){
+            Parcelable savedLayoutState = savedInstanceState.getParcelable("SavedLayout");
+            recyclerView.getLayoutManager().onRestoreInstanceState(savedLayoutState);
+            boardName = savedInstanceState.getString("boardName");
+            setHasOptionsMenu(true);
+        } else {
+            infiniteDbHelper.deleteCatalogCache();
+            if (getArguments() != null){
+                boardName = getArguments().getString("boardName");
+                setHasOptionsMenu(true);
+            }
+            getCatalogJson(getActivity(), boardName);
+        }
+
+        if (boardName != null) {
+            setActionBarTitle("/" + boardName + "/");
+        }
+
+        if (networkFragment == null) {
+            networkFragment = new CatalogNetworkFragment();
+            getFragmentManager().beginTransaction().add(networkFragment, "Catalog_Task").commit();
+        }
 
         catalogAdapter = new CatalogAdapter(
                 infiniteDbHelper.getCatalogCursor(),
                 getActivity().getFragmentManager(),
                 boardName, infiniteDbHelper);
-
-            recyclerView.setAdapter(catalogAdapter);
-
-
-        getCatalogJson(getActivity(), boardName);
-
+        recyclerView.setAdapter(catalogAdapter);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.catalog_swipe_container);
         swipeRefreshLayout.setOnRefreshListener(this);
 
         return view;
-
     }
 
     // Options Menu ////////////////////////////////////////////////////////////////////////////////
@@ -173,6 +179,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable("SavedLayout", layoutManager.onSaveInstanceState());
         outState.putString("boardName", boardName);
         super.onSaveInstanceState(outState);
     }
@@ -188,9 +195,9 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 .asJsonArray()
                 .setCallback(new FutureCallback<JsonArray>() {
                     @Override
-                    public void onCompleted(Exception e, JsonArray jsonElements) {
+                    public void onCompleted(Exception e, JsonArray jsonArray) {
                         if (e == null) {
-                            new InsertCatalogIntoDatabase().execute(jsonElements);
+                            networkFragment.beginTask(jsonArray, infiniteDbHelper, boardName, catalogAdapter);
                         } else {
                             Log.d(LOG_TAG, "Error Retrieving Catalog From Server " + e);
                         }
@@ -200,48 +207,11 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 });
     }
 
-    public class InsertCatalogIntoDatabase extends AsyncTask<JsonArray, Void, Void> {
-
-        @Override
-        protected Void doInBackground(JsonArray... params) {
-            JsonParser jsonParser = new JsonParser();
-            infiniteDbHelper.deleteCatalogCache();
-
-            for (JsonElement page : params[0]) {
-                JsonArray threads = page.getAsJsonObject().getAsJsonArray("threads");
-                //loop through each post on the catalog and submit the results to the database for caching.
-                for (JsonElement threadElement : threads) {
-                    JsonObject thread = threadElement.getAsJsonObject();
-
-                    infiniteDbHelper.insertCatalogEntry(
-                            boardName,
-                            jsonParser.getCatalogNo(thread),
-                            jsonParser.getCatalogFilename(thread),
-                            jsonParser.getCatalogTim(thread),
-                            jsonParser.getCatalogExt(thread),
-                            jsonParser.getCatalogSub(thread),
-                            jsonParser.getCatalogCom(thread),
-                            jsonParser.getCatalogReplies(thread),
-                            jsonParser.getCatalogImageReplyCount(thread),
-                            jsonParser.getCatalogSticky(thread),
-                            jsonParser.getCatalogLocked(thread),
-                            jsonParser.getCatalogEmbed(thread)
-                    );
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());
-            swipeRefreshLayout.setRefreshing(false);
-        }
-    }
-
     @Override
     public void onRefresh() {
-        getCatalogJson(getActivity(), boardName);
+        if (boardName != null){
+            getCatalogJson(getActivity(), boardName);
+        }
     }
 
     public void show(FragmentManager fragmentManager, String s) {
