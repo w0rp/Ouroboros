@@ -184,6 +184,13 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void onDestroyView() {
+        swipeRefreshLayout.setRefreshing(false);
+        recyclerView.setVisibility(View.GONE); //HACKS TO KEEP VIEW FROM APPEARING
+        super.onDestroyView();
+    }
+
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
     public void getCatalogJson(final Context context, final String boardName) {
 
