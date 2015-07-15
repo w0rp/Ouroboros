@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center"
     card_view:cardBackgroundColor="@color/cardview_light_background"
     card_view:cardElevation="1dp"
     card_view:cardUseCompatPadding="true"
     card_view:cardCornerRadius="4dp"
-    card_view:cardPreventCornerOverlap="false"
-    >
+    card_view:cardPreventCornerOverlap="false">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <FrameLayout
             android:id="@+id/thread_image_holder"
             android:layout_width="match_parent"
@@ -24,8 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                />
+                android:adjustViewBounds="true" />
 
             <ImageView
                 android:id="@+id/thread_video_play_button"
@@ -33,8 +33,8 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center_horizontal|center_vertical"
                 android:src="@drawable/ic_play_circle_outline_black_48dp" />
-
         </FrameLayout>
+
         <RelativeLayout
             android:id="@+id/thread_header"
             android:layout_width="match_parent"
@@ -44,23 +44,23 @@
             android:paddingRight="8dp"
             android:paddingLeft="8dp"
             android:textSize="14sp">
+
             <LinearLayout
                 android:id="@+id/thread_name_holder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
+
                 <TextView
                     android:id="@+id/thread_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Anonymous"
-                    android:layout_alignParentLeft="true"/>
+                    android:text="Anonymous" />
+
                 <TextView
                     android:id="@+id/thread_tripcode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="!tripcode"
-                    android:layout_alignRight="@+id/thread_name"
-                    android:layout_alignParentTop="true"/>
+                    android:text="!tripcode" />
                 <TextView
                     android:id="@+id/thread_email"
                     android:layout_width="wrap_content"
@@ -74,15 +74,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
-                    android:layout_below="@+id/thread_name_holder"
+                    android:layout_marginStart="8dp"
                     android:text="12adrf"/>
             </LinearLayout>
             <TextView
                 android:id="@+id/thread_post_no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="123456789"
-                android:layout_alignParentRight="true"/>
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:text="123456789" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -94,28 +95,27 @@
                 android:id="@+id/thread_sub_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="This is my thread title"
                 android:paddingTop="8dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
+                android:text="This is my thread title"
                 android:textSize="24sp"/>
             <TextView
                 android:id="@+id/thread_com_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="This is my comment"
                 android:layout_below="@+id/thread_sub_text"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
+                android:text="This is my comment"
                 android:textSize="14sp"/>
             <TextView
                 android:id="@+id/thread_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="This message was posted 1 hour ago"
                 android:layout_below="@id/thread_com_text"
                 android:padding="8dp"
-                />
+                android:text="This message was posted 1 hour ago" />
         </RelativeLayout>
         <RelativeLayout
             android:id="@+id/thread_footer"
@@ -123,21 +123,21 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/thread_body">
             <View
+                android:id="@+id/thread_divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/md_purple_100"
-                android:id="@+id/thread_divider"
                 android:paddingRight="8dp"
-                android:paddingLeft="8dp">
-            </View>
+                android:paddingLeft="8dp"
+                android:background="@color/md_purple_100" />
             <Button
                 android:id="@+id/thread_submit_reply_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_below="@id/thread_divider"
-                android:text="@string/reply"
                 android:padding="1dp"
+                android:text="@string/reply"
                 android:textSize="16sp"
                 android:textColor="@color/md_purple_500"
                 android:clickable="true"
@@ -147,9 +147,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_below="@id/thread_divider"
-                android:text="1000 Replies"
                 android:paddingRight="8dp"
+                android:paddingEnd="8dp"
+                android:text="1000 Replies"
                 android:textSize="16sp"
                 android:background="?android:attr/selectableItemBackground"/>
         </RelativeLayout>
