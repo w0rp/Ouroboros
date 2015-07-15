@@ -1,10 +1,19 @@
 <resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/md_green_500</item>
+        <item name="colorPrimaryDark">@color/md_green_700</item>
+        <item name="colorAccent">@color/md_purple_500</item>
+        <item name="textColorPrimary">@color/md_white_1000</item>
+        <item name="android:windowBackground">@color/md_white_1000</item>
+    </style>
 
-<!-- Base application theme. -->
-<style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-    <item name="colorPrimary">@color/md_green_500</item>
-    <item name="colorPrimaryDark">@color/md_green_700</item>
-    <item name="colorAccent">@color/md_purple_500</item>
-</style>
-
+    <!-- Dark application theme. -->
+    <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/md_green_500</item>
+        <item name="colorPrimaryDark">@color/md_green_700</item>
+        <item name="colorAccent">@color/md_purple_500</item>
+        <item name="textColorPrimary">@color/md_white_1000</item>
+        <item name="android:windowBackground">@color/md_white_1000</item>
+    </style>
 </resources>
