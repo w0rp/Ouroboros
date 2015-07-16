@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:fitsSystemWindows="true"
     android:minHeight="?attr/actionBarSize"
-    android:theme="@style/AppTheme"
-    android:background="@color/md_green_500">
+    android:theme="?attr/toolbar_theme"
+    android:background="@color/md_green_500"
+    android:elevation="4dp" >
 </android.support.v7.widget.Toolbar>
