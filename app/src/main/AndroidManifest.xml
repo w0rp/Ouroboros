@@ -18,12 +18,17 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data android:name="android.app.default_searchable"
-                android:value=".activities.SearchableActivity" />
         </activity>
         <activity
             android:name=".miscellaneous.OpenSourceLicenseActivity"
             android:label="OpenSourceLicenseActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".catalog.CatalogActivity" />
+        </activity>
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:label="SettingsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".catalog.CatalogActivity" />
@@ -50,5 +55,4 @@
                 android:value=".post.ThreadActivity" />
         </activity>
     </application>
-
 </manifest>

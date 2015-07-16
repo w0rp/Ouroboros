@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.settings.SettingsActivity;
 import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
@@ -83,8 +84,11 @@ public class NavigationDrawerFragment extends Fragment implements View.OnClickLi
         View view = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         Button addBoard = (Button) view.findViewById(R.id.navigation_button_add_board);
         Button license = (Button) view.findViewById(R.id.navigation_button_licences);
+        Button settings= (Button) view.findViewById(R.id.navigation_button_settings);
         addBoard.setOnClickListener(this);
         license.setOnClickListener(this);
+        settings.setOnClickListener(this);
+
 
 
         InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());
@@ -202,6 +206,12 @@ public class NavigationDrawerFragment extends Fragment implements View.OnClickLi
             case R.id.navigation_button_licences:{
                 Intent intent = new Intent(getActivity(), OpenSourceLicenseActivity.class);
                 startActivity(intent);
+                break;
+            }
+            case R.id.navigation_button_settings:{
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
+                break;
             }
         }
     }

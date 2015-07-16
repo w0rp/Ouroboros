@@ -1,9 +1,6 @@
-package com.luorrak.ouroboros.Settings;
+package com.luorrak.ouroboros.settings;
 
 import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceActivity;
@@ -29,14 +26,15 @@ import com.luorrak.ouroboros.R;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends PreferenceActivity {
 
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
+
     }
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -44,7 +42,6 @@ public class SettingsActivity extends Activity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-
             addPreferencesFromResource(R.xml.preferences);
         }
     }
