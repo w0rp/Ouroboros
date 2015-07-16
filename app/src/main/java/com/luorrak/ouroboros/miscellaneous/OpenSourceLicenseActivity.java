@@ -5,6 +5,8 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.webkit.WebView;
 
+import com.luorrak.ouroboros.util.Util;
+
 /**
  * Ouroboros - An 8chan browser
  * Copyright (C) 2015  Luorrak
@@ -25,6 +27,7 @@ import android.webkit.WebView;
 public class OpenSourceLicenseActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
 
         WebView webView = new WebView(this);

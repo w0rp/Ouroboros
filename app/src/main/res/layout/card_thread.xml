@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    card_view:cardBackgroundColor="@color/cardview_light_background"
+    card_view:cardBackgroundColor="?attr/card_background"
     card_view:cardElevation="2dp"
     card_view:cardUseCompatPadding="true"
     card_view:cardCornerRadius="4dp"
@@ -43,7 +43,7 @@
             android:paddingTop="8dp"
             android:paddingRight="8dp"
             android:paddingLeft="8dp"
-            android:textSize="14sp">
+            android:textSize="14sp" >
 
             <LinearLayout
                 android:id="@+id/thread_name_holder"
@@ -128,7 +128,7 @@
                 android:layout_height="1dp"
                 android:paddingRight="8dp"
                 android:paddingLeft="8dp"
-                android:background="@color/md_purple_100" />
+                android:background="?attr/divider_color" />
             <Button
                 android:id="@+id/thread_submit_reply_button"
                 android:layout_width="wrap_content"
@@ -139,7 +139,7 @@
                 android:padding="1dp"
                 android:text="@string/reply"
                 android:textSize="16sp"
-                android:textColor="@color/md_purple_500"
+                android:textColor="?attr/reply_button"
                 android:clickable="true"
                 android:background="?android:attr/selectableItemBackground"/>
             <Button

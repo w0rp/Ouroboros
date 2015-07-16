@@ -1,5 +1,12 @@
 package com.luorrak.ouroboros.util;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import com.luorrak.ouroboros.R;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -21,6 +28,10 @@ import org.jsoup.nodes.Document;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Util {
+    private static final int THEME_DEFAULT = 0;
+    private static final int THEME_DARK = 1;
+
+
     public static String[] parseYoutube(String embed) {
         String[] youtubeData = new String[2];
 
@@ -28,5 +39,26 @@ public class Util {
         youtubeData[0] = doc.select("a.file").first().attr("href");
         youtubeData[1] = doc.select("img.post-image").first().attr("src").substring(2);
         return youtubeData;
+    }
+
+    /*Set the theme */
+    public static void onActivityCreateSetTheme(Context context, int themeValue)
+    {
+        switch (themeValue)
+        {
+            default:
+            case THEME_DEFAULT:
+                context.setTheme(R.style.AppTheme);
+                break;
+            case THEME_DARK:
+                context.setTheme(R.style.AppThemeDark);
+                break;
+        }
+    }
+
+    public static int getTheme(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String themeValue = sharedPreferences.getString("theme_preference", "0");
+        return Integer.valueOf(themeValue);
     }
 }

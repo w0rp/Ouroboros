@@ -7,6 +7,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.util.Util;
 
 /**
  * Ouroboros - An 8chan browser
@@ -30,6 +31,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())

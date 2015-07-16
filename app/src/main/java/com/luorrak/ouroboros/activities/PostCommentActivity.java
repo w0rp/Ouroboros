@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.util.Util;
+
 /**
  * Ouroboros - An 8chan browser
  * Copyright (C) 2015  Luorrak
@@ -28,6 +30,7 @@ public class PostCommentActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_comment_activity);
 

@@ -2,4 +2,9 @@
 <resources>
     <attr name="toolbar_theme" format="reference"/>
     <attr name="popup_theme" format="reference"/>
+    <attr name="window_background" format="color"/>
+    <attr name="drawer_background" format="color"/>
+    <attr name="card_background" format="color"/>
+    <attr name="divider_color" format="color" />
+    <attr name="reply_button" format="color" />
 </resources>

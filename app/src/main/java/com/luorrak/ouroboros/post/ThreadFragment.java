@@ -77,7 +77,6 @@ public class ThreadFragment extends Fragment{
         setHasOptionsMenu(true);
 
         View view = inflater.inflate(R.layout.fragment_thread, container, false);
-        view.setBackgroundColor(Color.rgb(249, 249, 249));
         if (getArguments() != null) {
             resto = getArguments().getString("resto");
             boardName = getArguments().getString("boardName");

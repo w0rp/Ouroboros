@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.util.Util;
 
 /**
  * Ouroboros - An 8chan browser
@@ -35,6 +36,7 @@ public class CatalogActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_catalog);

@@ -14,6 +14,7 @@ import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogActivity;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.Util;
 
 /**
  * Ouroboros - An 8chan browser
@@ -38,6 +39,7 @@ public class ThreadActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());

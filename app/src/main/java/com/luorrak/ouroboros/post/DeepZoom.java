@@ -9,6 +9,7 @@ import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.luorrak.ouroboros.util.Util;
 
 import uk.co.senab.photoview.PhotoView;
 
@@ -34,6 +35,7 @@ import uk.co.senab.photoview.PhotoView;
 public class DeepZoom extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
         PhotoView photoView = new PhotoView(this);
         photoView.setMaximumScale(16);
