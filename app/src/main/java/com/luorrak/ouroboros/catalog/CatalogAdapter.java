@@ -74,11 +74,6 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
         String imageReplyCount = String.valueOf(cursor.getInt(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_IMAGES)));
         String embed = cursor.getString(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_EMBED));
 
-        //Catalog has no buisness parsing what wont be seen. Keeps heavily formatted threads from clogging up UI thread to much.
-        if (com.length() > 500){
-            com = com.substring(0, 500);
-        }
-
         if (sub != null){
             catalogViewHolder.catalogSubText.setVisibility(View.VISIBLE);
             catalogViewHolder.catalogSubText.setText(sub);
