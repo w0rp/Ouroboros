@@ -191,7 +191,7 @@ public class CommentParser {
         return node.toString();
     }
 
-    private CharSequence parseAnchor(Element anchor, final String currentBoard, String resto, final FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper){
+    private CharSequence parseAnchor(final Element anchor, final String currentBoard, String resto, final FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper){
 
         final String linkUrl = anchor.attr("href");
         if (linkUrl.contains("http")){
@@ -208,6 +208,19 @@ public class CommentParser {
             normalLink.setSpan(clickableNormalLink, 0, normalLink.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             return normalLink;
 
+        } else if (linkUrl.contains("_g")){
+            //normal link
+            SpannableString normalLink = new SpannableString(anchor.text());
+            ClickableSpan clickableNormalLink = new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    ExternalNavigationWarningFragment dialog = ExternalNavigationWarningFragment.newInstance(anchor.text());
+                    dialog.show(fragmentManager, "externallink");
+                }
+            };
+            normalLink.setSpan(new ForegroundColorSpan(Color.parseColor("#0645AD")), 0, normalLink.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            normalLink.setSpan(clickableNormalLink, 0, normalLink.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return normalLink;
         } else if (linkUrl.contains(resto)){
             //same thread
             String anchorText = infiniteDbHelper.isNoUserPost(currentBoard, linkUrl.split("#")[1]) ? anchor.text() + " (You)" : anchor.text();
