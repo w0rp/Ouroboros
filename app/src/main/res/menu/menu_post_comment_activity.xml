@@ -7,6 +7,6 @@
         android:id="@+id/action_submit"
         android:orderInCategory="200"
         android:title="Submit"
-        android:icon="@drawable/ic_send_black_24dp"
+        android:icon="@drawable/ic_send_white_24dp"
         app:showAsAction="always"/>
 </menu>
