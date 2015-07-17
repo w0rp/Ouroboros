@@ -28,9 +28,6 @@
         <activity
             android:name=".settings.SettingsActivity"
             android:label="SettingsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".catalog.CatalogActivity" />
         </activity>
         <activity
             android:name=".post.ThreadActivity"

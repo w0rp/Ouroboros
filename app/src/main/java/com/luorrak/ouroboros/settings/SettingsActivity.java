@@ -1,12 +1,14 @@
 package com.luorrak.ouroboros.settings;
 
-import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.catalog.CatalogActivity;
 import com.luorrak.ouroboros.util.Util;
 
 /**
@@ -45,6 +47,23 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
+
+            SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener = new
+                    SharedPreferences.OnSharedPreferenceChangeListener() {
+                        @Override
+                        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                            switch (key){
+                                case "theme_preference": {
+                                    Intent intent = new Intent(getActivity(), CatalogActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                }
+                            }
+                        }
+                    };
+
+            PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .registerOnSharedPreferenceChangeListener(preferenceChangeListener);
         }
     }
 }

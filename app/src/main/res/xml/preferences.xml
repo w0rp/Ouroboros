@@ -4,8 +4,9 @@
         <ListPreference
             android:key="theme_preference"
             android:title="Theme"
+            android:summary="Change Theme: Requires Restart"
             android:entries="@array/themeNames"
             android:entryValues="@array/themeValues"
-            android:dialogTitle="Theme1"
+            android:dialogTitle="Set Theme"
             android:defaultValue="0"/>
 </PreferenceScreen>
