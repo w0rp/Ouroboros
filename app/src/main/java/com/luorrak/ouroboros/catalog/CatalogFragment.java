@@ -103,7 +103,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (boardName != null) {
             setActionBarTitle("/" + boardName + "/");
         }
-
+        networkFragment = (CatalogNetworkFragment) getFragmentManager().findFragmentByTag("Catalog_Task");
         if (networkFragment == null) {
             networkFragment = new CatalogNetworkFragment();
             getFragmentManager().beginTransaction().add(networkFragment, "Catalog_Task").commit();
@@ -189,6 +189,14 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         swipeRefreshLayout.setRefreshing(false);
         recyclerView.setVisibility(View.GONE); //HACKS TO KEEP VIEW FROM APPEARING
         super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (networkFragment != null && networkFragment.getStatus() == AsyncTask.Status.FINISHED){
+            networkFragment.cancelTask();
+        }
+        super.onDestroy();
     }
 
     // Loading Data ////////////////////////////////////////////////////////////////////////////////

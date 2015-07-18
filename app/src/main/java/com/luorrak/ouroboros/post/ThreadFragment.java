@@ -84,6 +84,7 @@ public class ThreadFragment extends Fragment{
             resto = savedInstanceState.getString("resto");
             boardName = getArguments().getString("boardName");
         }
+        networkFragment = (ThreadNetworkFragment) getFragmentManager().findFragmentByTag("Thread_Task");
         if (networkFragment == null) {
             networkFragment = new ThreadNetworkFragment();
             getFragmentManager().beginTransaction().add(networkFragment, "Thread_Task").commit();

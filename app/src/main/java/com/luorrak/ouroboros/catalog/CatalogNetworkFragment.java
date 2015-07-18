@@ -79,6 +79,8 @@ public class CatalogNetworkFragment extends Fragment {
         insertCatalogIntoDatabaseTask.cancel(true);
     }
 
+    public AsyncTask.Status getStatus(){ return insertCatalogIntoDatabaseTask.getStatus(); }
+
     public class InsertCatalogIntoDatabase extends AsyncTask<JsonArray, Void, Void> {
         Activity activity;
         InfiniteDbHelper infiniteDbHelper;
@@ -102,6 +104,7 @@ public class CatalogNetworkFragment extends Fragment {
                 JsonArray threads = page.getAsJsonObject().getAsJsonArray("threads");
                 //loop through each post on the catalog and submit the results to the database for caching.
                 for (JsonElement threadElement : threads) {
+                    if (isCancelled()) break;
                     JsonObject thread = threadElement.getAsJsonObject();
 
                     infiniteDbHelper.insertCatalogEntry(
@@ -127,7 +130,9 @@ public class CatalogNetworkFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());
             swipeRefreshLayout = (SwipeRefreshLayout) activity.findViewById(R.id.catalog_swipe_container);
-            swipeRefreshLayout.setRefreshing(false);
+            if(swipeRefreshLayout != null) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
         }
 
         public void onDetach(){
