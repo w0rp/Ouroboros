@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +15,7 @@ import android.widget.Toast;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseActivity;
-import com.luorrak.ouroboros.settings.SettingsActivity;
+import com.luorrak.ouroboros.settings.SettingsFragment;
 import com.luorrak.ouroboros.util.Util;
 
 /**
@@ -102,8 +101,9 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
                 break;
             }
             case R.id.drawer_item_settings: {
-                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-                startActivity(intent);
+                SettingsFragment settingsFragment = new SettingsFragment();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, settingsFragment).commit();
                 break;
             }
             case R.id.drawer_item_licences: {

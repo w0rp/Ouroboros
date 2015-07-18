@@ -26,10 +26,6 @@
                 android:value=".catalog.CatalogActivity" />
         </activity>
         <activity
-            android:name=".settings.SettingsActivity"
-            android:label="SettingsActivity" >
-        </activity>
-        <activity
             android:name=".post.ThreadActivity"
             android:label="Thread">
             <meta-data
