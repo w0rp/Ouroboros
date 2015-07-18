@@ -109,7 +109,7 @@ public class NetworkHelper {
                             toast.show();
                             return;
                         }
-                        if (jsonObjectResponse.getHeaders().code() == 200){
+                        if (jsonObjectResponse.getHeaders().code() == 200 ){
                             captchaTest(jsonObjectResponse.getResult());
                             if (needDNSBLCaptcha){
                                 Toast toast = Toast.makeText(context, "Please fill out DNSBL Captcha", Toast.LENGTH_SHORT);
@@ -128,6 +128,11 @@ public class NetworkHelper {
                                 captchaText.setVisibility(View.VISIBLE);
 
                                 getCaptcha(context);
+                                return;
+                            } else if (jsonObjectResponse.getResult().has("error")){
+                                //unknown error
+                                Toast toast = Toast.makeText(context, jsonObjectResponse.getResult().get("error").getAsString(), Toast.LENGTH_SHORT);
+                                toast.show();
                                 return;
                             }
 
