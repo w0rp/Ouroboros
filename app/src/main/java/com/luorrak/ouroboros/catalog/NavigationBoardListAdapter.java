@@ -38,31 +38,25 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
  */
 public class NavigationBoardListAdapter extends CursorRecyclerAdapter {
     InfiniteDbHelper infiniteDbHelper;
-    private final String LOG_TAG = NavigationBoardListAdapter.class.getSimpleName();
-    private LayoutInflater inflater;
     private FragmentManager fragmentManager;
-    DrawerLayout mDrawerLayout;
-    View containerView;
     Context context;
-    public NavigationBoardListAdapter(Cursor cursor, FragmentManager fragmentManager, DrawerLayout mDrawerLayout, View containerView, Context context) {
+    public NavigationBoardListAdapter(Cursor cursor, FragmentManager fragmentManager, Context context) {
         super(cursor);
         this.fragmentManager = fragmentManager;
-        this.mDrawerLayout = mDrawerLayout;
-        this.containerView = containerView;
         this.context = context;
         infiniteDbHelper = new InfiniteDbHelper(context);
     }
 
     @Override
     public void onBindViewHolderCursor(RecyclerView.ViewHolder holder, Cursor cursor) {
-        NavigationBoardListViewHolder navigationBoardListViewHolder = (NavigationBoardListViewHolder)holder;
+        NavigationBoardListViewHolder navigationBoardListViewHolder = (NavigationBoardListViewHolder) holder;
         String boardName = cursor.getString(cursor.getColumnIndex(DbContract.BoardEntry.COLUMN_BOARDS));
         navigationBoardListViewHolder.boardNameBtn.setText("/" + boardName + "/");
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.navigation_board_list, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.board_list_item, parent, false);
         return new NavigationBoardListViewHolder(view);
     }
 
@@ -72,8 +66,8 @@ public class NavigationBoardListAdapter extends CursorRecyclerAdapter {
 
         public NavigationBoardListViewHolder(View itemView) {
             super(itemView);
-            boardNameBtn = (Button) itemView.findViewById(R.id.navigation_boardlist_boardname);
-            deleteItemBtn = (Button) itemView.findViewById(R.id.navigation_boardlist_delete_button);
+            boardNameBtn = (Button) itemView.findViewById(R.id.boardlist_boardname_button);
+            deleteItemBtn = (Button) itemView.findViewById(R.id.boardlist_delete_button);
             boardNameBtn.setAllCaps(false);
             boardNameBtn.setOnClickListener(this);
             deleteItemBtn.setOnClickListener(this);
@@ -82,17 +76,14 @@ public class NavigationBoardListAdapter extends CursorRecyclerAdapter {
         @Override
         public void onClick(View v) {
             switch (v.getId()){
-                case R.id.navigation_boardlist_boardname:{
+                case R.id.boardlist_boardname_button:{
                     String buttonText = boardNameBtn.getText().toString();
                     CatalogFragment catalogFragment = new CatalogFragment().newInstance(buttonText.substring(1, buttonText.length()-1));
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
                     break;
                 }
-                case R.id.navigation_boardlist_delete_button:{
-                    Log.d(LOG_TAG, "delete board button clicked");
-                    //DeleteBoardDialogFragment dialogFragment = new DeleteBoardDialogFragment().newInstance(boardNameBtn.getText().toString());
-                    //dialogFragment.show(fragmentManager, "Delete Board");
+                case R.id.boardlist_delete_button:{
                     final String buttonText = boardNameBtn.getText().toString();
                     AlertDialog alertDialog = new AlertDialog.Builder(context)
                             .setTitle("Remove Board")

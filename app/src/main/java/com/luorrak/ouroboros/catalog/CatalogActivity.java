@@ -1,15 +1,22 @@
 package com.luorrak.ouroboros.catalog;
 
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseActivity;
+import com.luorrak.ouroboros.settings.SettingsActivity;
 import com.luorrak.ouroboros.util.Util;
 
 /**
@@ -30,9 +37,10 @@ import com.luorrak.ouroboros.util.Util;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class CatalogActivity extends AppCompatActivity {
+public class CatalogActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private final String LOG_TAG = CatalogActivity.class.getSimpleName();
     private String board;
+    DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +57,14 @@ public class CatalogActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        NavigationDrawerFragment drawerFragment = (NavigationDrawerFragment)
-                getFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
-        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.setDrawerListener(drawerToggle);
+        drawerToggle.syncState();
 
         if (board != null){
             CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
@@ -60,7 +72,6 @@ public class CatalogActivity extends AppCompatActivity {
             fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -74,8 +85,34 @@ public class CatalogActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()){
+            case R.id.drawer_item_boards:{
+                BoardListFragment boardListFragment = new BoardListFragment();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
+                break;
+            }
+            case R.id.drawer_item_watchlist:{
+                Toast.makeText(getApplicationContext(), "Feature not yet implemented", Toast.LENGTH_SHORT).show();
+                break;
+            }
+            case R.id.drawer_item_settings: {
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
+                break;
+            }
+            case R.id.drawer_item_licences: {
+                Intent intent = new Intent(getApplicationContext(), OpenSourceLicenseActivity.class);
+                startActivity(intent);
+                break;
+            }
+        }
+        drawerLayout.closeDrawers();
+        return true;
+    }
 }

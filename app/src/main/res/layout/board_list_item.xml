@@ -5,16 +5,16 @@
     android:layout_height="wrap_content">
 
     <Button
-        android:id="@+id/navigation_boardlist_boardname"
+        android:id="@+id/boardlist_boardname_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@+id/navigation_boardlist_delete_button"
+        android:layout_toLeftOf="@+id/boardlist_delete_button"
         android:text="Board Name"
         android:textSize="16sp"
         android:background="?android:attr/selectableItemBackground"/>
     <Button
-        android:id="@+id/navigation_boardlist_delete_button"
+        android:id="@+id/boardlist_delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

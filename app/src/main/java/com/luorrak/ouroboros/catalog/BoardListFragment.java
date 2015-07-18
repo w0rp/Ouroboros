@@ -17,6 +17,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,7 +27,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.settings.SettingsActivity;
 import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
@@ -57,114 +59,42 @@ import com.koushikdutta.ion.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class NavigationDrawerFragment extends Fragment implements View.OnClickListener {
-    private final String LOG_TAG = NavigationDrawerFragment.class.getSimpleName();
+public class BoardListFragment extends Fragment {
+    NavigationBoardListAdapter boardListAdapter;
 
-    private static final String PREF_FILE_NAME = "navigationpref";
-    private static final String KEY_USER_LEARED_DRAWER="user_learned_drawer";
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
-
-    private boolean mUserLearnedDrawer;
-    private boolean mFromSavedInstanceState;
-
-    private View containerView;
-    private NavigationBoardListAdapter boardListAdapter;
-
-
-    public NavigationDrawerFragment() {
-        // Required empty public constructor
+    public BoardListFragment() {
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
-        Button addBoard = (Button) view.findViewById(R.id.navigation_button_add_board);
-        Button license = (Button) view.findViewById(R.id.navigation_button_licences);
-        Button settings= (Button) view.findViewById(R.id.navigation_button_settings);
-        addBoard.setOnClickListener(this);
-        license.setOnClickListener(this);
-        settings.setOnClickListener(this);
-
-
+        setHasOptionsMenu(true);
+        View view = inflater.inflate(R.layout.fragment_board_list, container, false);
 
         InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());
         Cursor boardListCursor = infiniteDbHelper.getBoardCursor();
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.navigation_boardlist);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.board_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        boardListAdapter = new NavigationBoardListAdapter(boardListCursor, getFragmentManager(), mDrawerLayout, containerView, getActivity());
+        boardListAdapter = new NavigationBoardListAdapter(boardListCursor, getFragmentManager(), getActivity());
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(boardListAdapter);
         return view;
     }
 
-
-    public void setUp(int fragmentID, DrawerLayout drawerLayout, Toolbar toolbar) {
-        containerView=getActivity().findViewById(fragmentID);
-        mDrawerLayout = drawerLayout;
-        mDrawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close){
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                if(!mUserLearnedDrawer){
-                    mUserLearnedDrawer = true;
-                    saveToPreferences(getActivity(), KEY_USER_LEARED_DRAWER, "true");
-                }
-                getActivity().invalidateOptionsMenu();
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                getActivity().invalidateOptionsMenu();
-            }
-        };
-        if(!mUserLearnedDrawer && !mFromSavedInstanceState){
-            mDrawerLayout.openDrawer(containerView);
-        }
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        //make a button on the app bar
-        mDrawerLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                mDrawerToggle.syncState();
-            }
-        });
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+        MenuItem addBoard = menu.findItem(R.id.action_add_board);
+        addBoard.setVisible(true);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        mUserLearnedDrawer = Boolean.valueOf(readFromPreferences(getActivity(), KEY_USER_LEARED_DRAWER, "false"));
-        if (savedInstanceState != null){
-            mFromSavedInstanceState = true;
-        }
-
-    }
-
-    public void saveToPreferences(Context context, String preferenceName, String preferenceValue){
-        SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(preferenceName, preferenceValue);
-        editor.apply();
-    }
-
-    public String readFromPreferences(Context context, String preferenceName, String defaultValue){
-        SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.getString(preferenceName, defaultValue);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.navigation_button_add_board:{
-                Log.d(LOG_TAG, "add board button clicked");
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_add_board:{
                 final EditText edittext = new EditText(getActivity());
                 edittext.setInputType(InputType.TYPE_CLASS_TEXT);
                 AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
@@ -203,16 +133,7 @@ public class NavigationDrawerFragment extends Fragment implements View.OnClickLi
                 alertDialog.show();
                 break;
             }
-            case R.id.navigation_button_licences:{
-                Intent intent = new Intent(getActivity(), OpenSourceLicenseActivity.class);
-                startActivity(intent);
-                break;
-            }
-            case R.id.navigation_button_settings:{
-                Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                startActivity(intent);
-                break;
-            }
         }
+        return super.onOptionsItemSelected(item);
     }
 }

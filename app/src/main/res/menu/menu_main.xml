@@ -33,4 +33,10 @@
         app:showAsAction="collapseActionView|ifRoom"
         android:visible="false"/>
 
+    <item android:id="@+id/action_add_board"
+        android:orderInCategory="150"
+        android:title="Add Board"
+        android:icon="@drawable/ic_add_white_24dp"
+        app:showAsAction="collapseActionView|ifRoom"
+        android:visible="false"/>
 </menu>
