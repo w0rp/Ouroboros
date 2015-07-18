@@ -2,7 +2,6 @@ package com.luorrak.ouroboros.catalog;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,8 +11,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.JsonParser;
-import com.luorrak.ouroboros.post.ThreadAdapter;
-import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 
 /**

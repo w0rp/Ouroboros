@@ -22,13 +22,10 @@ import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
 
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.activities.PostCommentActivity;
-import com.luorrak.ouroboros.api.JsonParser;
+import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
@@ -159,7 +156,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         switch (item.getItemId()){
             case R.id.action_reply:{
                 String resto = "0";
-                Intent intent =  new Intent(getActivity(), PostCommentActivity.class);
+                Intent intent =  new Intent(getActivity(), ReplyCommentActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(CatalogAdapter.THREAD_NO, resto);
                 intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);

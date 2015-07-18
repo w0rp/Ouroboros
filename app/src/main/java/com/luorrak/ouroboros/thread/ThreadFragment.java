@@ -1,11 +1,8 @@
-package com.luorrak.ouroboros.post;
+package com.luorrak.ouroboros.thread;
 
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -19,17 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.activities.PostCommentActivity;
-import com.luorrak.ouroboros.api.JsonParser;
+import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.ChanUrls;
-import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 
 /**
@@ -171,7 +164,7 @@ public class ThreadFragment extends Fragment{
                 return true;
             }
             case R.id.action_reply:{
-                Intent intent =  new Intent(getActivity(), PostCommentActivity.class);
+                Intent intent =  new Intent(getActivity(), ReplyCommentActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(CatalogAdapter.THREAD_NO, resto);
                 intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);

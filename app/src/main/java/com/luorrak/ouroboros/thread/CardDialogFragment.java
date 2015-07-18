@@ -1,4 +1,4 @@
-package com.luorrak.ouroboros.post;
+package com.luorrak.ouroboros.thread;
 
 import android.app.Fragment;
 import android.database.Cursor;

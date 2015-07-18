@@ -1,4 +1,4 @@
-package com.luorrak.ouroboros.activities;
+package com.luorrak.ouroboros.reply;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -42,7 +42,7 @@ import java.util.Random;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class PostCommentActivityFragment extends Fragment {
+public class ReplyCommentFragment extends Fragment {
     private static boolean isPosting;
     String resto;
     String boardName;
@@ -50,7 +50,7 @@ public class PostCommentActivityFragment extends Fragment {
     SharedPreferences sharedPreferences;
     NetworkHelper networkHelper;
 
-    public PostCommentActivityFragment() {
+    public ReplyCommentFragment() {
     }
 
     @Override

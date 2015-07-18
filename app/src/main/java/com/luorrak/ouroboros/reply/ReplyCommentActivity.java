@@ -1,4 +1,4 @@
-package com.luorrak.ouroboros.activities;
+package com.luorrak.ouroboros.reply;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -24,8 +24,8 @@ import com.luorrak.ouroboros.util.Util;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class PostCommentActivity extends AppCompatActivity {
-    private final String LOG_TAG = PostCommentActivity.class.getSimpleName();
+public class ReplyCommentActivity extends AppCompatActivity {
+    private final String LOG_TAG = ReplyCommentActivity.class.getSimpleName();
     private Toolbar toolbar;
 
     @Override

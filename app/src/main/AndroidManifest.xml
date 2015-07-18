@@ -26,25 +26,25 @@
                 android:value=".catalog.CatalogActivity" />
         </activity>
         <activity
-            android:name=".post.ThreadActivity"
+            android:name=".thread.ThreadActivity"
             android:label="Thread">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".catalog.CatalogActivity" />
         </activity>
         <activity
-            android:name=".post.DeepZoom"
+            android:name=".thread.DeepZoom"
             android:label="DeepZoom">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".post.ThreadActivity" />
+                android:value=".thread.ThreadActivity" />
         </activity>
         <activity
-            android:name=".activities.PostCommentActivity"
+            android:name=".reply.ReplyCommentActivity"
             android:label="@string/title_activity_post_comment_activity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".post.ThreadActivity" />
+                android:value=".thread.ThreadActivity" />
         </activity>
     </application>
 </manifest>

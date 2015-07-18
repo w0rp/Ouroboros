@@ -1,4 +1,4 @@
-package com.luorrak.ouroboros.post;
+package com.luorrak.ouroboros.thread;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -22,7 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.activities.PostCommentActivity;
+import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.api.CommentParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.ChanUrls;
@@ -295,7 +295,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             @Override
             public void onClick(View v) {
                 Log.d(LOG_TAG, "Reply button pressed " + no);
-                Intent intent =  new Intent(context, PostCommentActivity.class);
+                Intent intent =  new Intent(context, ReplyCommentActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(CatalogAdapter.THREAD_NO, resto);
                 intent.putExtra(CatalogAdapter.REPLY_NO, no);

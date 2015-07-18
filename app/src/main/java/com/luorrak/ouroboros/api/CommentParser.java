@@ -17,9 +17,9 @@ import android.text.style.StyleSpan;
 import android.view.View;
 
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.post.CardDialogFragment;
-import com.luorrak.ouroboros.post.ExternalNavigationWarningFragment;
-import com.luorrak.ouroboros.post.InterThreadNavigationWarningFragment;
+import com.luorrak.ouroboros.thread.CardDialogFragment;
+import com.luorrak.ouroboros.thread.ExternalNavigationWarningFragment;
+import com.luorrak.ouroboros.thread.InterThreadNavigationWarningFragment;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.SpoilerSpan;
 
