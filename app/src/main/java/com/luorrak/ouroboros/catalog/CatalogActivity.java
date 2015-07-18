@@ -1,7 +1,6 @@
 package com.luorrak.ouroboros.catalog;
 
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
@@ -14,7 +13,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseActivity;
+import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseFragment;
 import com.luorrak.ouroboros.settings.SettingsFragment;
 import com.luorrak.ouroboros.util.Util;
 
@@ -107,8 +106,9 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
                 break;
             }
             case R.id.drawer_item_licences: {
-                Intent intent = new Intent(getApplicationContext(), OpenSourceLicenseActivity.class);
-                startActivity(intent);
+                OpenSourceLicenseFragment openSourceLicenseFragment = new OpenSourceLicenseFragment();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, openSourceLicenseFragment).commit();
                 break;
             }
         }

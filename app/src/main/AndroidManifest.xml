@@ -19,13 +19,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".miscellaneous.OpenSourceLicenseActivity"
-            android:label="OpenSourceLicenseActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".catalog.CatalogActivity" />
-        </activity>
-        <activity
             android:name=".thread.ThreadActivity"
             android:label="Thread">
             <meta-data
