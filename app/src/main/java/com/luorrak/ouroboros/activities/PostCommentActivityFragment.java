@@ -43,17 +43,20 @@ import java.util.Random;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class PostCommentActivityFragment extends Fragment {
+    private static boolean isPosting;
     String resto;
     String boardName;
     String replyNo;
     SharedPreferences sharedPreferences;
     NetworkHelper networkHelper;
+
     public PostCommentActivityFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        isPosting = false;
         View view = inflater.inflate(R.layout.fragment_post_comment_activity, container, false);
         setActionBarTitle("Post a comment");
 
@@ -108,7 +111,8 @@ public class PostCommentActivityFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_submit){
+        if (id == R.id.action_submit && !isPosting){
+            isPosting = true;
             EditText nameText = (EditText) getActivity().findViewById(R.id.post_comment_editText_name);
             EditText emailText = (EditText) getActivity().findViewById(R.id.post_comment_editText_email);
             EditText subjectText = (EditText) getActivity().findViewById(R.id.post_comment_editText_subject);
@@ -140,5 +144,8 @@ public class PostCommentActivityFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    public static void finishedPosting(){
+        isPosting = false;
+    }
 
 }

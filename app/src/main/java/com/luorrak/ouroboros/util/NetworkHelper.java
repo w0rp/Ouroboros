@@ -20,6 +20,7 @@ import com.koushikdutta.async.http.body.StringPart;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.activities.PostCommentActivityFragment;
 import com.luorrak.ouroboros.api.JsonParser;
 
 import org.jsoup.Jsoup;
@@ -102,6 +103,7 @@ public class NetworkHelper {
                 .setCallback(new FutureCallback<Response<JsonObject>>() {
                     @Override
                     public void onCompleted(Exception e, Response<JsonObject> jsonObjectResponse) {
+                        PostCommentActivityFragment.finishedPosting();
                         String boardName;
                         String userPostNo;
                         if (e != null){
