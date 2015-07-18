@@ -184,11 +184,16 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         super.onSaveInstanceState(outState);
     }
 
+    //https://stackoverflow.com/questions/27057449/when-switch-fragment-with-swiperefreshlayout-during-refreshing-fragment-freezes
     @Override
-    public void onDestroyView() {
-        swipeRefreshLayout.setRefreshing(false);
-        recyclerView.setVisibility(View.GONE); //HACKS TO KEEP VIEW FROM APPEARING
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
+
+        if (swipeRefreshLayout!=null) {
+            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.destroyDrawingCache();
+            swipeRefreshLayout.clearAnimation();
+        }
     }
 
     @Override
