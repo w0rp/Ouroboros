@@ -14,6 +14,8 @@ import com.luorrak.ouroboros.util.DbContract.CatalogEntry;
 import com.luorrak.ouroboros.util.DbContract.ThreadEntry;
 import com.luorrak.ouroboros.util.DbContract.UserPosts;
 
+import javax.xml.transform.sax.TemplatesHandler;
+
 /**
  * Ouroboros - An 8chan browser
  * Copyright (C) 2015  Luorrak
@@ -208,6 +210,23 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         return cursor;
     }
 
+    // Gallery Function ////////////////////////////////////////////////////////////////////////////
+
+    public Cursor getGalleryCursor() {
+        Cursor cursor = db.query(
+                CatalogEntry.TABLE_NAME, //table name
+                null, //columns to search
+                CatalogEntry.COLUMN_CATALOG_TIM + " IS NOT NULL", //where clause
+                null, //where arguements
+                null, //Group by
+                null, //having
+                null,
+                null//orderby
+        );
+        cursor.moveToFirst();
+        return cursor;
+    }
+
     // Board Helper Functions //////////////////////////////////////////////////////////////////////
 
     public void insertBoardEntry(String board){
@@ -382,5 +401,4 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
 
         onCreate(db);
     }
-
 }
