@@ -60,6 +60,7 @@ public class BoardListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
+        getActivity().setTitle("Boards");
         View view = inflater.inflate(R.layout.fragment_board_list, container, false);
 
         InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());

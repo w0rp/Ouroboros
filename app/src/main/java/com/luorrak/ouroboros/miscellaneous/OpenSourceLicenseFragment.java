@@ -36,6 +36,7 @@ public class OpenSourceLicenseFragment extends Fragment {
         Util.onActivityCreateSetTheme(getActivity(), Util.getTheme(getActivity()));
         super.onCreateView(inflater, container, savedInstanceState);
 
+        getActivity().setTitle("License");
         WebView webView = new WebView(getActivity());
         AssetManager am = getActivity().getAssets();
         webView.loadUrl("file:///android_asset/license.html");
