@@ -1,6 +1,7 @@
 package com.luorrak.ouroboros.thread;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.gallery.GalleryFragment;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.ChanUrls;
@@ -145,9 +147,12 @@ public class ThreadFragment extends Fragment{
         MenuItem refreshButton = menu.findItem(R.id.action_refresh);
         MenuItem scrollButton = menu.findItem(R.id.action_scroll_bottom);
         MenuItem replyButton = menu.findItem(R.id.action_reply);
+        MenuItem galleryButton = menu.findItem(R.id.action_gallery);
+
         refreshButton.setVisible(true);
         scrollButton.setVisible(true);
         replyButton.setVisible(true);
+        galleryButton.setVisible(true);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -170,6 +175,13 @@ public class ThreadFragment extends Fragment{
                 intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
                 getActivity().startActivity(intent);
                 return true;
+            }
+            case R.id.action_gallery:{
+                GalleryFragment galleryFragment = new GalleryFragment().newInstance(boardName);
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.placeholder_card, galleryFragment)
+                        .addToBackStack("galleryfragment")
+                        .commit();
             }
         }
         return super.onOptionsItemSelected(item);

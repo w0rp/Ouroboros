@@ -213,15 +213,13 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     // Gallery Function ////////////////////////////////////////////////////////////////////////////
 
     public Cursor getGalleryCursor() {
-        Cursor cursor = db.query(
-                CatalogEntry.TABLE_NAME, //table name
-                null, //columns to search
-                CatalogEntry.COLUMN_CATALOG_TIM + " IS NOT NULL", //where clause
-                null, //where arguements
-                null, //Group by
-                null, //having
+        Cursor cursor = db.query(ThreadEntry.TABLE_NAME,
                 null,
-                null//orderby
+                ThreadEntry.COLUMN_THREAD_TIMS + " IS NOT NULL",
+                null,
+                null,
+                null,
+                null
         );
         cursor.moveToFirst();
         return cursor;

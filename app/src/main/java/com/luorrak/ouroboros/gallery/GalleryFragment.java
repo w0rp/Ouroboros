@@ -1,6 +1,8 @@
 package com.luorrak.ouroboros.gallery;
 
 import android.app.Fragment;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -36,19 +38,33 @@ public class GalleryFragment extends Fragment {
     RecyclerView recyclerView;
     GridLayoutManager gridLayoutManager;
     GalleryAdapter galleryAdapter;
+    String boardName;
     InfiniteDbHelper infiniteDbHelper;
+
+    public GalleryFragment(){
+    }
+
+    public GalleryFragment newInstance(String boardName) {
+        GalleryFragment frag = new GalleryFragment();
+        Bundle args = new Bundle();
+        args.putString("boardName", boardName);
+        frag.setArguments(args);
+        return frag;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-
-        String boardName = getActivity().getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
-
+        infiniteDbHelper = new InfiniteDbHelper(getActivity());
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
-        recyclerView = (RecyclerView) view.findViewById(R.id.postList);
+
+        if (getArguments() != null){
+            boardName = getArguments().getString("boardName");
+        }
+
+        recyclerView = (RecyclerView) view.findViewById(R.id.gallery_list);
         gridLayoutManager = new GridLayoutManager(getActivity(), 3);
         recyclerView.setLayoutManager(gridLayoutManager);
-
         galleryAdapter = new GalleryAdapter(infiniteDbHelper.getGalleryCursor(), boardName);
         recyclerView.setAdapter(galleryAdapter);
 

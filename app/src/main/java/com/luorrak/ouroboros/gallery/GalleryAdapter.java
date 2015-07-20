@@ -20,6 +20,9 @@ import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.NetworkHelper;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Ouroboros - An 8chan browser
  * Copyright (C) 2015  Luorrak
@@ -44,6 +47,7 @@ public class GalleryAdapter extends CursorRecyclerAdapter {
     String boardName;
     String tim;
     String ext;
+    List<String> validExt = Arrays.asList(".png", ".jpg", ".gif");
     public GalleryAdapter(Cursor cursor, String boardName) {
         super(cursor);
         this.boardName = boardName;
@@ -56,8 +60,10 @@ public class GalleryAdapter extends CursorRecyclerAdapter {
         tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
         ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
 
-        String imageUrl = ChanUrls.getImageUrl(boardName, tim, ext);
-        networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
+        if (validExt.contains(ext)){
+            String imageUrl = ChanUrls.getImageUrl(boardName, tim, ext);
+            networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
+        }
     }
 
     @Override
