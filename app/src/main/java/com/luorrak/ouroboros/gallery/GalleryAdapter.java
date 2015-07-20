@@ -45,8 +45,6 @@ import java.util.List;
 public class GalleryAdapter extends CursorRecyclerAdapter {
     NetworkHelper networkHelper = new NetworkHelper();
     String boardName;
-    String tim;
-    String ext;
     List<String> validExt = Arrays.asList(".png", ".jpg", ".gif");
     public GalleryAdapter(Cursor cursor, String boardName) {
         super(cursor);
@@ -57,12 +55,24 @@ public class GalleryAdapter extends CursorRecyclerAdapter {
     public void onBindViewHolderCursor(RecyclerView.ViewHolder holder, Cursor cursor) {
         GalleryViewHolder galleryViewHolder = (GalleryViewHolder)holder;
 
-        tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
-        ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
+        final String tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
+        final String ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
 
         if (validExt.contains(ext)){
-            String imageUrl = ChanUrls.getImageUrl(boardName, tim, ext);
+            String imageUrl = ChanUrls.getThumbnailUrl(boardName, tim);
             networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
+
+            galleryViewHolder.galleryImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, DeepZoom.class);
+                    intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+                    intent.putExtra(CatalogAdapter.TIM, tim);
+                    intent.putExtra(CatalogAdapter.EXT, ext);
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 
@@ -72,23 +82,12 @@ public class GalleryAdapter extends CursorRecyclerAdapter {
         return new GalleryViewHolder(view);
     }
 
-    class GalleryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class GalleryViewHolder extends RecyclerView.ViewHolder {
         ImageView galleryImage;
 
         public GalleryViewHolder(View itemView) {
             super(itemView);
             galleryImage = (ImageView) itemView.findViewById(R.id.gallery_image);
-            galleryImage.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            Context context = v.getContext();
-            Intent intent = new Intent(context, DeepZoom.class);
-            intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
-            intent.putExtra(CatalogAdapter.TIM, tim);
-            intent.putExtra(CatalogAdapter.EXT, ext);
-            context.startActivity(intent);
         }
     }
 }
