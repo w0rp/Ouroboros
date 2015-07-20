@@ -57,7 +57,7 @@ public class GalleryFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         infiniteDbHelper = new InfiniteDbHelper(getActivity());
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
-
+        getActivity().setTitle("Gallery");
         if (getArguments() != null){
             boardName = getArguments().getString("boardName");
         }

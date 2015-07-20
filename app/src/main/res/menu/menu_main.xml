@@ -11,14 +11,7 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         android:visible="false"
         />
-
-    <item android:id="@+id/action_refresh"
-        android:orderInCategory="120"
-        android:title="Refresh"
-        android:icon="@drawable/ic_refresh_white_24dp"
-        app:showAsAction="collapseActionView|ifRoom"
-        android:visible="false"/>
-
+    
     <item android:id="@+id/action_scroll_bottom"
         android:orderInCategory="130"
         android:title="Scroll"
@@ -33,16 +26,24 @@
         app:showAsAction="collapseActionView|ifRoom"
         android:visible="false"/>
 
-    <item android:id="@+id/action_add_board"
+    <item android:id="@+id/action_refresh"
         android:orderInCategory="150"
-        android:title="Add Board"
-        android:icon="@drawable/ic_add_white_24dp"
+        android:title="Refresh"
+        android:icon="@drawable/ic_refresh_white_24dp"
         app:showAsAction="collapseActionView|ifRoom"
         android:visible="false"/>
 
     <item android:id="@+id/action_gallery"
         android:orderInCategory="160"
         android:title="Gallery"
-        app:showAsAction="never"
+        android:icon="@drawable/ic_add_white_24dp"
+        app:showAsAction="collapseActionView|ifRoom"
+        android:visible="false"/>
+
+    <item android:id="@+id/action_add_board"
+        android:orderInCategory="170"
+        android:title="Add Board"
+        android:icon="@drawable/ic_add_white_24dp"
+        app:showAsAction="collapseActionView|ifRoom"
         android:visible="false"/>
 </menu>

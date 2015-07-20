@@ -3,6 +3,7 @@ package com.luorrak.ouroboros.gallery;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +54,8 @@ public class GalleryAdapter extends CursorRecyclerAdapter {
 
     @Override
     public void onBindViewHolderCursor(RecyclerView.ViewHolder holder, Cursor cursor) {
-        GalleryViewHolder galleryViewHolder = (GalleryViewHolder)holder;
+        final GalleryViewHolder galleryViewHolder = (GalleryViewHolder)holder;
+        galleryViewHolder.playButton.setVisibility(View.GONE);
 
         final String tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
         final String ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
@@ -73,6 +75,36 @@ public class GalleryAdapter extends CursorRecyclerAdapter {
                     context.startActivity(intent);
                 }
             });
+        } else {
+            if (ext.equals(".webm")){
+                String imageUrl = ChanUrls.getThumbnailUrl(boardName, tim);
+                networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
+                galleryViewHolder.playButton.setVisibility(View.VISIBLE);
+
+                galleryViewHolder.playButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext));
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(uri, "video/webm");
+                        galleryViewHolder.itemView.getContext().startActivity(intent);
+                    }
+                });
+            } else if (ext.equals(".mp4")) {
+                String imageUrl = ChanUrls.getThumbnailUrl(boardName, tim);
+                networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
+                galleryViewHolder.playButton.setVisibility(View.VISIBLE);
+
+                galleryViewHolder.playButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext));
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(uri, "video/mp4");
+                        galleryViewHolder.itemView.getContext().startActivity(intent);
+                    }
+                });
+            }
         }
     }
 
@@ -84,10 +116,12 @@ public class GalleryAdapter extends CursorRecyclerAdapter {
 
     class GalleryViewHolder extends RecyclerView.ViewHolder {
         ImageView galleryImage;
+        ImageView playButton;
 
         public GalleryViewHolder(View itemView) {
             super(itemView);
             galleryImage = (ImageView) itemView.findViewById(R.id.gallery_image);
+            playButton = (ImageView) itemView.findViewById(R.id.gallery_video_play_button);
         }
     }
 }
