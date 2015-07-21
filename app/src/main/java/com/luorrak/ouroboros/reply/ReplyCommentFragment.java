@@ -1,6 +1,9 @@
 package com.luorrak.ouroboros.reply;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -12,7 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.koushikdutta.async.http.body.FilePart;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.JsonParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
@@ -20,7 +25,6 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.Reply;
 import com.luorrak.ouroboros.util.SaveReplyText;
-import com.koushikdutta.async.http.body.FilePart;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -47,8 +51,10 @@ public class ReplyCommentFragment extends Fragment {
     String resto;
     String boardName;
     String replyNo;
+    ArrayList<String> attachments;
     SharedPreferences sharedPreferences;
     NetworkHelper networkHelper;
+    final int FILE_SELECT_CODE = 1;
 
     public ReplyCommentFragment() {
     }
@@ -56,6 +62,7 @@ public class ReplyCommentFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        attachments = new ArrayList<String>();
         isPosting = false;
         View view = inflater.inflate(R.layout.fragment_post_comment_activity, container, false);
         setActionBarTitle("Post a comment");
@@ -111,6 +118,20 @@ public class ReplyCommentFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if (id == R.id.action_attach_file){
+            boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+            if (isKitKat) {
+                Intent intent = new Intent();
+                intent.setType("*/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(intent,FILE_SELECT_CODE);
+
+            } else {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                startActivityForResult(intent,FILE_SELECT_CODE);
+            }
+        }
         if (id == R.id.action_submit && !isPosting){
             isPosting = true;
             EditText nameText = (EditText) getActivity().findViewById(R.id.post_comment_editText_name);
@@ -148,4 +169,16 @@ public class ReplyCommentFragment extends Fragment {
         isPosting = false;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == FILE_SELECT_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (attachments.size() < 5){
+                    attachments.add(data.getData().getPath());
+                } else {
+                    Toast.makeText(getActivity(), "Max attachments reached", Toast.LENGTH_SHORT);
+                }
+            }
+        }
+    }
 }
