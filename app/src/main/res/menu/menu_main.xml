@@ -46,4 +46,18 @@
         android:icon="@drawable/ic_add_white_24dp"
         app:showAsAction="collapseActionView|ifRoom"
         android:visible="false"/>
+
+    <item android:id="@+id/action_save_image"
+        android:orderInCategory="180"
+        android:title="Save Image"
+        android:icon="@drawable/ic_add_white_24dp"
+        app:showAsAction="collapseActionView|ifRoom"
+        android:visible="false"/>
+
+    <item android:id="@+id/action_save_all_images"
+        android:orderInCategory="180"
+        android:title="Save All Images"
+        android:icon="@drawable/ic_add_white_24dp"
+        app:showAsAction="collapseActionView|ifRoom"
+        android:visible="false"/>
 </menu>

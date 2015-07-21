@@ -1,14 +1,23 @@
 package com.luorrak.ouroboros.thread;
 
-import android.app.Activity;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
-import com.luorrak.ouroboros.util.ChanUrls;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.catalog.CatalogAdapter;
+import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.Util;
 
 import uk.co.senab.photoview.PhotoView;
@@ -32,14 +41,22 @@ import uk.co.senab.photoview.PhotoView;
  */
 
 //https://github.com/koush/ion/blob/master/ion-sample/src/com/koushikdutta/ion/sample/DeepZoomSample.java
-public class DeepZoom extends Activity{
+public class DeepZoom extends AppCompatActivity{
+    String boardName;
+    String tim;
+    String ext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
-        PhotoView photoView = new PhotoView(this);
+        setContentView(R.layout.activity_deepzoom);
+        PhotoView photoView = (PhotoView) findViewById(R.id.deepzoom_photoview);
         photoView.setMaximumScale(16);
-        setContentView(photoView);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         final ProgressDialog dlg = new ProgressDialog(this);
         dlg.setTitle("Loading...");
@@ -47,9 +64,9 @@ public class DeepZoom extends Activity{
         dlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dlg.show();
 
-        String boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
-        String tim = getIntent().getStringExtra(CatalogAdapter.TIM);
-        String ext = getIntent().getStringExtra(CatalogAdapter.EXT);
+        boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
+        tim = getIntent().getStringExtra(CatalogAdapter.TIM);
+        ext = getIntent().getStringExtra(CatalogAdapter.EXT);
 
         Ion.with(this)
                 .load(ChanUrls.getImageUrl(boardName, tim, ext))
@@ -64,5 +81,31 @@ public class DeepZoom extends Activity{
                         dlg.cancel();
                     }
                 });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem saveImage = menu.findItem(R.id.action_save_image);
+        saveImage.setVisible(true);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_save_image: {
+                Toast.makeText(getApplicationContext(), "Placeholder", Toast.LENGTH_SHORT).show();
+                //Download manager to continue being lazy
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext)));
+                request.setDescription(tim + ext);
+                request.setTitle(tim + ext);
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, tim + ext);
+
+                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                manager.enqueue(request);
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
