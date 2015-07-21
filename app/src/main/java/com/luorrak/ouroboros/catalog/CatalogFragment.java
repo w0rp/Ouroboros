@@ -21,13 +21,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
 
+import com.google.gson.JsonArray;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
-import com.google.gson.JsonArray;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
 
 
 /**
@@ -195,8 +195,10 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onDestroy() {
-        if (networkFragment != null && networkFragment.getStatus() == AsyncTask.Status.FINISHED){
-            networkFragment.cancelTask();
+        if (networkFragment != null){
+            if (networkFragment.getStatus() == AsyncTask.Status.FINISHED){
+                networkFragment.cancelTask();
+            }
         }
         super.onDestroy();
     }
