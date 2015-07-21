@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -21,11 +22,13 @@ import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.gallery.GalleryFragment;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.ChanUrls;
+import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.NetworkHelper;
 
 /**
  * Ouroboros - An 8chan browser
@@ -48,6 +51,7 @@ public class ThreadFragment extends Fragment{
     // Construction ////////////////////////////////////////////////////////////////////////////////
     private final String LOG_TAG = ThreadFragment.class.getSimpleName();
     private InfiniteDbHelper infiniteDbHelper;
+    private NetworkHelper networkHelper = new NetworkHelper();
     private RecyclerView recyclerView;
     private ThreadAdapter threadAdapter;
     private LinearLayoutManager layoutManager;
@@ -148,11 +152,13 @@ public class ThreadFragment extends Fragment{
         MenuItem scrollButton = menu.findItem(R.id.action_scroll_bottom);
         MenuItem replyButton = menu.findItem(R.id.action_reply);
         MenuItem galleryButton = menu.findItem(R.id.action_gallery);
+        MenuItem saveAllImagesButton = menu.findItem(R.id.action_save_all_images);
 
         refreshButton.setVisible(true);
         scrollButton.setVisible(true);
         replyButton.setVisible(true);
         galleryButton.setVisible(true);
+        saveAllImagesButton.setVisible(true);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -161,12 +167,12 @@ public class ThreadFragment extends Fragment{
         switch (item.getItemId()){
             case R.id.action_refresh:{
                 getThread(resto, boardName);
-                return true;
+                break;
             }
             case R.id.action_scroll_bottom:{
                 Log.d(LOG_TAG, "getItemCount " + threadAdapter.getItemCount());
                 recyclerView.scrollToPosition(threadAdapter.getItemCount() - 1);
-                return true;
+                break;
             }
             case R.id.action_reply:{
                 Intent intent =  new Intent(getActivity(), ReplyCommentActivity.class);
@@ -174,14 +180,29 @@ public class ThreadFragment extends Fragment{
                 intent.putExtra(CatalogAdapter.THREAD_NO, resto);
                 intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
                 getActivity().startActivity(intent);
-                return true;
+                break;
             }
             case R.id.action_gallery:{
-                GalleryFragment galleryFragment = new GalleryFragment().newInstance(boardName);
+                GalleryFragment galleryFragment = new GalleryFragment().newInstance(boardName, resto);
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.placeholder_card, galleryFragment)
                         .addToBackStack("galleryfragment")
                         .commit();
+                break;
+            }
+            case R.id.action_save_all_images: {
+                String tim;
+                String ext;
+                Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
+               do {
+                   tim = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
+                   ext = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
+                   networkHelper.downloadFile(boardName, tim, ext, getActivity());
+
+                } while (imageCursor.moveToNext());
+
+                imageCursor.close();
+                break;
             }
         }
         return super.onOptionsItemSelected(item);

@@ -14,8 +14,6 @@ import com.luorrak.ouroboros.util.DbContract.CatalogEntry;
 import com.luorrak.ouroboros.util.DbContract.ThreadEntry;
 import com.luorrak.ouroboros.util.DbContract.UserPosts;
 
-import javax.xml.transform.sax.TemplatesHandler;
-
 /**
  * Ouroboros - An 8chan browser
  * Copyright (C) 2015  Luorrak
@@ -212,11 +210,11 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     // Gallery Function ////////////////////////////////////////////////////////////////////////////
 
-    public Cursor getGalleryCursor() {
+    public Cursor getGalleryCursor(String resto) {
         Cursor cursor = db.query(ThreadEntry.TABLE_NAME,
                 null,
-                ThreadEntry.COLUMN_THREAD_TIMS + " IS NOT NULL",
-                null,
+                ThreadEntry.COLUMN_THREAD_TIMS + " IS NOT NULL AND " + ThreadEntry.COLUMN_THREAD_RESTO + "=?",
+                new String[] {resto},
                 null,
                 null,
                 null
