@@ -1,10 +1,13 @@
 package com.luorrak.ouroboros.util;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -240,5 +243,15 @@ public class NetworkHelper {
         Ion.with(imageView)
                 .load(imageUrl)
                 .withBitmapInfo();
+    }
+
+    public void downloadFile(String boardName, String tim, String ext, Context context){
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext)));
+        request.setDescription(tim + ext);
+        request.setTitle(tim + ext);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, tim + ext);
+
+        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
     }
 }

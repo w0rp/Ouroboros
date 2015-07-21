@@ -1,11 +1,7 @@
 package com.luorrak.ouroboros.thread;
 
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +14,7 @@ import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.ChanUrls;
+import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.Util;
 
 import uk.co.senab.photoview.PhotoView;
@@ -42,6 +39,7 @@ import uk.co.senab.photoview.PhotoView;
 
 //https://github.com/koush/ion/blob/master/ion-sample/src/com/koushikdutta/ion/sample/DeepZoomSample.java
 public class DeepZoom extends AppCompatActivity{
+    NetworkHelper networkHelper = new NetworkHelper();
     String boardName;
     String tim;
     String ext;
@@ -96,14 +94,7 @@ public class DeepZoom extends AppCompatActivity{
         switch (item.getItemId()){
             case R.id.action_save_image: {
                 Toast.makeText(getApplicationContext(), "Placeholder", Toast.LENGTH_SHORT).show();
-                //Download manager to continue being lazy
-                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext)));
-                request.setDescription(tim + ext);
-                request.setTitle(tim + ext);
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, tim + ext);
-
-                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                manager.enqueue(request);
+                networkHelper.downloadFile(boardName, tim, ext, getApplicationContext());
             }
         }
         return super.onOptionsItemSelected(item);
