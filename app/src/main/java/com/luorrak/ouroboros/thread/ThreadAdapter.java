@@ -256,8 +256,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                         }
                     });
                 } else {
+                    //isembed
+                    if (youtubeData[0] != null){
                         final String youtubeVideoUrl = youtubeData[0];
-                        //isembed
                         threadViewHolder.videoPlayButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -266,6 +267,8 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                                 context.startActivity(intent);
                             }
                         });
+
+                    }
                 }
                 threadViewHolder.image_0.setOnClickListener(null);
 

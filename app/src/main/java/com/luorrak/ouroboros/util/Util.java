@@ -1,6 +1,5 @@
 package com.luorrak.ouroboros.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -36,8 +35,10 @@ public class Util {
         String[] youtubeData = new String[2];
 
         Document doc = Jsoup.parse(embed);
-        youtubeData[0] = doc.select("a.file").first().attr("href");
-        youtubeData[1] = doc.select("img.post-image").first().attr("src").substring(2);
+        if (doc.select("a.file").size() > 0){
+            youtubeData[0] = doc.select("a.file").first().attr("href");
+            youtubeData[1] = doc.select("img.post-image").first().attr("src").substring(2);
+        }
         return youtubeData;
     }
 
