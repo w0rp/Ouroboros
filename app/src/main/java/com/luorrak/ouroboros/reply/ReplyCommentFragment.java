@@ -55,6 +55,7 @@ public class ReplyCommentFragment extends Fragment {
     SharedPreferences sharedPreferences;
     NetworkHelper networkHelper;
     final int FILE_SELECT_CODE = 1;
+    Reply reply;
 
     public ReplyCommentFragment() {
     }
@@ -142,7 +143,7 @@ public class ReplyCommentFragment extends Fragment {
             ImageView captchaImage = (ImageView) getActivity().findViewById(R.id.post_comment_captcha_image);
 
             Random random = new Random();
-            Reply reply = new Reply();
+            reply = new Reply();
 
             reply.name = nameText.getText().toString();
             reply.email = emailText.getText().toString();
@@ -173,10 +174,11 @@ public class ReplyCommentFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FILE_SELECT_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                if (attachments.size() < 5){
-                    attachments.add(data.getData().getPath());
+                if (attachments.size() < 1){
+                    reply.filePath.add(data.getData().getPath());
+                    reply.fileName.add(data.getData().getLastPathSegment());
                 } else {
-                    Toast.makeText(getActivity(), "Max attachments reached", Toast.LENGTH_SHORT);
+                    Toast.makeText(getActivity(), "Only one file can be uploaded right now.", Toast.LENGTH_SHORT);
                 }
             }
         }

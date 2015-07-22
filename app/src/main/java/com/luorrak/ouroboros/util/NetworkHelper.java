@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.body.FilePart;
 import com.koushikdutta.async.http.body.Part;
 import com.koushikdutta.async.http.body.StringPart;
 import com.koushikdutta.ion.Ion;
@@ -29,6 +30,7 @@ import com.luorrak.ouroboros.api.JsonParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,6 +93,12 @@ public class NetworkHelper {
         } else {
             parameters.add(new StringPart("post", "New Reply"));
             parameters.add(new StringPart("thread", reply.resto)); //only if new thread else nothing
+        }
+
+        if (reply.filePath != null){
+            for (int i = 0; i < reply.filePath.size(); i++){
+                parameters.add(new FilePart(reply.fileName.get(i), new File(reply.filePath.get(i))));
+            }
         }
 
         if (genericCaptcha) {

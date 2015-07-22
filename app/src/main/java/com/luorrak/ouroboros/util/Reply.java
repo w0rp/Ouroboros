@@ -1,7 +1,5 @@
 package com.luorrak.ouroboros.util;
 
-import com.koushikdutta.async.http.body.FilePart;
-
 import java.util.ArrayList;
 
 /**
@@ -30,8 +28,8 @@ public class Reply{
     public String comment = "";
     public String board = "";
     public String resto = "0";
-    public ArrayList<FilePart> file;
-    public String fileName = "";
+    public ArrayList<String> filePath = new ArrayList<String>();
+    public ArrayList<String> fileName = new ArrayList<String>();
     public String password = "";
     public boolean spoilerImage = false;
     public String captchaText = "";
