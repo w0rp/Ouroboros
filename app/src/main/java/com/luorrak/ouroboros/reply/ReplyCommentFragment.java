@@ -3,6 +3,7 @@ package com.luorrak.ouroboros.reply;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -17,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.koushikdutta.async.http.body.FilePart;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.JsonParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
@@ -51,7 +51,6 @@ public class ReplyCommentFragment extends Fragment {
     String resto;
     String boardName;
     String replyNo;
-    ArrayList<String> attachments;
     SharedPreferences sharedPreferences;
     NetworkHelper networkHelper;
     final int FILE_SELECT_CODE = 1;
@@ -63,13 +62,16 @@ public class ReplyCommentFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        attachments = new ArrayList<String>();
         isPosting = false;
         View view = inflater.inflate(R.layout.fragment_post_comment_activity, container, false);
         setActionBarTitle("Post a comment");
 
         networkHelper = new NetworkHelper();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        reply = new Reply();
+        reply.filePath = new ArrayList<Uri>();
+        reply.fileName = new ArrayList<String>();
 
         resto = getActivity().getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
         boardName = getActivity().getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
@@ -123,13 +125,13 @@ public class ReplyCommentFragment extends Fragment {
             boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
             if (isKitKat) {
                 Intent intent = new Intent();
-                intent.setType("*/*");
+                intent.setType("file/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent,FILE_SELECT_CODE);
 
             } else {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*");
+                intent.setType("file/*");
                 startActivityForResult(intent,FILE_SELECT_CODE);
             }
         }
@@ -143,7 +145,6 @@ public class ReplyCommentFragment extends Fragment {
             ImageView captchaImage = (ImageView) getActivity().findViewById(R.id.post_comment_captcha_image);
 
             Random random = new Random();
-            reply = new Reply();
 
             reply.name = nameText.getText().toString();
             reply.email = emailText.getText().toString();
@@ -156,7 +157,6 @@ public class ReplyCommentFragment extends Fragment {
             }
             reply.resto = resto;
             reply.board = boardName;
-            ArrayList<FilePart> fileParts = new ArrayList<FilePart>(); //for later
 
             reply.password = Long.toHexString(random.nextLong());
 
@@ -174,11 +174,11 @@ public class ReplyCommentFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FILE_SELECT_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                if (attachments.size() < 1){
-                    reply.filePath.add(data.getData().getPath());
+                if (reply.filePath.size() < 1){
+                    reply.filePath.add(data.getData());
                     reply.fileName.add(data.getData().getLastPathSegment());
                 } else {
-                    Toast.makeText(getActivity(), "Only one file can be uploaded right now.", Toast.LENGTH_SHORT);
+                    Toast.makeText(getActivity(), "Only one file can be uploaded right now.", Toast.LENGTH_SHORT).show();
                 }
             }
         }

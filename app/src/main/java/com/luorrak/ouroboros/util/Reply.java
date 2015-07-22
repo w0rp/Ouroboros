@@ -1,5 +1,7 @@
 package com.luorrak.ouroboros.util;
 
+import android.net.Uri;
+
 import java.util.ArrayList;
 
 /**
@@ -28,8 +30,8 @@ public class Reply{
     public String comment = "";
     public String board = "";
     public String resto = "0";
-    public ArrayList<String> filePath = new ArrayList<String>();
-    public ArrayList<String> fileName = new ArrayList<String>();
+    public ArrayList<Uri> filePath;
+    public ArrayList<String> fileName;
     public String password = "";
     public boolean spoilerImage = false;
     public String captchaText = "";
