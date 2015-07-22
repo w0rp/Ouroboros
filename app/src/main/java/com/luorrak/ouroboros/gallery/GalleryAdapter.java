@@ -9,13 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.thread.DeepZoom;
-import com.luorrak.ouroboros.thread.ThreadActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
@@ -46,7 +43,7 @@ import java.util.List;
 public class GalleryAdapter extends CursorRecyclerAdapter {
     NetworkHelper networkHelper = new NetworkHelper();
     String boardName;
-    List<String> validExt = Arrays.asList(".png", ".jpg", ".gif");
+    List<String> validExt = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
     public GalleryAdapter(Cursor cursor, String boardName) {
         super(cursor);
         this.boardName = boardName;
