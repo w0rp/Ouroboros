@@ -1,7 +1,5 @@
 package com.luorrak.ouroboros.util;
 
-import android.net.Uri;
-
 import java.util.ArrayList;
 
 /**
@@ -30,7 +28,7 @@ public class Reply{
     public String comment = "";
     public String board = "";
     public String resto = "0";
-    public ArrayList<Uri> filePath;
+    public ArrayList<String> filePath;
     public ArrayList<String> fileName;
     public String password = "";
     public boolean spoilerImage = false;

@@ -24,8 +24,8 @@ import com.koushikdutta.async.http.body.StringPart;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.reply.ReplyCommentFragment;
 import com.luorrak.ouroboros.api.JsonParser;
+import com.luorrak.ouroboros.reply.ReplyCommentFragment;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -97,7 +97,7 @@ public class NetworkHelper {
 
         if (reply.filePath != null){
             for (int i = 0; i < reply.filePath.size(); i++){
-                parameters.add(new FilePart("file", new File(reply.filePath.get(i).getPath())));
+                parameters.add(new FilePart("file", new File(reply.filePath.get(i))));
             }
         }
 
