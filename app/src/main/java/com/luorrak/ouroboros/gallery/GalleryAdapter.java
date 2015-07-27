@@ -2,7 +2,6 @@ package com.luorrak.ouroboros.gallery;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,10 +13,9 @@ import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.thread.DeepZoom;
 import com.luorrak.ouroboros.util.ChanUrls;
-import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
-import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.NetworkHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,25 +38,30 @@ import java.util.List;
  */
 
 
-public class GalleryAdapter extends CursorRecyclerAdapter {
+public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
     NetworkHelper networkHelper = new NetworkHelper();
     String boardName;
+    ArrayList<Media> mediaItems;
     List<String> validExt = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
-    public GalleryAdapter(Cursor cursor, String boardName) {
-        super(cursor);
+    public GalleryAdapter(ArrayList<Media> mediaItems, String boardName) {
+        this.mediaItems = mediaItems;
         this.boardName = boardName;
     }
 
     @Override
-    public void onBindViewHolderCursor(RecyclerView.ViewHolder holder, Cursor cursor) {
+    public GalleryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_item, parent, false);
+        return new GalleryViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(GalleryViewHolder holder, int position) {
         final GalleryViewHolder galleryViewHolder = (GalleryViewHolder)holder;
+        final Media media = mediaItems.get(position);
         galleryViewHolder.playButton.setVisibility(View.GONE);
 
-        final String tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
-        final String ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
-
-        if (validExt.contains(ext)){
-            String imageUrl = ChanUrls.getThumbnailUrl(boardName, tim);
+        if (validExt.contains(media.ext)){
+            String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
             networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
 
             galleryViewHolder.galleryImage.setOnClickListener(new View.OnClickListener() {
@@ -67,35 +70,35 @@ public class GalleryAdapter extends CursorRecyclerAdapter {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, DeepZoom.class);
                     intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
-                    intent.putExtra(CatalogAdapter.TIM, tim);
-                    intent.putExtra(CatalogAdapter.EXT, ext);
+                    intent.putExtra(CatalogAdapter.TIM, media.fileName);
+                    intent.putExtra(CatalogAdapter.EXT, media.ext);
                     context.startActivity(intent);
                 }
             });
         } else {
-            if (ext.equals(".webm")){
-                String imageUrl = ChanUrls.getThumbnailUrl(boardName, tim);
+            if (media.ext.equals(".webm")){
+                String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
                 networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
                 galleryViewHolder.playButton.setVisibility(View.VISIBLE);
 
                 galleryViewHolder.playButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext));
+                        Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, media.fileName, media.ext));
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setDataAndType(uri, "video/webm");
                         galleryViewHolder.itemView.getContext().startActivity(intent);
                     }
                 });
-            } else if (ext.equals(".mp4")) {
-                String imageUrl = ChanUrls.getThumbnailUrl(boardName, tim);
+            } else if (media.ext.equals(".mp4")) {
+                String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
                 networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
                 galleryViewHolder.playButton.setVisibility(View.VISIBLE);
 
                 galleryViewHolder.playButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext));
+                        Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, media.fileName, media.ext));
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setDataAndType(uri, "video/mp4");
                         galleryViewHolder.itemView.getContext().startActivity(intent);
@@ -106,11 +109,10 @@ public class GalleryAdapter extends CursorRecyclerAdapter {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_item, parent, false);
-        return new GalleryViewHolder(view);
+    public int getItemCount() {
+        return mediaItems.size();
     }
-
+    
     class GalleryViewHolder extends RecyclerView.ViewHolder {
         ImageView galleryImage;
         ImageView playButton;
