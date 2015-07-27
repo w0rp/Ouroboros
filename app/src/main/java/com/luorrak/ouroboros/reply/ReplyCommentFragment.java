@@ -125,13 +125,13 @@ public class ReplyCommentFragment extends Fragment {
             boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
             if (isKitKat) {
                 Intent intent = new Intent();
-                intent.setType("file/*");
+                intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent,FILE_SELECT_CODE);
 
             } else {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("file/*");
+                intent.setType("image/*");
                 startActivityForResult(intent,FILE_SELECT_CODE);
             }
         }
