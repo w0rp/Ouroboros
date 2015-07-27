@@ -85,7 +85,7 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
             catalogViewHolder.catalogComText.setText(commentParser.parseCom(
                     com,
                     "v",
-                    "1", //dummy data as link is unclickable
+                    "-1", //dummy data as link is unclickable
                     fragmentManager,
                     infiniteDbHelper
             ));
