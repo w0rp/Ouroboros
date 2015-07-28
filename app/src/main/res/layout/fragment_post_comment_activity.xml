@@ -25,41 +25,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Email"
-                android:maxLines="1"
-                android:layout_below="@+id/post_comment_editText_name"/>
+                android:maxLines="1" />
             <EditText
                 android:id="@+id/post_comment_editText_subject"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Subject"
-                android:maxLines="1"
-                android:layout_below="@+id/post_comment_editText_email"/>
+                android:maxLines="1" />
             <EditText
                 android:id="@+id/post_comment_editText_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter your comment"
-                android:layout_below="@+id/post_comment_editText_subject"/>
-
-            <ListView
-                android:id="@+id/post_comment_attachment_card_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/post_comment_editText_comment"
-                android:visibility="gone">
-            </ListView>
+                android:hint="Enter your comment" />
             <ImageView
                 android:id="@+id/post_comment_captcha_image"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
-                android:layout_below="@+id/post_comment_attachment_card_list"
                 android:visibility="gone"/>
             <EditText
                 android:id="@+id/post_comment_captcha_editText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Please Enter Captcha Text"
-                android:layout_below="@+id/post_comment_captcha_image"
                 android:visibility="gone"/>
         </LinearLayout>
 </ScrollView>
