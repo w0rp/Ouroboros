@@ -78,7 +78,13 @@ public class CatalogNetworkFragment extends Fragment {
         insertCatalogIntoDatabaseTask.cancel(true);
     }
 
-    public AsyncTask.Status getStatus(){ return insertCatalogIntoDatabaseTask.getStatus(); }
+    public AsyncTask.Status getStatus(){
+        if (insertCatalogIntoDatabaseTask != null){
+            return insertCatalogIntoDatabaseTask.getStatus();
+        } else {
+            return null;
+        }
+    }
 
     public class InsertCatalogIntoDatabase extends AsyncTask<JsonArray, Void, Void> {
         Activity activity;
