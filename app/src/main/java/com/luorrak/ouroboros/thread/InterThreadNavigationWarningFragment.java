@@ -65,7 +65,6 @@ public class InterThreadNavigationWarningFragment extends DialogFragment {
         } else {
             final String no = url_split[3].split("\\.")[0];
             return new AlertDialog.Builder(getActivity())
-                    .setIcon(R.drawable.ic_launcher)
                     .setTitle("Proceed to thread?")
                     .setMessage(">>>/" + board + "/" + no)
                     .setPositiveButton(R.string.navigation_warning_ok,
