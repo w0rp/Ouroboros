@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -144,6 +145,9 @@ public class ReplyCommentFragment extends Fragment {
 
         if (id == R.id.action_submit && !isPosting){
             isPosting = true;
+            ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
+            progressBar.setVisibility(View.VISIBLE);
+
             EditText nameText = (EditText) getActivity().findViewById(R.id.post_comment_editText_name);
             EditText emailText = (EditText) getActivity().findViewById(R.id.post_comment_editText_email);
             EditText subjectText = (EditText) getActivity().findViewById(R.id.post_comment_editText_subject);

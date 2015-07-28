@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.JsonElement;
@@ -117,6 +118,8 @@ public class NetworkHelper {
                         ReplyCommentFragment.finishedPosting();
                         String boardName;
                         String userPostNo;
+                        ProgressBar progressBar = (ProgressBar) ((Activity)context).findViewById(R.id.progress_bar);
+                        progressBar.setVisibility(View.GONE);
                         if (e != null){
                             Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
                             toast.show();
