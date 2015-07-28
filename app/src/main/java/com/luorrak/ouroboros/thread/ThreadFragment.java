@@ -74,6 +74,22 @@ public class ThreadFragment extends Fragment{
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        layoutManager = new LinearLayoutManager(getActivity()){
+            @Override
+            protected int getExtraLayoutSpace(RecyclerView.State state) {
+                return 300;
+            }
+        };
+        if (savedInstanceState != null) {
+            resto = savedInstanceState.getString("resto");
+            boardName = getArguments().getString("boardName");
+            layoutManager.onRestoreInstanceState(savedInstanceState.getParcelable("SavedLayout"));
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState){
         infiniteDbHelper = new InfiniteDbHelper(getActivity());
         setHasOptionsMenu(true);
@@ -81,9 +97,6 @@ public class ThreadFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_thread, container, false);
         if (getArguments() != null) {
             resto = getArguments().getString("resto");
-            boardName = getArguments().getString("boardName");
-        } else if (savedInstanceState != null) {
-            resto = savedInstanceState.getString("resto");
             boardName = getArguments().getString("boardName");
         }
         networkFragment = (ThreadNetworkFragment) getFragmentManager().findFragmentByTag("Thread_Task");
@@ -95,12 +108,6 @@ public class ThreadFragment extends Fragment{
             getThread(resto, boardName);
 
             recyclerView = (RecyclerView) view.findViewById(R.id.postList);
-            layoutManager = new LinearLayoutManager(getActivity()){
-                @Override
-                protected int getExtraLayoutSpace(RecyclerView.State state) {
-                    return 300;
-                }
-            };
 
             threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getActivity().getFragmentManager(), boardName, getActivity());
             threadAdapter.setHasStableIds(true);
