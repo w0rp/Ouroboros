@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
@@ -222,6 +223,8 @@ public class ThreadFragment extends Fragment{
     }
 
     public void getThreadJson(final Context context, final String boardName, final String threadNumber){
+        ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
         final String threadJsonUrl = ChanUrls.getThreadUrl(boardName, threadNumber);
 
         Log.d(LOG_TAG, "thread json url "+ threadJsonUrl);

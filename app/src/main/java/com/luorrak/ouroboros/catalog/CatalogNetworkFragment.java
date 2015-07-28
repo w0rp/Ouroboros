@@ -5,6 +5,8 @@ import android.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -127,8 +129,12 @@ public class CatalogNetworkFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());
             swipeRefreshLayout = (SwipeRefreshLayout) activity.findViewById(R.id.catalog_swipe_container);
+            ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progress_bar);
             if(swipeRefreshLayout != null) {
                 swipeRefreshLayout.setRefreshing(false);
+            }
+            if (progressBar != null){
+                progressBar.setVisibility(View.GONE);
             }
         }
 

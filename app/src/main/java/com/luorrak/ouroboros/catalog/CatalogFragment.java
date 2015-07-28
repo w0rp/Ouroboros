@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
+import android.widget.ProgressBar;
 
 import com.google.gson.JsonArray;
 import com.koushikdutta.async.future.FutureCallback;
@@ -205,9 +206,9 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
     public void getCatalogJson(final Context context, final String boardName) {
-
         String catalogJsonUrl = ChanUrls.getCatalogUrl(boardName);
-
+        ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
         Ion.with(context)
                 .load(catalogJsonUrl)
                 .setLogging(LOG_TAG, Log.DEBUG)

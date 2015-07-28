@@ -5,10 +5,13 @@ import android.app.Fragment;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.JsonParser;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
@@ -137,6 +140,10 @@ public class ThreadNetworkFragment extends Fragment {
             activity.setTitle(threadSubject != null ? threadSubject : "/" + boardName + "/" + resto);
             cursor.close();
 
+            ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progress_bar);
+            if (progressBar != null){
+                progressBar.setVisibility(View.GONE);
+            }
             threadAdapter.changeCursor(infiniteDbHelper.getThreadCursor(resto));
         }
     }

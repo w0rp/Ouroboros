@@ -8,6 +8,17 @@
         android:id="@+id/app_bar"
         layout="@layout/toolbar"/>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_bar"
+        android:layout_marginTop="-6dp"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:elevation="17dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
     <FrameLayout
         android:id="@+id/placeholder_card"
         android:layout_width="match_parent"
