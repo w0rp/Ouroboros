@@ -82,7 +82,14 @@ public class ReplyCommentFragment extends Fragment {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         reply = new Reply();
-        reply.filePath = new ArrayList<>();
+        if (savedInstanceState == null){
+            reply.filePath = new ArrayList<>();
+        } else {
+            reply.filePath = savedInstanceState.getStringArrayList("filePath");
+            for (String file : reply.filePath){
+                addAttachmentPreview(file, view);
+            }
+        }
         reply.fileName = new ArrayList<String>();
 
         resto = getActivity().getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
@@ -177,6 +184,12 @@ public class ReplyCommentFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList("filePath", reply.filePath);
+    }
+
     public static void finishedPosting(){
         isPosting = false;
     }
@@ -209,13 +222,13 @@ public class ReplyCommentFragment extends Fragment {
                 return;
             } else {
                 reply.filePath.add(filePath);
-                addAttachmentPreview(filePath);
+                addAttachmentPreview(filePath, getView());
             }
         }
     }
 
-    private void addAttachmentPreview(final String filePath) {
-        final LinearLayout view = (LinearLayout) getView().findViewById(R.id.post_comment_container);
+    private void addAttachmentPreview(final String filePath, View layout) {
+        final LinearLayout view = (LinearLayout) layout.findViewById(R.id.post_comment_container);
         final View card = View.inflate(getActivity(), R.layout.card_reply_attachment, null);
         ImageView imagePreview = (ImageView) card.findViewById(R.id.reply_attachment_image);
         TextView filePathTextView = (TextView) card.findViewById(R.id.reply_attachment_path);
