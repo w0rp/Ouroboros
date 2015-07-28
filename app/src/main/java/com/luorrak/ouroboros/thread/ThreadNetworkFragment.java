@@ -142,7 +142,7 @@ public class ThreadNetworkFragment extends Fragment {
 
             ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progress_bar);
             if (progressBar != null){
-                progressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.INVISIBLE);
             }
             threadAdapter.changeCursor(infiniteDbHelper.getThreadCursor(resto));
         }

@@ -18,13 +18,13 @@
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:elevation="17dp"
         android:indeterminate="true"
-        android:visibility="gone" />
+        android:visibility="invisible" />
 
     <fragment
         android:id="@+id/fragment_post_comment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/app_bar"
+        android:layout_below="@+id/progress_bar"
         android:name="com.luorrak.ouroboros.reply.ReplyCommentFragment"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"

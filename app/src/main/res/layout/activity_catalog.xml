@@ -25,9 +25,9 @@
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:elevation="17dp"
             android:indeterminate="true"
-            android:visibility="gone" />
+            android:visibility="invisible" />
         <RelativeLayout
-            android:layout_below="@+id/app_bar"
+            android:layout_below="@+id/progress_bar"
             android:id="@+id/activity_catalog_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">

@@ -119,7 +119,7 @@ public class NetworkHelper {
                         String boardName;
                         String userPostNo;
                         ProgressBar progressBar = (ProgressBar) ((Activity)context).findViewById(R.id.progress_bar);
-                        progressBar.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.INVISIBLE);
                         if (e != null){
                             Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
                             toast.show();

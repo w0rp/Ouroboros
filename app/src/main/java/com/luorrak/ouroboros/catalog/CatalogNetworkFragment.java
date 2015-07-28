@@ -140,7 +140,7 @@ public class CatalogNetworkFragment extends Fragment {
                 swipeRefreshLayout.setRefreshing(false);
             }
             if (progressBar != null){
-                progressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.INVISIBLE);
             }
         }
 

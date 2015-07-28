@@ -17,20 +17,20 @@
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:elevation="17dp"
         android:indeterminate="true"
-        android:visibility="gone" />
+        android:visibility="invisible" />
 
     <FrameLayout
         android:id="@+id/placeholder_card"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/app_bar">
+        android:layout_below="@+id/progress_bar">
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/placeholder_card_dialog"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/app_bar">
+        android:layout_below="@+id/progress_bar">
     </FrameLayout>
 
 </RelativeLayout>
