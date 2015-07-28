@@ -6,7 +6,7 @@
     <item android:id="@+id/action_attach_file"
         android:orderInCategory="100"
         android:title="Attach File"
-        android:icon="@drawable/ic_add_white_24dp"
+        android:icon="@drawable/ic_attach_file_white_24dp"
         app:showAsAction="collapseActionView|ifRoom" />
     <item
         android:id="@+id/action_submit"

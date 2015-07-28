@@ -21,8 +21,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -215,7 +215,7 @@ public class ReplyCommentFragment extends Fragment {
         final View card = View.inflate(getActivity(), R.layout.card_reply_attachment, null);
         ImageView imagePreview = (ImageView) card.findViewById(R.id.reply_attachment_image);
         TextView filePathTextView = (TextView) card.findViewById(R.id.reply_attachment_path);
-        Button deleteAttachment = (Button) card.findViewById(R.id.reply_delete_attachment);
+        ImageButton deleteAttachment = (ImageButton) card.findViewById(R.id.reply_delete_attachment);
         Ion.with(imagePreview)
                 .load(filePath)
                 .withBitmapInfo();
