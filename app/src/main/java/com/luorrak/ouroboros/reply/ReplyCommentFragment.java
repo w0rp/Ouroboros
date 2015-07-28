@@ -21,10 +21,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.JsonParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
@@ -55,13 +59,13 @@ import java.util.Random;
  */
 public class ReplyCommentFragment extends Fragment {
     private static boolean isPosting;
-    String resto;
-    String boardName;
-    String replyNo;
-    SharedPreferences sharedPreferences;
-    NetworkHelper networkHelper;
-    final int FILE_SELECT_CODE = 1;
-    Reply reply;
+    private String resto;
+    private String boardName;
+    private String replyNo;
+    private SharedPreferences sharedPreferences;
+    private NetworkHelper networkHelper;
+    private final int FILE_SELECT_CODE = 1;
+    private Reply reply;
 
     public ReplyCommentFragment() {
     }
@@ -99,6 +103,7 @@ public class ReplyCommentFragment extends Fragment {
         subjetText.addTextChangedListener(new SaveReplyText(sharedPreferences, SaveReplyText.subjectEditTextKey));
         commentText.addTextChangedListener(new SaveReplyText(sharedPreferences, SaveReplyText.commentEditTextKey));
 
+
         if (replyNo != null){
             if (commentText.getText().toString().equals("")){
                 commentText.append(">>" + replyNo + "\n");
@@ -112,6 +117,7 @@ public class ReplyCommentFragment extends Fragment {
         setHasOptionsMenu(true);
         return view;
     }
+
 
     public void setActionBarTitle(String title){
         getActivity().setTitle(title);
@@ -129,19 +135,13 @@ public class ReplyCommentFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_attach_file){
-            boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-            if (isKitKat) {
-                Intent intent = new Intent();
-                intent.setType("*/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent,FILE_SELECT_CODE);
-
+            if (reply.filePath.size() < 1) {
+                selectFile();
             } else {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*");
-                startActivityForResult(intent,FILE_SELECT_CODE);
+                Toast.makeText(getActivity(), "Maximum amount of attachments reached", Toast.LENGTH_SHORT).show();
             }
         }
+
         if (id == R.id.action_submit && !isPosting){
             isPosting = true;
             EditText nameText = (EditText) getActivity().findViewById(R.id.post_comment_editText_name);
@@ -177,21 +177,57 @@ public class ReplyCommentFragment extends Fragment {
         isPosting = false;
     }
 
+    private void removeFile() {
+        reply.filePath.clear();
+    }
+
+    private void selectFile() {
+        boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        if (isKitKat) {
+            Intent intent = new Intent();
+            intent.setType("*/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(intent,FILE_SELECT_CODE);
+
+        } else {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");
+            startActivityForResult(intent,FILE_SELECT_CODE);
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FILE_SELECT_CODE && resultCode == Activity.RESULT_OK) {
-            if (reply.filePath.size() < 1) {
-                String filePath = getPath(getActivity(), data.getData());
-                if (filePath == null){
-                    Toast.makeText(getActivity(), "Could not retrieve file", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                reply.filePath.add(filePath);
-                reply.fileName.add(data.getData().getLastPathSegment());
+            String filePath = getPath(getActivity(), data.getData());
+            if (filePath == null){
+                Toast.makeText(getActivity(), "Could not retrieve file", Toast.LENGTH_SHORT).show();
+                return;
             } else {
-                Toast.makeText(getActivity(), "Only one file can be uploaded right now.", Toast.LENGTH_SHORT).show();
+                reply.filePath.add(filePath);
+                addAttachmentPreview(filePath);
             }
         }
+    }
+
+    private void addAttachmentPreview(final String filePath) {
+        final LinearLayout view = (LinearLayout) getView().findViewById(R.id.post_comment_container);
+        final View card = View.inflate(getActivity(), R.layout.card_reply_attachment, null);
+        ImageView imagePreview = (ImageView) card.findViewById(R.id.reply_attachment_image);
+        TextView filePathTextView = (TextView) card.findViewById(R.id.reply_attachment_path);
+        Button deleteAttachment = (Button) card.findViewById(R.id.reply_delete_attachment);
+        Ion.with(imagePreview)
+                .load(filePath)
+                .withBitmapInfo();
+        filePathTextView.setText(filePath);
+        deleteAttachment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reply.filePath.remove(filePath);
+                view.removeView(card);
+            }
+        });
+        view.addView(card);
     }
 
     //https://stackoverflow.com/questions/20067508/get-real-path-from-uri-android-kitkat-new-storage-access-framework
