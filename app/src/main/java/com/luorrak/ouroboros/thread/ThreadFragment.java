@@ -1,8 +1,10 @@
 package com.luorrak.ouroboros.thread;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -192,17 +194,30 @@ public class ThreadFragment extends Fragment{
                 break;
             }
             case R.id.action_save_all_images: {
-                String tim;
-                String ext;
-                Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
-               do {
-                   tim = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
-                   ext = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
-                   networkHelper.downloadFile(boardName, tim, ext, getActivity());
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Download All Images")
+                        .setMessage("Are you sure you want to download all images?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                String tim;
+                                String ext;
+                                Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
+                                do {
+                                    tim = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
+                                    ext = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
+                                    networkHelper.downloadFile(boardName, tim, ext, getActivity());
 
-                } while (imageCursor.moveToNext());
+                                } while (imageCursor.moveToNext());
 
-                imageCursor.close();
+                                imageCursor.close();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .show();
                 break;
             }
         }
