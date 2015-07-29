@@ -277,10 +277,11 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                 threadViewHolder.image_0.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Activity context = (Activity) v.getContext();
                         DeepZoom deepZoom = new DeepZoom().newInstance(boardName, tim, ext);
-                        FragmentTransaction fragmentTransaction = context.getFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.placeholder_card, deepZoom).addToBackStack("deepzoom").commit();
+                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.placeholder_card, deepZoom)
+                                .addToBackStack("deepzoom")
+                                .commit();
                     }
                 });
             }

@@ -78,7 +78,7 @@ public class GalleryFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.gallery_list);
         gridLayoutManager = new GridLayoutManager(getActivity(), 3);
         recyclerView.setLayoutManager(gridLayoutManager);
-        galleryAdapter = new GalleryAdapter(mediaArrayList, boardName);
+        galleryAdapter = new GalleryAdapter(mediaArrayList, boardName, getFragmentManager());
         recyclerView.setAdapter(galleryAdapter);
 
         return view;
