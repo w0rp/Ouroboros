@@ -66,6 +66,7 @@ public class DeepZoom extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_deepzoom, container, false);
         final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
         photoView = (PhotoView) view.findViewById(R.id.deepzoom_photoview);
@@ -77,6 +78,7 @@ public class DeepZoom extends Fragment{
             boardName = getArguments().getString("boardName");
             tim = getArguments().getString("tim");
             ext = getArguments().getString("ext");
+            getActivity().setTitle(tim + ext);
         }
 
         Ion.with(photoView)
