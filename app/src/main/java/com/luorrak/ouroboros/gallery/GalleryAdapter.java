@@ -1,5 +1,7 @@
 package com.luorrak.ouroboros.gallery;
 
+import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -67,12 +69,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             galleryViewHolder.galleryImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, DeepZoom.class);
-                    intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
-                    intent.putExtra(CatalogAdapter.TIM, media.fileName);
-                    intent.putExtra(CatalogAdapter.EXT, media.ext);
-                    context.startActivity(intent);
+                    Activity context = (Activity) v.getContext();
+                    DeepZoom deepZoom = new DeepZoom().newInstance(boardName, media.fileName, media.ext);
+                    FragmentTransaction fragmentTransaction = context.getFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.placeholder_card, deepZoom).addToBackStack("deepzoom").commit();
                 }
             });
         } else {
