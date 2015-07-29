@@ -82,37 +82,38 @@ public class ThreadFragment extends Fragment{
                 return 300;
             }
         };
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null){
+            Parcelable savedLayoutState = savedInstanceState.getParcelable("savedLayout");
             resto = savedInstanceState.getString("resto");
             boardName = getArguments().getString("boardName");
-            layoutManager.onRestoreInstanceState(savedInstanceState.getParcelable("SavedLayout"));
+            layoutManager.onRestoreInstanceState(savedLayoutState);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState){
         infiniteDbHelper = new InfiniteDbHelper(getActivity());
-        setHasOptionsMenu(true);
-
+        networkFragment = (ThreadNetworkFragment) getFragmentManager().findFragmentByTag("Thread_Task");
         View view = inflater.inflate(R.layout.fragment_thread, container, false);
+        setHasOptionsMenu(true);
+        recyclerView = (RecyclerView) view.findViewById(R.id.postList);
+
         if (getArguments() != null) {
             resto = getArguments().getString("resto");
             boardName = getArguments().getString("boardName");
         }
-        networkFragment = (ThreadNetworkFragment) getFragmentManager().findFragmentByTag("Thread_Task");
+
         if (networkFragment == null) {
             networkFragment = new ThreadNetworkFragment();
             getFragmentManager().beginTransaction().add(networkFragment, "Thread_Task").commit();
         }
+
         if (boardName != null){
             getThread(resto, boardName);
-
-            recyclerView = (RecyclerView) view.findViewById(R.id.postList);
-
+            recyclerView.setLayoutManager(layoutManager);
             threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getActivity().getFragmentManager(), boardName, getActivity());
             threadAdapter.setHasStableIds(true);
             threadAdapter.hasStableIds();
-            recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(threadAdapter);
         }
 
@@ -138,17 +139,17 @@ public class ThreadFragment extends Fragment{
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable("SavedLayout", layoutManager.onSaveInstanceState());
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("savedLayout", layoutManager.onSaveInstanceState());
         outState.putString("boardName", boardName);
         outState.putString("resto", resto);
-        super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         if(savedInstanceState != null)
         {
-            Parcelable savedLayoutState = savedInstanceState.getParcelable("SavedLayout");
+            Parcelable savedLayoutState = savedInstanceState.getParcelable("savedLayout");
             recyclerView.getLayoutManager().onRestoreInstanceState(savedLayoutState);
         }
         super.onViewStateRestored(savedInstanceState);
