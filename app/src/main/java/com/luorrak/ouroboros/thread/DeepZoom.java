@@ -43,17 +43,19 @@ public class DeepZoom extends Fragment{
     String boardName;
     String tim;
     String ext;
+    String oldTitle;
     PhotoView photoView;
 
     public DeepZoom() {
     }
 
-    public DeepZoom newInstance(String boardName, String tim, String ext) {
+    public DeepZoom newInstance(String boardName, String tim, String ext, CharSequence title) {
         DeepZoom frag = new DeepZoom();
         Bundle args = new Bundle();
         args.putString("boardName", boardName);
         args.putString("tim", tim);
         args.putString("ext", ext);
+        args.putString("title", title.toString());
         frag.setArguments(args);
         return frag;
     }
@@ -78,6 +80,7 @@ public class DeepZoom extends Fragment{
             boardName = getArguments().getString("boardName");
             tim = getArguments().getString("tim");
             ext = getArguments().getString("ext");
+            oldTitle = getArguments().getString("title");
             getActivity().setTitle(tim + ext);
         }
 
@@ -110,5 +113,11 @@ public class DeepZoom extends Fragment{
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroyView() {
+        getActivity().setTitle(oldTitle);
+        super.onDestroyView();
     }
 }

@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.thread.DeepZoom;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.NetworkHelper;
@@ -47,10 +46,12 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     FragmentManager fragmentManager;
     ArrayList<Media> mediaItems;
     List<String> validExt = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
-    public GalleryAdapter(ArrayList<Media> mediaItems, String boardName, FragmentManager fragmentManager) {
+    Context context;
+    public GalleryAdapter(ArrayList<Media> mediaItems, String boardName, FragmentManager fragmentManager, Context context) {
         this.mediaItems = mediaItems;
         this.boardName = boardName;
         this.fragmentManager = fragmentManager;
+        this.context = context;
     }
 
     @Override
@@ -72,7 +73,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             galleryViewHolder.galleryImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DeepZoom deepZoom = new DeepZoom().newInstance(boardName, media.fileName, media.ext);
+                    DeepZoom deepZoom = new DeepZoom().newInstance(boardName, media.fileName, media.ext, ((Activity) context).getTitle());
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.placeholder_card, deepZoom).addToBackStack("deepzoom").commit();
                 }

@@ -22,19 +22,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.ImageViewBitmapInfo;
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.api.CommentParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
+import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.Util;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.ImageViewBitmapInfo;
-import com.koushikdutta.ion.Ion;
 
 
 /**
@@ -85,7 +85,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         final String no;
         String id;
         String sub;
-        String com;
+        final String com;
         String email;
         long threadTime;
         final String tim;
@@ -277,9 +277,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                 threadViewHolder.image_0.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        DeepZoom deepZoom = new DeepZoom().newInstance(boardName, tim, ext);
+                        DeepZoom deepZoom = new DeepZoom().newInstance(boardName, tim, ext, ((Activity) context).getTitle());
                         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.placeholder_card, deepZoom)
+                        fragmentTransaction.add(R.id.placeholder_card, deepZoom)
                                 .addToBackStack("deepzoom")
                                 .commit();
                     }
@@ -417,7 +417,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                 case R.id.thread_view_replies_button:{
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     CardDialogFragment cardDialogFragment = CardDialogFragment.showReplies(threadNo.getText().toString(), boardName);
-                    fragmentTransaction.add(R.id.placeholder_card_dialog, cardDialogFragment)
+                    fragmentTransaction.add(R.id.placeholder_card, cardDialogFragment)
                             .addToBackStack("threadDialog")
                             .commit();
                     break;

@@ -230,7 +230,7 @@ public class CommentParser {
                 public void onClick(View widget) {
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     CardDialogFragment cardDialogFragment = CardDialogFragment.showPost(linkUrl, currentBoard);
-                    fragmentTransaction.add(R.id.placeholder_card_dialog, cardDialogFragment)
+                    fragmentTransaction.add(R.id.placeholder_card, cardDialogFragment)
                             .addToBackStack("threadDialog")
                             .commit();
 
