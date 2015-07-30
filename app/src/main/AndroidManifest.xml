@@ -27,6 +27,13 @@
                 android:value=".catalog.CatalogActivity" />
         </activity>
         <activity
+            android:name=".thread.DeepZoom"
+            android:label="Deepzoom" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".thread.ThreadActivity" />
+        </activity>
+        <activity
             android:name=".reply.ReplyCommentActivity"
             android:label="@string/title_activity_post_comment_activity" >
             <meta-data

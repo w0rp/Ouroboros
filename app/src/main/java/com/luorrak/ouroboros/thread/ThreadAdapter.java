@@ -1,6 +1,5 @@
 package com.luorrak.ouroboros.thread;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -277,11 +276,11 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                 threadViewHolder.image_0.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        DeepZoom deepZoom = new DeepZoom().newInstance(boardName, tim, ext, ((Activity) context).getTitle());
-                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.add(R.id.placeholder_card, deepZoom)
-                                .addToBackStack("deepzoom")
-                                .commit();
+                        Intent intent = new Intent(context, DeepZoom.class);
+                        intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+                        intent.putExtra(CatalogAdapter.TIM, tim);
+                        intent.putExtra(CatalogAdapter.EXT, ext);
+                        context.startActivity(intent);
                     }
                 });
             }
