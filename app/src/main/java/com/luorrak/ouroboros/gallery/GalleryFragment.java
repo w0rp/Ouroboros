@@ -18,6 +18,7 @@ import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
 
@@ -74,41 +75,14 @@ public class GalleryFragment extends Fragment {
             resto = getArguments().getString("resto");
         }
 
-        ArrayList<Media> mediaArrayList = createMediaList();
+        ArrayList<Media> mediaArrayList = Util.createMediaList(infiniteDbHelper, resto);
         recyclerView = (RecyclerView) view.findViewById(R.id.gallery_list);
         gridLayoutManager = new GridLayoutManager(getActivity(), 3);
         recyclerView.setLayoutManager(gridLayoutManager);
-        galleryAdapter = new GalleryAdapter(mediaArrayList, boardName, getFragmentManager(), getActivity());
+        galleryAdapter = new GalleryAdapter(mediaArrayList, boardName, resto, getFragmentManager(), getActivity());
         recyclerView.setAdapter(galleryAdapter);
 
         return view;
-    }
-
-    public ArrayList<Media> createMediaList(){
-        ArrayList<Media> mediaArrayList = new ArrayList<Media>();
-        Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
-
-        do {
-            String no = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NO));
-            String tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
-            String ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
-
-            if (tim != null){
-                mediaArrayList.add(createMediaItem(no, tim, ext));
-            }
-        } while (cursor.moveToNext());
-
-        cursor.close();
-
-        return mediaArrayList;
-    }
-
-    public Media createMediaItem(String no, String tim, String ext){
-        Media mediaItem = new Media();
-        mediaItem.no = no;
-        mediaItem.fileName = tim;
-        mediaItem.ext = ext;
-        return mediaItem;
     }
 
     @Override

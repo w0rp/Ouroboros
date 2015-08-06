@@ -1,0 +1,22 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_bar"
+        android:layout_marginTop="-6dp"
+        android:layout_marginBottom="-6dp"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:elevation="17dp"
+        android:indeterminate="true"
+        android:visibility="invisible" />
+
+    <uk.co.senab.photoview.PhotoView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/deepzoom_photoview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

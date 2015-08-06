@@ -12,7 +12,7 @@ import android.widget.ImageView;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
-import com.luorrak.ouroboros.thread.DeepZoom;
+import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.NetworkHelper;
 
@@ -42,13 +42,15 @@ import java.util.List;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
     NetworkHelper networkHelper = new NetworkHelper();
     String boardName;
+    String resto;
     FragmentManager fragmentManager;
     ArrayList<Media> mediaItems;
     List<String> validExt = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
     Context context;
-    public GalleryAdapter(ArrayList<Media> mediaItems, String boardName, FragmentManager fragmentManager, Context context) {
+    public GalleryAdapter(ArrayList<Media> mediaItems, String boardName, String resto, FragmentManager fragmentManager, Context context) {
         this.mediaItems = mediaItems;
         this.boardName = boardName;
+        this.resto = resto;
         this.fragmentManager = fragmentManager;
         this.context = context;
     }
@@ -72,10 +74,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             galleryViewHolder.galleryImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context, DeepZoom.class);
+                    Intent intent = new Intent(context, DeepZoomActivity.class);
+                    intent.putExtra(CatalogAdapter.THREAD_NO, resto);
                     intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
-                    intent.putExtra(CatalogAdapter.TIM, media.fileName);
-                    intent.putExtra(CatalogAdapter.EXT, media.ext);
                     context.startActivity(intent);
                 }
             });

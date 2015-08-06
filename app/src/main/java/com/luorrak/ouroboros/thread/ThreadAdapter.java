@@ -27,6 +27,7 @@ import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.CommentParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
+import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
@@ -276,10 +277,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                 threadViewHolder.image_0.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(context, DeepZoom.class);
+                        Intent intent = new Intent(context, DeepZoomActivity.class);
+                        intent.putExtra(CatalogAdapter.THREAD_NO, resto);
                         intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
-                        intent.putExtra(CatalogAdapter.TIM, tim);
-                        intent.putExtra(CatalogAdapter.EXT, ext);
                         context.startActivity(intent);
                     }
                 });
