@@ -278,6 +278,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(context, DeepZoomActivity.class);
+                        intent.putExtra(CatalogAdapter.TIM, tim);
                         intent.putExtra(CatalogAdapter.THREAD_NO, resto);
                         intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
                         context.startActivity(intent);

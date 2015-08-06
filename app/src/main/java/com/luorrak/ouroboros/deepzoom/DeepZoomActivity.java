@@ -36,6 +36,7 @@ import java.util.ArrayList;
 
 public class DeepZoomActivity extends AppCompatActivity{
     private ArrayList<Media> mediaList;
+    private String fileName;
     private String resto;
     private String boardName;
     private InfiniteDbHelper infiniteDbHelper;
@@ -52,14 +53,18 @@ public class DeepZoomActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        fileName = getIntent().getStringExtra(CatalogAdapter.TIM);
         resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
         boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
 
         newMediaListInstance();
+        int selectedMediaItem = findMediaItemIndex(fileName);
 
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+
+        mPager.setCurrentItem(selectedMediaItem);
 
     }
 
@@ -77,6 +82,15 @@ public class DeepZoomActivity extends AppCompatActivity{
         public int getCount() {
             return mediaList.size();
         }
+    }
+
+    public int findMediaItemIndex(String fileName){
+        for (int i = 0; i < mediaList.size(); i++){
+            if (mediaList.get(i).fileName.equals(fileName)){
+                return i;
+            }
+        }
+        return 0;
     }
 
     public void newMediaListInstance(){

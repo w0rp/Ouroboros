@@ -75,6 +75,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, DeepZoomActivity.class);
+                    intent.putExtra(CatalogAdapter.TIM, media.fileName);
                     intent.putExtra(CatalogAdapter.THREAD_NO, resto);
                     intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
                     context.startActivity(intent);
