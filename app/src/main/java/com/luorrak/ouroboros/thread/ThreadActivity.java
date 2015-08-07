@@ -126,7 +126,7 @@ public class ThreadActivity extends AppCompatActivity {
         fragmentManager.popBackStack("threadDialog", FragmentManager.POP_BACK_STACK_INCLUSIVE);
         if (threadNo != "0"){
             ThreadFragment threadFragment = new ThreadFragment().newInstance(threadNo, boardName);
-            fragmentTransaction.add(R.id.placeholder_card, threadFragment)
+            fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
                     .addToBackStack("thread")
                     .commit();
         } else {

@@ -78,6 +78,7 @@ public class ThreadFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         isStatusCheckIsRunning = false;
         if (savedInstanceState != null){
             savedLayoutState = savedInstanceState.getParcelable("savedLayout");
@@ -91,8 +92,7 @@ public class ThreadFragment extends Fragment{
         infiniteDbHelper = new InfiniteDbHelper(getActivity());
         networkFragment = (ThreadNetworkFragment) getFragmentManager().findFragmentByTag("Thread_Task");
         View view = inflater.inflate(R.layout.fragment_thread, container, false);
-        setHasOptionsMenu(true);
-
+        getActivity().invalidateOptionsMenu();
         layoutManager = new LinearLayoutManager(getActivity()){
             @Override
             protected int getExtraLayoutSpace(RecyclerView.State state) {
@@ -230,7 +230,7 @@ public class ThreadFragment extends Fragment{
                 break;
             }
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     public void setActionBarTitle(String title){
