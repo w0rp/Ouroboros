@@ -129,6 +129,7 @@ public class DeepZoomFragment extends Fragment {
             case R.id.action_save_image: {
                 Toast.makeText(getActivity(), "Downloading...", Toast.LENGTH_SHORT).show();
                 networkHelper.downloadFile(boardName, mediaItem.fileName, mediaItem.ext, getActivity());
+                break;
             }
             case R.id.action_external_browser: {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext)));
