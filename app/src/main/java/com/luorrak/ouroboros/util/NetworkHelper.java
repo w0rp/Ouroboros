@@ -260,7 +260,7 @@ public class NetworkHelper {
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext)));
         request.setDescription(tim + ext);
         request.setTitle(tim + ext);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, tim + ext);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS + "/Ouroboros", tim + ext);
 
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);
