@@ -10,7 +10,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
-import com.luorrak.ouroboros.gallery.Media;
+import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Util;
 

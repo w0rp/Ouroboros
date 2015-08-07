@@ -1,4 +1,4 @@
-package com.luorrak.ouroboros.gallery;
+package com.luorrak.ouroboros.util;
 
 /**
  * Ouroboros - An 8chan browser

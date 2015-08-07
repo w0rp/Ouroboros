@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
+import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.NetworkHelper;
 

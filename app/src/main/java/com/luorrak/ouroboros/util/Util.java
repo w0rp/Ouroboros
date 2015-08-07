@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.preference.PreferenceManager;
 
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.gallery.Media;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
