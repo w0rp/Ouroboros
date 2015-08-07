@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -126,6 +127,9 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         MenuItem replyButton = menu.findItem(R.id.action_reply);
         replyButton.setVisible(true);
 
+        MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
+        openExternalButton.setVisible(true);
+
         MenuItem searchButton = menu.findItem(R.id.action_search);
         searchButton.setVisible(true);
         SearchView searchView = (SearchView) searchButton.getActionView();
@@ -162,10 +166,17 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 intent.putExtra(CatalogAdapter.THREAD_NO, resto);
                 intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
                 getActivity().startActivity(intent);
+                break;
+            }
+            case R.id.action_external_browser: {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ChanUrls.getCatalogUrlExternal(boardName)));
+                startActivity(browserIntent);
+                break;
             }
             default:
                 return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     public void setActionBarTitle(String title){

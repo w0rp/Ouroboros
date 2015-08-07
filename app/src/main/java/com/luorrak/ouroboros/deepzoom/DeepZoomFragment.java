@@ -1,5 +1,7 @@
 package com.luorrak.ouroboros.deepzoom;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -115,7 +117,9 @@ public class DeepZoomFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
         MenuItem saveImage = menu.findItem(R.id.action_save_image);
+        MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
         saveImage.setVisible(true);
+        openExternalButton.setVisible(true);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -125,6 +129,11 @@ public class DeepZoomFragment extends Fragment {
             case R.id.action_save_image: {
                 Toast.makeText(getActivity(), "Downloading...", Toast.LENGTH_SHORT).show();
                 networkHelper.downloadFile(boardName, mediaItem.fileName, mediaItem.ext, getActivity());
+            }
+            case R.id.action_external_browser: {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext)));
+                startActivity(browserIntent);
+                break;
             }
         }
         return super.onOptionsItemSelected(item);

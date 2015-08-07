@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -165,12 +166,14 @@ public class ThreadFragment extends Fragment{
         MenuItem replyButton = menu.findItem(R.id.action_reply);
         MenuItem galleryButton = menu.findItem(R.id.action_gallery);
         MenuItem saveAllImagesButton = menu.findItem(R.id.action_save_all_images);
+        MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
 
         refreshButton.setVisible(true);
         scrollButton.setVisible(true);
         replyButton.setVisible(true);
         galleryButton.setVisible(true);
         saveAllImagesButton.setVisible(true);
+        openExternalButton.setVisible(true);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -227,6 +230,11 @@ public class ThreadFragment extends Fragment{
                             }
                         })
                         .show();
+                break;
+            }
+            case R.id.action_external_browser: {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ChanUrls.getThreadUrlExternal(boardName, resto)));
+                startActivity(browserIntent);
                 break;
             }
         }

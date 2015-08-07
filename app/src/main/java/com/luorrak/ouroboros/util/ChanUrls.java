@@ -41,6 +41,15 @@ public class ChanUrls {
         return builder.toString();
     }
 
+    public static String getCatalogUrlExternal(String boardName){
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(SCHEME)
+                .authority(DOMAIN_NAME)
+                .appendPath(boardName)
+                .appendPath("catalog.html")
+                .build();
+        return builder.toString();
+    }
     public static String getThreadUrl(String boardName, String no){
         Uri.Builder builder = new Uri.Builder();
         builder.scheme(SCHEME)
@@ -48,6 +57,17 @@ public class ChanUrls {
                 .appendPath(boardName)
                 .appendPath(THREAD_FOLDER)
                 .appendPath(no + THREAD_ENDPOINT)
+                .build();
+        return builder.toString();
+    }
+
+    public static String getThreadUrlExternal(String boardName, String no){
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(SCHEME)
+                .authority(DOMAIN_NAME)
+                .appendPath(boardName)
+                .appendPath(THREAD_FOLDER)
+                .appendPath(no + ".html")
                 .build();
         return builder.toString();
     }
