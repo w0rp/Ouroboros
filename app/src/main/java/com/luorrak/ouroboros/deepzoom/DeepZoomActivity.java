@@ -57,14 +57,14 @@ public class DeepZoomActivity extends AppCompatActivity{
         resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
         boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
 
-        newMediaListInstance();
+        newMediaListInstance(infiniteDbHelper, resto);
         int selectedMediaItem = findMediaItemIndex(fileName);
 
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPager.setCurrentItem(selectedMediaItem);
         mPager.setAdapter(mPagerAdapter);
 
-        mPager.setCurrentItem(selectedMediaItem);
 
     }
 
@@ -75,7 +75,7 @@ public class DeepZoomActivity extends AppCompatActivity{
 
         @Override
         public Fragment getItem(int position) {
-            return new DeepZoomFragment().newInstance(boardName, position);
+            return new DeepZoomFragment().newInstance(boardName, resto, position);
         }
 
         @Override
@@ -93,7 +93,7 @@ public class DeepZoomActivity extends AppCompatActivity{
         return 0;
     }
 
-    public void newMediaListInstance(){
+    public void newMediaListInstance(InfiniteDbHelper infiniteDbHelper, String resto){
         if (mediaList == null){
             mediaList = Util.createMediaList(infiniteDbHelper, resto);
         }

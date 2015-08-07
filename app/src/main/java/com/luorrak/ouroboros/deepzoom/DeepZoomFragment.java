@@ -18,6 +18,7 @@ import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.gallery.Media;
 import com.luorrak.ouroboros.util.ChanUrls;
+import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
 
 import uk.co.senab.photoview.PhotoView;
@@ -43,14 +44,17 @@ public class DeepZoomFragment extends Fragment {
     PhotoView photoView;
     ProgressBar progressBar;
     NetworkHelper networkHelper;
+    InfiniteDbHelper infiniteDbHelper;
     int position;
     String boardName;
+    String resto;
     Media mediaItem;
 
-    public Fragment newInstance(String boardName, int position) {
+    public Fragment newInstance(String boardName, String resto, int position) {
         DeepZoomFragment deepZoomFragment = new DeepZoomFragment();
         Bundle args = new Bundle();
         args.putString("boardName", boardName);
+        args.putString("resto", resto);
         args.putInt("position", position);
         deepZoomFragment.setArguments(args);
         return deepZoomFragment;
@@ -60,10 +64,19 @@ public class DeepZoomFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         networkHelper = new NetworkHelper();
+        infiniteDbHelper = new InfiniteDbHelper(getActivity());
         if (getArguments() != null){
             boardName = getArguments().getString("boardName");
+            resto = getArguments().getString("resto");
             position = getArguments().getInt("position");
         }
+
+        if (savedInstanceState != null){
+            boardName = savedInstanceState.getString("boardName");
+            resto = savedInstanceState.getString("resto");
+            position = savedInstanceState.getInt("position");
+        }
+        ((DeepZoomActivity) getActivity()).newMediaListInstance(infiniteDbHelper, resto);
         mediaItem = ((DeepZoomActivity) getActivity()).getMediaItem(position);
     }
 
@@ -88,6 +101,14 @@ public class DeepZoomFragment extends Fragment {
                     }
                 });
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("boardName", boardName);
+        outState.putString("resto", resto);
+        outState.putInt("position", position);
     }
 
     @Override
