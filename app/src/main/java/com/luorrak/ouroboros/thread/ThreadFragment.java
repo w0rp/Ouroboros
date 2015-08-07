@@ -62,6 +62,7 @@ public class ThreadFragment extends Fragment{
     String resto;
     String boardName;
     Parcelable savedLayoutState ;
+    private boolean isStatusCheckIsRunning;
     private Handler handler;
 
     //Get thread number from link somehow
@@ -77,6 +78,7 @@ public class ThreadFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isStatusCheckIsRunning = false;
         if (savedInstanceState != null){
             savedLayoutState = savedInstanceState.getParcelable("savedLayout");
             resto = savedInstanceState.getString("resto");
@@ -113,15 +115,13 @@ public class ThreadFragment extends Fragment{
         }
 
         if (boardName != null){
-            getThread(resto, boardName);
+            handler = new Handler();
+            startStatusCheck();
             threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getFragmentManager(), boardName, getActivity());
             threadAdapter.setHasStableIds(true);
             threadAdapter.hasStableIds();
             recyclerView.setAdapter(threadAdapter);
         }
-
-        handler = new Handler();
-        startStatusCheck();
         return view;
     }
 
@@ -281,10 +281,14 @@ public class ThreadFragment extends Fragment{
     };
 
     private void startStatusCheck() {
-        statusCheck.run();
+        if (!isStatusCheckIsRunning){
+            isStatusCheckIsRunning = true;
+            statusCheck.run();
+        }
     }
 
     private void stopStatusCheck() {
+        isStatusCheckIsRunning = false;
         handler.removeCallbacks(statusCheck);
     }
 }
