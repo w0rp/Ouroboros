@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.view.ActionProvider;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -62,6 +64,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private String boardName = null;
     private InfiniteDbHelper infiniteDbHelper;
     private CatalogNetworkFragment networkFragment;
+    private ActionProvider shareActionProvider;
 
     public CatalogFragment() {
     }
@@ -123,12 +126,14 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
         inflater.inflate(R.menu.menu_main, menu);
-
         MenuItem replyButton = menu.findItem(R.id.action_reply);
-        replyButton.setVisible(true);
-
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
+        MenuItem shareButton = menu.findItem(R.id.menu_item_share);
+
+        replyButton.setVisible(true);
         openExternalButton.setVisible(true);
+        shareButton.setVisible(true);
+        shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
 
         MenuItem searchButton = menu.findItem(R.id.action_search);
         searchButton.setVisible(true);
@@ -171,6 +176,14 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
             case R.id.action_external_browser: {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ChanUrls.getCatalogUrlExternal(boardName)));
                 startActivity(browserIntent);
+                break;
+            }
+            case R.id.menu_item_share: {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                String shareBody = ChanUrls.getCatalogUrlExternal(boardName);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(shareIntent, "Share via"));
                 break;
             }
             default:

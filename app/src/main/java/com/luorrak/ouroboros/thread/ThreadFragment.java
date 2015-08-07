@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.v4.view.ActionProvider;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -64,6 +66,7 @@ public class ThreadFragment extends Fragment{
     String boardName;
     Parcelable savedLayoutState ;
     private boolean isStatusCheckIsRunning;
+    private ActionProvider shareActionProvider;
     private Handler handler;
 
     //Get thread number from link somehow
@@ -167,6 +170,7 @@ public class ThreadFragment extends Fragment{
         MenuItem galleryButton = menu.findItem(R.id.action_gallery);
         MenuItem saveAllImagesButton = menu.findItem(R.id.action_save_all_images);
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
+        MenuItem shareButton = menu.findItem(R.id.menu_item_share);
 
         refreshButton.setVisible(true);
         scrollButton.setVisible(true);
@@ -174,6 +178,9 @@ public class ThreadFragment extends Fragment{
         galleryButton.setVisible(true);
         saveAllImagesButton.setVisible(true);
         openExternalButton.setVisible(true);
+        shareButton.setVisible(true);
+
+        shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -235,6 +242,14 @@ public class ThreadFragment extends Fragment{
             case R.id.action_external_browser: {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ChanUrls.getThreadUrlExternal(boardName, resto)));
                 startActivity(browserIntent);
+                break;
+            }
+            case R.id.menu_item_share: {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                String shareBody = ChanUrls.getThreadUrlExternal(boardName, resto);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(shareIntent, "Share via"));
                 break;
             }
         }

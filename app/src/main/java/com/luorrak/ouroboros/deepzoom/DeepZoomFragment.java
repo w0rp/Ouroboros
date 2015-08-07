@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ActionProvider;
+import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,6 +53,7 @@ public class DeepZoomFragment extends Fragment {
     String boardName;
     String resto;
     Media mediaItem;
+    private ActionProvider shareActionProvider;
 
     public Fragment newInstance(String boardName, String resto, int position) {
         DeepZoomFragment deepZoomFragment = new DeepZoomFragment();
@@ -118,8 +121,13 @@ public class DeepZoomFragment extends Fragment {
         inflater.inflate(R.menu.menu_main, menu);
         MenuItem saveImage = menu.findItem(R.id.action_save_image);
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
+        MenuItem shareButton = menu.findItem(R.id.menu_item_share);
+
+        shareButton.setVisible(true);
         saveImage.setVisible(true);
         openExternalButton.setVisible(true);
+
+        shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -134,6 +142,14 @@ public class DeepZoomFragment extends Fragment {
             case R.id.action_external_browser: {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext)));
                 startActivity(browserIntent);
+                break;
+            }
+            case R.id.menu_item_share: {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                String shareBody = ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(shareIntent, "Share via"));
                 break;
             }
         }
