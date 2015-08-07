@@ -93,8 +93,8 @@ public class ThreadActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id ==android.R.id.home){
-            this.finish();
+        if (id == android.R.id.home){
+            this.onBackPressed();
             return true;
         }
 
