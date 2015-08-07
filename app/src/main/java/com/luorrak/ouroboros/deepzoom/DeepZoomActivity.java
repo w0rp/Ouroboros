@@ -62,8 +62,8 @@ public class DeepZoomActivity extends AppCompatActivity{
 
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        mPager.setCurrentItem(selectedMediaItem);
         mPager.setAdapter(mPagerAdapter);
+        mPager.setCurrentItem(selectedMediaItem);
 
 
     }
