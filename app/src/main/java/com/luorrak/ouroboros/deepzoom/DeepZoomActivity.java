@@ -1,5 +1,6 @@
 package com.luorrak.ouroboros.deepzoom;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -10,11 +11,13 @@ import android.support.v7.widget.Toolbar;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
+import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Ouroboros - An 8chan browser
@@ -95,7 +98,15 @@ public class DeepZoomActivity extends AppCompatActivity{
 
     public void newMediaListInstance(InfiniteDbHelper infiniteDbHelper, String resto){
         if (mediaList == null){
-            mediaList = Util.createMediaList(infiniteDbHelper, resto);
+            mediaList = new ArrayList<Media>();
+            Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
+            do {
+                byte[] serializedPostMedia = cursor.getBlob(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
+                if(serializedPostMedia != null){
+                    mediaList.addAll((Collection<? extends Media>) Util.deserializeObject(serializedPostMedia));
+                }
+            } while (cursor.moveToNext());
+            cursor.close();
         }
     }
 

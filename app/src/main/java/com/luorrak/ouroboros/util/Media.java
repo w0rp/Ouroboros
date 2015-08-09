@@ -20,6 +20,9 @@ import java.io.Serializable;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Media implements Serializable{
+    public String height;
+    public String width;
+    public String fileSize;
     public String no;
     public String fileName;
     public String originalFileName;

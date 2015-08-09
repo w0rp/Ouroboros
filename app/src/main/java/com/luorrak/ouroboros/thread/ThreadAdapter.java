@@ -5,36 +5,29 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Point;
-import android.net.Uri;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.ImageViewBitmapInfo;
-import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.CommentParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
-import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
-import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
-import com.luorrak.ouroboros.util.NetworkHelper;
-import com.luorrak.ouroboros.util.Util;
+import com.luorrak.ouroboros.util.Media;
+
+import java.util.ArrayList;
 
 
 /**
@@ -57,18 +50,12 @@ import com.luorrak.ouroboros.util.Util;
 public class ThreadAdapter extends CursorRecyclerAdapter {
     private final String LOG_TAG = ThreadAdapter.class.getSimpleName();
 
-    NetworkHelper networkHelper = new NetworkHelper();
     CommentParser commentParser = new CommentParser();
-    private LayoutInflater inflater;
     private FragmentManager fragmentManager;
     private String boardName;
-    private boolean visibile;
     private Context context;
     private InfiniteDbHelper infiniteDbHelper;
-    private final int W = 0, H = 1;
-    private int maxImgWidth;
-    private int maxImgHeight;
-    private int minImgHeight;
+
 
     public ThreadAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName, Context context) {
         super(cursor);
@@ -88,15 +75,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         final String com;
         String email;
         long threadTime;
-        final String tim;
-        final String ext;
         final String embed;
-        int imageWidth;
-        int imageHeight;
-        String imageUrl = null;
-        boolean isVideo = false;
-        boolean isWebm = false;
-        boolean isMp4 = false;
         final String resto;
         //Should make this into an object to make it more obvious
         String[] youtubeData = {null, null}; //youtubeData[0] is video url youtubeData[1] is image url to load for thumbnail
@@ -104,7 +83,6 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         ThreadViewHolder threadViewHolder = (ThreadViewHolder)holder;
 
         //Prevent refresh flickering
-        threadViewHolder.image_0.setVisibility(View.GONE);
         threadViewHolder.threadName.setVisibility(View.GONE);
         threadViewHolder.threadTripcode.setVisibility(View.GONE);
         threadViewHolder.threadNo.setVisibility(View.GONE);
@@ -114,7 +92,6 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         threadViewHolder.threadEmail.setVisibility(View.GONE);
         threadViewHolder.threadTime.setVisibility(View.GONE);
         threadViewHolder.threadReplies.setVisibility(View.GONE);
-        threadViewHolder.videoPlayButton.setVisibility(View.GONE);
 
         name = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NAME));
         tripcode = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TRIP));
@@ -123,12 +100,8 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         com = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_COM));
         email = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EMAIL));
         threadTime = cursor.getLong(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIME));
-        tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
-        ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
         embed = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EMBED));
         resto = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_RESTO));
-        imageHeight = Integer.valueOf(cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_IMAGE_HEIGHT)));
-        imageWidth = Integer.valueOf(cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_IMAGE_WIDTH)));
         id = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_ID));
 
         Cursor repliesCursor = infiniteDbHelper.getReplies(no);
@@ -182,110 +155,13 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                 ));
         threadViewHolder.threadTime.setVisibility(View.VISIBLE);
 
+
+        // VIEW PAGER ///////////////////////////////////////////////////////////////////////////////
         //does image exist?
-        if (tim != null && ext != null){
-            switch (ext) {
-                case ".webm":
-                    isVideo = true;
-                    isWebm = true;
-                    imageUrl = ChanUrls.getThumbnailUrl(boardName, tim);
-                    break;
-                case ".mp4":
-                    isVideo = true;
-                    isMp4 = true;
-                    imageUrl = ChanUrls.getThumbnailUrl(boardName, tim);
-                    break;
-                default:
-                    imageUrl = ChanUrls.getThumbnailUrl(boardName, tim);
-                    break;
-            }
-        } else if (embed != null && embed.contains("youtube.com")){
-            isVideo = true;
-            youtubeData = Util.parseYoutube(embed);
-            imageUrl = "https://" + youtubeData[1];
-        }
 
-        if (imageUrl != null){
-            threadViewHolder.image_0.setVisibility(View.VISIBLE);
-            if (embed == null){
-                updateImageBounds();
-                final int[] size = new int[2]; calcSize(size, imageHeight, imageWidth);
-                threadViewHolder.image_0.getLayoutParams().height = size[H];
-            } else {
-                //Jumping bug is back again here
-                threadViewHolder.image_0.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            }
-            final boolean finalIsVideo = isVideo;
-            Ion.with(threadViewHolder.image_0)
-                    .smartSize(true)
-                    .crossfade(true)
-                    .load(imageUrl)
-                    .withBitmapInfo()
-                    .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
-                        @Override
-                        public void onCompleted(Exception e, ImageViewBitmapInfo imageViewBitmapInfo) {
-                            if (e != null || imageViewBitmapInfo.getBitmapInfo() == null || finalIsVideo){
-                                return;
-                            }
-                            Ion.with(imageViewBitmapInfo.getImageView())
-                                    .crossfade(true)
-                                    .smartSize(true)
-                                    .load(ChanUrls.getImageUrl(boardName, tim, ext))
-                                    .withBitmapInfo();
-                        }
-                    });
-            if (isVideo) {
-                threadViewHolder.videoPlayButton.setVisibility(View.VISIBLE);
-                if (isWebm){
-                    threadViewHolder.videoPlayButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext));
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setDataAndType(uri, "video/webm");
-                            context.startActivity(intent);
-                        }
-                    });
-                } else if (isMp4) {
-                    threadViewHolder.videoPlayButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext));
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setDataAndType(uri, "video/mp4");
-                            context.startActivity(intent);
-                        }
-                    });
-                } else {
-                    //isembed
-                    if (youtubeData[0] != null){
-                        final String youtubeVideoUrl = youtubeData[0];
-                        threadViewHolder.videoPlayButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(youtubeVideoUrl));
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                context.startActivity(intent);
-                            }
-                        });
 
-                    }
-                }
-                threadViewHolder.image_0.setOnClickListener(null);
+        // END VIEWPAGER ///////////////////////////////////////////////////////////////////////////
 
-            } else {
-                threadViewHolder.image_0.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(context, DeepZoomActivity.class);
-                        intent.putExtra(CatalogAdapter.TIM, tim);
-                        intent.putExtra(CatalogAdapter.THREAD_NO, resto);
-                        intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
-                        context.startActivity(intent);
-                    }
-                });
-            }
-        }
 
         if (!replies.equals("0")){
             threadViewHolder.threadReplies.setVisibility(View.VISIBLE);
@@ -314,13 +190,6 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
     }
 
     @Override
-    public void onViewRecycled(RecyclerView.ViewHolder holder) {
-        ThreadViewHolder threadViewHolder = (ThreadViewHolder) holder;
-        threadViewHolder.image_0.setImageDrawable(null);
-        super.onViewRecycled(holder);
-    }
-
-    @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread, parent, false);
         return new ThreadViewHolder(view);
@@ -332,52 +201,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
     // Utility /////////////////////////////////////////////////////////////////////////////////////
 
-    //Adapted from Chanobol
-    private void calcSize(int[] size, double imageHeight, double imageWidth) {
-        double w = imageWidth, h = imageHeight;
-        if (w < maxImgWidth) {
-            double w_old = w;
-            w = Math.min(maxImgWidth, w_old * 2);
-            h *= w / w_old;
-        }
-        if (h < minImgHeight) {
-            double h_old = h;
-            h = minImgHeight;
-            w *= h / h_old;
-        }
 
-        if (w > maxImgWidth) {
-            double w_old = w;
-            w = maxImgWidth;
-            h *= w / w_old;
-        }
-        if (h > maxImgHeight) {
-            double h_old = h;
-            h = maxImgHeight;
-            w *= h / h_old;
-        }
-
-        size[W] = (int) w;
-        size[H] = (int) h;
-    }
-
-    //Adapted from Chanobol
-    private void updateImageBounds() {
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-        int screenWidth, screenHeight;
-        Point size = new Point();
-        display.getSize(size);
-        screenWidth = size.x;
-        screenHeight = size.y;
-
-        maxImgWidth = (int) (screenWidth * 0.9);
-        maxImgHeight = (int) (screenHeight * 0.8);
-        minImgHeight = (int) (screenHeight * 0.15);
-    }
 
     class ThreadViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public ImageView image_0;
         public TextView threadName;
         public TextView threadTripcode;
         public TextView threadNo;
@@ -387,12 +213,10 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         public TextView threadEmail;
         public TextView threadTime;
         public Button threadReplies;
-        public ImageView videoPlayButton;
         public Button threadReplyButton;
 
         public ThreadViewHolder(View itemView) {
             super(itemView);
-            image_0 = (ImageView) itemView.findViewById(R.id.thread_image_0);
             threadName = (TextView) itemView.findViewById(R.id.thread_name);
             threadTripcode = (TextView) itemView.findViewById(R.id.thread_tripcode);
             threadNo = (TextView) itemView.findViewById(R.id.thread_post_no);
@@ -402,12 +226,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadEmail = (TextView) itemView.findViewById(R.id.thread_email);
             threadTime = (TextView) itemView.findViewById(R.id.thread_time);
             threadReplies = (Button) itemView.findViewById(R.id.thread_view_replies_button);
-            videoPlayButton = (ImageView) itemView.findViewById(R.id.thread_video_play_button);
             threadReplyButton = (Button) itemView.findViewById(R.id.thread_submit_reply_button);
 
             threadReplies.setOnClickListener(this);
-            image_0.setOnClickListener(this);
-            videoPlayButton.setOnClickListener(this);
             threadReplyButton.setOnClickListener(this);
         }
 
@@ -423,6 +244,32 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                     break;
                 }
             }
+        }
+    }
+
+
+
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        byte[] serializedMediaList;
+        ArrayList<Media> mediaList;
+        String embed;
+        String resto;
+        public ScreenSlidePagerAdapter(android.support.v4.app.FragmentManager fm, byte[] serializedMediaList, ArrayList<Media> mediaList, String embed, String resto) {
+            super(fm);
+            this.serializedMediaList = serializedMediaList;
+            this.mediaList = mediaList;
+            this.embed = embed;
+            this.resto = resto;
+    }
+
+        @Override
+        public Fragment getItem(int position) {
+            return new MediaViewFragment().newInstance(boardName, position, serializedMediaList, embed, resto);
+        }
+
+        @Override
+        public int getCount() {
+            return mediaList.size();
         }
     }
 }

@@ -186,7 +186,7 @@ public class DbContract {
         WARNING: may be null
         Type: BLOB
         */
-        public static final String COLUMN_THREAD_EXTRA_FILES = "extra_files";
+        public static final String COLUMN_THREAD_MEDIA_FILES = "media_files";
     }
 
     public static final class UserPosts implements BaseColumns{

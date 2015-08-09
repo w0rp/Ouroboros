@@ -2,7 +2,6 @@ package com.luorrak.ouroboros.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.preference.PreferenceManager;
 
 import com.luorrak.ouroboros.R;
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 
 /**
  * Ouroboros - An 8chan browser
@@ -72,31 +70,10 @@ public class Util {
         return Integer.valueOf(themeValue);
     }
 
-    public static ArrayList<Media> createMediaList(InfiniteDbHelper infiniteDbHelper, String resto){
-        ArrayList<Media> mediaArrayList = new ArrayList<Media>();
-        Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
-
-        do {
-            String tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
-            String ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
-            byte[] serializedExtraFiles = cursor.getBlob(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTRA_FILES));
-
-            if (tim != null){
-                mediaArrayList.add(createMediaItem(tim, ext));
-            }
-            if (serializedExtraFiles != null){
-                ArrayList<Media> extraFiles = (ArrayList<Media>) Util.deserializeObject(serializedExtraFiles);
-                mediaArrayList.addAll(extraFiles);
-            }
-        } while (cursor.moveToNext());
-
-        cursor.close();
-
-        return mediaArrayList;
-    }
-
-    public static Media createMediaItem(String tim, String ext){
+    public static Media createMediaItem(String height, String width, String tim, String ext){
         Media mediaItem = new Media();
+        mediaItem.height = height;
+        mediaItem.width = width;
         mediaItem.fileName = tim;
         mediaItem.ext = ext;
         return mediaItem;

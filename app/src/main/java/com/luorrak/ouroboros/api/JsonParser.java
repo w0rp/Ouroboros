@@ -182,18 +182,29 @@ public class JsonParser {
         return id != null ? id.getAsString() : null;
     }
 
-    public byte[] getExtraFiles(JsonObject threadJson){
-        if (threadJson.has(THREAD_EXTRA_FILES)){
-            JsonArray extraFiles = threadJson.getAsJsonArray(THREAD_EXTRA_FILES);
-            ArrayList<Media> extraMediaArrayList = new ArrayList<>();
-            for (JsonElement fileElement : extraFiles){
-                JsonObject extraFileJson = fileElement.getAsJsonObject();
-                String tim = extraFileJson.get(THREAD_TIM).getAsString();
-                String ext = extraFileJson.get(THREAD_EXT).getAsString();
-                Media mediaItem = Util.createMediaItem(tim, ext);
-                extraMediaArrayList.add(mediaItem);
+    public byte[] getMediaFiles(JsonObject threadJson){
+        if (threadJson.has(THREAD_TIM)){
+            ArrayList<Media> mediaArrayList = new ArrayList<>();
+            String height = getThreadImageHeight(threadJson);
+            String width = getThreadImageWidth(threadJson);
+            String tim = getThreadTim(threadJson);
+            String ext = getThreadExt(threadJson);
+            Media mediaItem = Util.createMediaItem(height, width, tim, ext);
+            mediaArrayList.add(mediaItem);
+
+            if (threadJson.has(THREAD_EXTRA_FILES)){
+                JsonArray extraFiles = threadJson.getAsJsonArray(THREAD_EXTRA_FILES);
+                for (JsonElement fileElement : extraFiles){
+                    JsonObject extraFileJson = fileElement.getAsJsonObject();
+                    height = getThreadImageHeight(extraFileJson);
+                    width = getThreadImageWidth(extraFileJson);
+                    tim = getThreadTim(extraFileJson);
+                    ext = getThreadExt(extraFileJson);
+                    mediaItem = Util.createMediaItem(height, width, tim, ext);
+                    mediaArrayList.add(mediaItem);
+                }
             }
-            return Util.serializeObject(extraMediaArrayList);
+            return Util.serializeObject(mediaArrayList);
         }
         return null;
     }

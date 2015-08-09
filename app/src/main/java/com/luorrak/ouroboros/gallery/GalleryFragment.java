@@ -22,6 +22,7 @@ import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Ouroboros - An 8chan browser
@@ -69,6 +70,8 @@ public class GalleryFragment extends Fragment {
         setHasOptionsMenu(true);
         infiniteDbHelper = new InfiniteDbHelper(getActivity());
         networkHelper = new NetworkHelper();
+        ArrayList<Media> mediaArrayList = new ArrayList<>();
+
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
         getActivity().setTitle("Gallery");
         if (getArguments() != null){
@@ -76,7 +79,16 @@ public class GalleryFragment extends Fragment {
             resto = getArguments().getString("resto");
         }
 
-        ArrayList<Media> mediaArrayList = Util.createMediaList(infiniteDbHelper, resto);
+        Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
+        do {
+            byte[] serializedPostMedia = cursor.getBlob(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
+            if(serializedPostMedia != null){
+                mediaArrayList.addAll((Collection<? extends Media>) Util.deserializeObject(serializedPostMedia));
+            }
+        } while (cursor.moveToNext());
+
+        cursor.close();
+
         recyclerView = (RecyclerView) view.findViewById(R.id.gallery_list);
         gridLayoutManager = new GridLayoutManager(getActivity(), 3);
         recyclerView.setLayoutManager(gridLayoutManager);
