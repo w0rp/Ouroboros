@@ -1,6 +1,6 @@
 package com.luorrak.ouroboros.thread;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -57,7 +57,7 @@ public class CardDialogFragment extends Fragment {
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.postList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        ThreadAdapter threadAdapter = new ThreadAdapter(cursor, getActivity().getFragmentManager(), boardName, getActivity());
+        ThreadAdapter threadAdapter = new ThreadAdapter(cursor, getActivity().getSupportFragmentManager(), boardName, getActivity());
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(threadAdapter);

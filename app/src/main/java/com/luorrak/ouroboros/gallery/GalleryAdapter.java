@@ -1,9 +1,9 @@
 package com.luorrak.ouroboros.gallery;
 
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +13,8 @@ import android.widget.ImageView;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
-import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.ChanUrls;
+import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.NetworkHelper;
 
 import java.util.ArrayList;

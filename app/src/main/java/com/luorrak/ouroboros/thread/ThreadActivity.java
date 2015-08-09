@@ -1,10 +1,10 @@
 package com.luorrak.ouroboros.thread;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -57,7 +57,7 @@ public class ThreadActivity extends AppCompatActivity {
 
             String resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
             String boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
-            FragmentManager fragmentManager = getFragmentManager();
+            FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
             fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
@@ -119,7 +119,7 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     public void doPositiveClickInternal(String threadNo, String boardName) {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         //clear dialog fragments

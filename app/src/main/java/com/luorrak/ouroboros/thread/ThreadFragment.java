@@ -1,8 +1,7 @@
 package com.luorrak.ouroboros.thread;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -53,7 +53,7 @@ import com.luorrak.ouroboros.util.NetworkHelper;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class ThreadFragment extends Fragment{
+public class ThreadFragment extends Fragment {
     // Construction ////////////////////////////////////////////////////////////////////////////////
     private final String LOG_TAG = ThreadFragment.class.getSimpleName();
     private InfiniteDbHelper infiniteDbHelper;

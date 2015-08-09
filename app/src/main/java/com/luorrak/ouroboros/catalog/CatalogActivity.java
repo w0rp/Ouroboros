@@ -1,6 +1,6 @@
 package com.luorrak.ouroboros.catalog;
 
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
@@ -69,7 +69,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
 
         if (board != null){
             CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
         }
     }
@@ -89,7 +89,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         switch (menuItem.getItemId()){
             case R.id.drawer_item_boards:{
                 BoardListFragment boardListFragment = new BoardListFragment();
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
                 progressBar.setVisibility(View.INVISIBLE);
                 break;
@@ -100,14 +100,14 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
             }
             case R.id.drawer_item_settings: {
                 SettingsFragment settingsFragment = new SettingsFragment();
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, settingsFragment).commit();
                 progressBar.setVisibility(View.INVISIBLE);
                 break;
             }
             case R.id.drawer_item_licences: {
                 OpenSourceLicenseFragment openSourceLicenseFragment = new OpenSourceLicenseFragment();
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, openSourceLicenseFragment).commit();
                 progressBar.setVisibility(View.INVISIBLE);
                 break;

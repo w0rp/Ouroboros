@@ -1,7 +1,7 @@
 package com.luorrak.ouroboros.api;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.Html;

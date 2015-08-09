@@ -6,7 +6,6 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.catalog.CatalogActivity;
 
 /**
  * Ouroboros - An 8chan browser
