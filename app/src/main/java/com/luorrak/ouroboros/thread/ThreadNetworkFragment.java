@@ -127,7 +127,8 @@ public class ThreadNetworkFragment extends Fragment {
                         jsonParser.getThreadId(post),
                         jsonParser.getThreadEmbed(post),
                         jsonParser.getThreadImageHeight(post),
-                        jsonParser.getThreadImageWidth(post)
+                        jsonParser.getThreadImageWidth(post),
+                        jsonParser.getExtraFiles(post)
                 );
             }
             return null;

@@ -10,6 +10,12 @@ import com.luorrak.ouroboros.R;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -71,12 +77,16 @@ public class Util {
         Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
 
         do {
-            String no = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NO));
             String tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
             String ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
+            byte[] serializedExtraFiles = cursor.getBlob(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTRA_FILES));
 
             if (tim != null){
-                mediaArrayList.add(createMediaItem(no, tim, ext));
+                mediaArrayList.add(createMediaItem(tim, ext));
+            }
+            if (serializedExtraFiles != null){
+                ArrayList<Media> extraFiles = (ArrayList<Media>) Util.deserializeObject(serializedExtraFiles);
+                mediaArrayList.addAll(extraFiles);
             }
         } while (cursor.moveToNext());
 
@@ -85,11 +95,39 @@ public class Util {
         return mediaArrayList;
     }
 
-    public static Media createMediaItem(String no, String tim, String ext){
+    public static Media createMediaItem(String tim, String ext){
         Media mediaItem = new Media();
-        mediaItem.no = no;
         mediaItem.fileName = tim;
         mediaItem.ext = ext;
         return mediaItem;
+    }
+
+    public static byte[] serializeObject (Object object) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        try {
+            ObjectOutput objectOutput = new ObjectOutputStream(outputStream);
+            objectOutput.writeObject(object);
+            objectOutput.close();
+
+            byte[] serializedObject = outputStream.toByteArray();
+            return serializedObject;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public static Object deserializeObject(byte[] bytes) {
+        try {
+            ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(bytes));
+            Object object = inputStream.readObject();
+            inputStream.close();
+
+            return object;
+        } catch (IOException e) {
+            return null;
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
     }
 }

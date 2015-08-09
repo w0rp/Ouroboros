@@ -181,6 +181,12 @@ public class DbContract {
 
         public static final String COLUMN_THREAD_EMBED = "embed";
 
+        /*
+        Serialized Arraylist of Media Items
+        WARNING: may be null
+        Type: BLOB
+        */
+        public static final String COLUMN_THREAD_EXTRA_FILES = "extra_files";
     }
 
     public static final class UserPosts implements BaseColumns{

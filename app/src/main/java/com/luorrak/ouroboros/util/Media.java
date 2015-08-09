@@ -1,5 +1,7 @@
 package com.luorrak.ouroboros.util;
 
+import java.io.Serializable;
+
 /**
  * Ouroboros - An 8chan browser
  * Copyright (C) 2015  NothingOfNote
@@ -17,7 +19,7 @@ package com.luorrak.ouroboros.util;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class Media {
+public class Media implements Serializable{
     public String no;
     public String fileName;
     public String originalFileName;

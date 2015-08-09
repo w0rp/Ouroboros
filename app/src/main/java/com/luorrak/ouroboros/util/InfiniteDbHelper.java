@@ -125,7 +125,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     public boolean insertThreadEntry(String board, String resto, String no, String filename, String tims, String exts,
                                      String sub, String com, String email, String name, String trip, String time, String last_modified,
-                                     String id, String embed, String imageHeight, String imageWidth){
+                                     String id, String embed, String imageHeight, String imageWidth, byte[] extraFiles){
         long newRowId;
 
         ContentValues values = new ContentValues();
@@ -146,6 +146,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         values.put(ThreadEntry.COLUMN_THREAD_EMBED, embed);
         values.put(ThreadEntry.COLUMN_THREAD_IMAGE_HEIGHT, imageHeight);
         values.put(ThreadEntry.COLUMN_THREAD_IMAGE_WIDTH, imageWidth);
+        values.put(ThreadEntry.COLUMN_THREAD_EXTRA_FILES, extraFiles);
 
         try {
             db.insertOrThrow(
@@ -369,6 +370,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 ThreadEntry.COLUMN_THREAD_EMBED + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_IMAGE_HEIGHT + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_IMAGE_WIDTH + " TEXT, " +
+                ThreadEntry.COLUMN_THREAD_EXTRA_FILES + " BLOB, " +
 
                 //I think this should auto overwrite dup posts if they ever come up
                 " UNIQUE (" + ThreadEntry.COLUMN_THREAD_NO + ", " + ThreadEntry.COLUMN_BOARD_NAME +

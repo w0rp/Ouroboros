@@ -5,6 +5,8 @@ import android.util.Log;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.luorrak.ouroboros.util.Media;
+import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
 
@@ -178,6 +180,22 @@ public class JsonParser {
     public String getThreadId(JsonObject threadJson){
         JsonElement id = threadJson.get(THREAD_ID);
         return id != null ? id.getAsString() : null;
+    }
+
+    public byte[] getExtraFiles(JsonObject threadJson){
+        if (threadJson.has(THREAD_EXTRA_FILES)){
+            JsonArray extraFiles = threadJson.getAsJsonArray(THREAD_EXTRA_FILES);
+            ArrayList<Media> extraMediaArrayList = new ArrayList<>();
+            for (JsonElement fileElement : extraFiles){
+                JsonObject extraFileJson = fileElement.getAsJsonObject();
+                String tim = extraFileJson.get(THREAD_TIM).getAsString();
+                String ext = extraFileJson.get(THREAD_EXT).getAsString();
+                Media mediaItem = Util.createMediaItem(tim, ext);
+                extraMediaArrayList.add(mediaItem);
+            }
+            return Util.serializeObject(extraMediaArrayList);
+        }
+        return null;
     }
 
     public void checkExtraFiles(String label, ArrayList<String> value, JsonObject threadJson){
