@@ -86,7 +86,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
 
     @Override
     public MediaViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_thread_media_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.media_item, parent, false);
         return new MediaViewHolder(view);
     }
 
@@ -97,20 +97,22 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         final Media media = mediaItems.get(position);
         mediaViewHolder.playButton.setVisibility(View.GONE);
 
+        updateImageBounds();
+        final int[] size = new int[2]; calcSize(size, Double.parseDouble(media.height), Double.parseDouble(media.width));
+
+        if (mediaItems.size() <= 1){
+            mediaViewHolder.mediaImage.getLayoutParams().height = size[H];
+            mediaViewHolder.mediaImage.getLayoutParams().width = maxImgWidth;
+        } else {
+            mediaViewHolder.mediaImage.getLayoutParams().height =
+                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, context.getResources().getDisplayMetrics());
+
+            mediaViewHolder.mediaImage.getLayoutParams().width = maxImgWidth;
+            mediaViewHolder.mediaImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        }
+
+
         if (validExt.contains(media.ext)){
-            updateImageBounds();
-            final int[] size = new int[2]; calcSize(size, Double.parseDouble(media.height), Double.parseDouble(media.width));
-
-            if (mediaItems.size() <= 1){
-                mediaViewHolder.mediaImage.getLayoutParams().height = size[H];
-                mediaViewHolder.mediaImage.getLayoutParams().width = maxImgWidth;
-            } else {
-                mediaViewHolder.mediaImage.getLayoutParams().height =
-                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, context.getResources().getDisplayMetrics());
-
-                mediaViewHolder.mediaImage.getLayoutParams().width = maxImgWidth;
-                mediaViewHolder.mediaImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            }
             String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
             networkHelper.getImageWithCrossfade(mediaViewHolder.mediaImage, imageUrl);
 

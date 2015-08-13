@@ -71,7 +71,7 @@ public class MediaViewFragment extends Fragment {
         String resto = null;
         final String[] youtubeData;
 
-        View view = inflater.inflate(R.layout.fragment_thread_media_item, container, false);
+        View view = inflater.inflate(R.layout.media_item, container, false);
         ImageView mediaView = (ImageView) view.findViewById(R.id.thread_media_item);
         ImageView videoPlayButton = (ImageView) view.findViewById(R.id.thread_media_play_button);
 

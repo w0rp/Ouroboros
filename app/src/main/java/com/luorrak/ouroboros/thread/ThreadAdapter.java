@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -160,7 +159,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         threadViewHolder.threadTime.setVisibility(View.VISIBLE);
 
 
-        // VIEW PAGER ///////////////////////////////////////////////////////////////////////////////
+        // MediaView ///////////////////////////////////////////////////////////////////////////////
         //does image exist?
         MediaAdapter mediaAdapter;
         SnappyLinearLayoutManager layoutManager = new SnappyLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
@@ -170,6 +169,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             recyclerView.setVisibility(View.VISIBLE);
             ArrayList<Media> mediaArrayList = (ArrayList<Media>) Util.deserializeObject(serializedMediaList);
             mediaAdapter = new MediaAdapter(mediaArrayList, boardName, resto, fragmentManager, context, viewWidth);
+            if (mediaArrayList.size() > 1){
+                recyclerView.setScrollbarFadingEnabled(false);
+            }
         } else {
             recyclerView.setVisibility(View.GONE);
             mediaAdapter = new MediaAdapter(new ArrayList<Media>(), boardName, resto, fragmentManager, context, viewWidth);
@@ -177,7 +179,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
         recyclerView.setAdapter(mediaAdapter);
 
-        // END VIEWPAGER ///////////////////////////////////////////////////////////////////////////
+        // END MediaView ///////////////////////////////////////////////////////////////////////////
 
 
         if (!replies.equals("0")){
@@ -209,17 +211,6 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread, parent, false);
-
-        ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
-        if (viewTreeObserver.isAlive()) {
-            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    viewWidth = view.getWidth();
-                }
-            });
-        }
         return new ThreadViewHolder(view);
     }
 

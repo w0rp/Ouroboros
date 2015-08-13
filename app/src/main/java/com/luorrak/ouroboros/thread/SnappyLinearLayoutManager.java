@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
 /**
@@ -62,25 +61,17 @@ public class SnappyLinearLayoutManager extends LinearLayoutManager implements Sn
             return 0;
         }
         if (getOrientation() == HORIZONTAL) {
-            return calcPosForVelocity(velocityX, getChildAt(0).getLeft(), getChildAt(0).getWidth(),
-                    getPosition(getChildAt(0)));
+            return calcPosForVelocity(velocityX, getPosition(getChildAt(0)));
         } else {
-            return calcPosForVelocity(velocityY, getChildAt(0).getTop(), getChildAt(0).getHeight(),
-                    getPosition(getChildAt(0)));
+            return calcPosForVelocity(velocityY, getPosition(getChildAt(0)));
         }
     }
 
-    private int calcPosForVelocity(int velocity, int scrollPos, int childSize, int currPos) {
-        //final double v = Math.sqrt(velocity * velocity);
-        final double dist = getSplineFlingDistance(velocity/3);
-
-        final double tempScroll = scrollPos + (velocity > 0 ? dist : -dist);
-
+    private int calcPosForVelocity(int velocity, int currPos) {
         if (velocity < 0) {
-            // Not sure if I need to lower bound this here.
-            return (int) Math.max(currPos + tempScroll / childSize + 2 , 0);
+            return (int) Math.max(currPos, 0);
         } else {
-            return (int) (currPos + (tempScroll / childSize) + 1);
+            return (int) currPos + 1;
         }
     }
 
@@ -109,18 +100,6 @@ public class SnappyLinearLayoutManager extends LinearLayoutManager implements Sn
                 };
         linearSmoothScroller.setTargetPosition(position);
         startSmoothScroll(linearSmoothScroller);
-    }
-
-    private double getSplineFlingDistance(double velocity) {
-        final double l = getSplineDeceleration(velocity);
-        final double decelMinusOne = DECELERATION_RATE - 1.0;
-        return ViewConfiguration.getScrollFriction() * deceleration
-                * Math.exp(DECELERATION_RATE / decelMinusOne * l);
-    }
-
-    private double getSplineDeceleration(double velocity) {
-        return Math.log(INFLEXION * Math.abs(velocity)
-                / (ViewConfiguration.getScrollFriction() * deceleration));
     }
 
     /**
