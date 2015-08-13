@@ -98,6 +98,7 @@ public class DeepZoomFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
 
         Ion.with(photoView)
+                .deepZoom()
                 .load(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext))
                 .setCallback(new FutureCallback<ImageView>() {
                     @Override

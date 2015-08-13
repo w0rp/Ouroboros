@@ -256,6 +256,13 @@ public class NetworkHelper {
                 .withBitmapInfo();
     }
 
+    public void getImageWithCrossfade(ImageView imageView, String imageUrl) {
+        Ion.with(imageView)
+                .smartSize(true)
+                .crossfade(true)
+                .load(imageUrl);
+    }
+
     public void downloadFile(String boardName, String tim, String ext, Context context){
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext)));
         request.setDescription(tim + ext);

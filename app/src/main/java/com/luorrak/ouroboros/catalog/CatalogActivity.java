@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseFragment;
 import com.luorrak.ouroboros.settings.SettingsFragment;
@@ -47,6 +48,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
         setContentView(R.layout.activity_catalog);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 

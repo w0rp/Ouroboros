@@ -1,12 +1,11 @@
 package com.luorrak.ouroboros.thread;
 
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.format.DateUtils;
@@ -15,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -26,6 +26,7 @@ import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Media;
+import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
 
@@ -55,6 +56,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
     private String boardName;
     private Context context;
     private InfiniteDbHelper infiniteDbHelper;
+    int viewWidth;
 
 
     public ThreadAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName, Context context) {
@@ -77,6 +79,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         long threadTime;
         final String embed;
         final String resto;
+        byte[] serializedMediaList;
         //Should make this into an object to make it more obvious
         String[] youtubeData = {null, null}; //youtubeData[0] is video url youtubeData[1] is image url to load for thumbnail
 
@@ -103,6 +106,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         embed = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EMBED));
         resto = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_RESTO));
         id = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_ID));
+        serializedMediaList = cursor.getBlob(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
 
         Cursor repliesCursor = infiniteDbHelper.getReplies(no);
         String replies = String.valueOf(repliesCursor.getCount());
@@ -158,7 +162,20 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
         // VIEW PAGER ///////////////////////////////////////////////////////////////////////////////
         //does image exist?
+        MediaAdapter mediaAdapter;
+        SnappyLinearLayoutManager layoutManager = new SnappyLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+        SnappyRecyclerView recyclerView = (SnappyRecyclerView) threadViewHolder.threadMediaItemRecycler;
+        recyclerView.setLayoutManager(layoutManager);
+        if (serializedMediaList != null) {
+            recyclerView.setVisibility(View.VISIBLE);
+            ArrayList<Media> mediaArrayList = (ArrayList<Media>) Util.deserializeObject(serializedMediaList);
+            mediaAdapter = new MediaAdapter(mediaArrayList, boardName, resto, fragmentManager, context, viewWidth);
+        } else {
+            recyclerView.setVisibility(View.GONE);
+            mediaAdapter = new MediaAdapter(new ArrayList<Media>(), boardName, resto, fragmentManager, context, viewWidth);
+        }
 
+        recyclerView.setAdapter(mediaAdapter);
 
         // END VIEWPAGER ///////////////////////////////////////////////////////////////////////////
 
@@ -191,12 +208,22 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread, parent, false);
+
+        ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    viewWidth = view.getWidth();
+                }
+            });
+        }
         return new ThreadViewHolder(view);
     }
 
     // TextHandling ////////////////////////////////////////////////////////////////////////////////
-
 
 
     // Utility /////////////////////////////////////////////////////////////////////////////////////
@@ -214,6 +241,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         public TextView threadTime;
         public Button threadReplies;
         public Button threadReplyButton;
+        public SnappyRecyclerView threadMediaItemRecycler;
 
         public ThreadViewHolder(View itemView) {
             super(itemView);
@@ -227,6 +255,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadTime = (TextView) itemView.findViewById(R.id.thread_time);
             threadReplies = (Button) itemView.findViewById(R.id.thread_view_replies_button);
             threadReplyButton = (Button) itemView.findViewById(R.id.thread_submit_reply_button);
+            threadMediaItemRecycler = (SnappyRecyclerView) itemView.findViewById(R.id.thread_media_recycler);
 
             threadReplies.setOnClickListener(this);
             threadReplyButton.setOnClickListener(this);
@@ -247,29 +276,4 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         }
     }
 
-
-
-    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        byte[] serializedMediaList;
-        ArrayList<Media> mediaList;
-        String embed;
-        String resto;
-        public ScreenSlidePagerAdapter(android.support.v4.app.FragmentManager fm, byte[] serializedMediaList, ArrayList<Media> mediaList, String embed, String resto) {
-            super(fm);
-            this.serializedMediaList = serializedMediaList;
-            this.mediaList = mediaList;
-            this.embed = embed;
-            this.resto = resto;
-    }
-
-        @Override
-        public Fragment getItem(int position) {
-            return new MediaViewFragment().newInstance(boardName, position, serializedMediaList, embed, resto);
-        }
-
-        @Override
-        public int getCount() {
-            return mediaList.size();
-        }
-    }
 }

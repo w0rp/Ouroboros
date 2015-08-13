@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.DbContract;
@@ -51,6 +52,7 @@ public class DeepZoomActivity extends AppCompatActivity{
         Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deepzoom);
+        Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);

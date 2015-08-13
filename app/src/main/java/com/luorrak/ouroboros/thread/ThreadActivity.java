@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogActivity;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
@@ -42,6 +43,7 @@ public class ThreadActivity extends AppCompatActivity {
         Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
+        Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
