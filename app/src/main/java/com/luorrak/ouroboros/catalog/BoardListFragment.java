@@ -50,7 +50,7 @@ import com.koushikdutta.ion.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BoardListFragment extends Fragment {
+public class BoardListFragment extends android.app.Fragment {
     NavigationBoardListAdapter boardListAdapter;
 
     public BoardListFragment() {

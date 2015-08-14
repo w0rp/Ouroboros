@@ -1,6 +1,6 @@
 package com.luorrak.ouroboros.catalog;
 
-import android.support.v4.app.FragmentManager;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -86,7 +86,7 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
                     com,
                     "v",
                     "-1", //dummy data as link is unclickable
-                    fragmentManager,
+                    null,
                     infiniteDbHelper
             ));
         } else {

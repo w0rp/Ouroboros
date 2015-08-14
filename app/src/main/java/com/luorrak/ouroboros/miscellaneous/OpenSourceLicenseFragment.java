@@ -27,7 +27,7 @@ import com.luorrak.ouroboros.util.Util;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class OpenSourceLicenseFragment extends Fragment {
+public class OpenSourceLicenseFragment extends android.app.Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
