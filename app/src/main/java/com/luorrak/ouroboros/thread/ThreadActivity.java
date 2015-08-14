@@ -105,13 +105,11 @@ public class ThreadActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        if(getFragmentManager().getBackStackEntryCount() > 1){
-            getFragmentManager().popBackStack();
-        } else if(getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack();
-        } else {
-            this.finish();
-        }
+       if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+       } else {
+           this.finish();
+       }
     }
 
     public void doPositiveClickExternal(String url) {

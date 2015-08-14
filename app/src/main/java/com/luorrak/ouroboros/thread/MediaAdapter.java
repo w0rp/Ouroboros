@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.Display;
@@ -30,8 +31,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.ImageViewBitmapInfo;
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
@@ -114,7 +119,38 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
 
         if (validExt.contains(media.ext)){
             String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
-            networkHelper.getImageWithCrossfade(mediaViewHolder.mediaImage, imageUrl);
+            Ion.with(mediaViewHolder.mediaImage)
+                    .smartSize(true)
+                    .crossfade(true)
+                    .load(imageUrl)
+                    .withBitmapInfo()
+                    .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
+                        @Override
+                        public void onCompleted(Exception e, ImageViewBitmapInfo result) {
+                            if (e != null || result.getBitmapInfo() == null) {
+                                return;
+                            }
+
+                            Palette.generateAsync(result.getBitmapInfo().bitmap,
+                                    new Palette.PaletteAsyncListener() {
+                                        @Override
+                                        public void onGenerated(Palette palette) {
+                                            Palette.Swatch vibrant =
+                                                    palette.getLightMutedSwatch();
+                                            if (vibrant != null) {
+                                                mediaViewHolder.mediaHolder.setBackgroundColor(
+                                                        vibrant.getRgb());
+                                            }
+                                        }
+                                    });
+
+                            Ion.with(result.getImageView())
+                                    .crossfade(true)
+                                    .smartSize(true)
+                                    .load(ChanUrls.getImageUrl(boardName, media.fileName, media.ext))
+                                    .withBitmapInfo();
+                        }
+                    });
 
             mediaViewHolder.mediaImage.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -165,11 +201,13 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     }
 
     class MediaViewHolder extends RecyclerView.ViewHolder {
+        public FrameLayout mediaHolder;
         public ImageView mediaImage;
         public ImageView playButton;
 
         public MediaViewHolder(View itemView) {
             super(itemView);
+            mediaHolder = (FrameLayout) itemView.findViewById(R.id.media_holder);
             mediaImage = (ImageView) itemView.findViewById(R.id.thread_media_item);
             playButton = (ImageView) itemView.findViewById(R.id.thread_media_play_button);
         }

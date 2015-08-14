@@ -7,22 +7,24 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.graphics.Palette;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.NetworkHelper;
 
 import uk.co.senab.photoview.PhotoView;
@@ -90,7 +92,7 @@ public class DeepZoomFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_deepzoom, container, false);
         setHasOptionsMenu(true);
-
+        final LinearLayout deepzoomContainer = (LinearLayout) rootView.findViewById(R.id.deepzoom_container);
         photoView = (PhotoView) rootView.findViewById(R.id.deepzoom_photoview);
         photoView.setMaximumScale(16);
 
@@ -100,10 +102,27 @@ public class DeepZoomFragment extends Fragment {
         Ion.with(photoView)
                 .deepZoom()
                 .load(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext))
-                .setCallback(new FutureCallback<ImageView>() {
+                .withBitmapInfo()
+                .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                     @Override
-                    public void onCompleted(Exception e, android.widget.ImageView imageView) {
+                    public void onCompleted(Exception e, ImageViewBitmapInfo result) {
                         progressBar.setVisibility(View.INVISIBLE);
+                        if (e != null || result.getBitmapInfo() == null) {
+                            return;
+                        }
+
+                        Palette.generateAsync(result.getBitmapInfo().bitmap,
+                                new Palette.PaletteAsyncListener() {
+                                    @Override
+                                    public void onGenerated(Palette palette) {
+                                        Palette.Swatch vibrant =
+                                                palette.getLightMutedSwatch();
+                                        if (vibrant != null) {
+                                            deepzoomContainer.setBackgroundColor(
+                                                    vibrant.getRgb());
+                                        }
+                                    }
+                                });
                     }
                 });
         return rootView;
