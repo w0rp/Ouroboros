@@ -98,7 +98,12 @@ public class NetworkHelper {
 
         if (reply.filePath != null){
             for (int i = 0; i < reply.filePath.size(); i++){
-                parameters.add(new FilePart("file", new File(reply.filePath.get(i))));
+                if (i == 0){
+                    parameters.add(new FilePart("file", new File(reply.filePath.get(i))));
+                } else {
+                    int fileNumber = i + 1;
+                    parameters.add(new FilePart("file" + fileNumber, new File(reply.filePath.get(i))));
+                }
             }
         }
 
