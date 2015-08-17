@@ -37,6 +37,9 @@ public class Util {
     private static final int THEME_DEFAULT = 0;
     private static final int THEME_DARK = 1;
 
+    public static final int THREAD_LAYOUT_VERTICAL = 0;
+    public static final int THREAD_LAYOUT_HORIZONTAL = 1;
+
 
     public static String[] parseYoutube(String embed) {
         String[] youtubeData = new String[2];
@@ -67,6 +70,12 @@ public class Util {
     public static int getTheme(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String themeValue = sharedPreferences.getString("theme_preference", "0");
+        return Integer.valueOf(themeValue);
+    }
+
+    public static int getThreadView(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String themeValue = sharedPreferences.getString("thread_view", "0");
         return Integer.valueOf(themeValue);
     }
 

@@ -65,7 +65,7 @@ public class CommentParser {
         List<Node> comLineArray = doc.body().childNodes();
         CharSequence processedText = new SpannableString("");
 
-
+        int i = 1;
         for (Node comLine : comLineArray){
             //legacy stuff to avoid hard crashes
             if (comLine instanceof TextNode){
@@ -99,7 +99,11 @@ public class CommentParser {
                         CharSequence parsedNode = parseNode(node, currentBoard, resto, fragmentManager, infiniteDbHelper);
                         processedText = TextUtils.concat(processedText, parsedNode);
                     }
-                    processedText = TextUtils.concat(processedText, "\n");
+                    if (i++ != comLineArray.size()){
+                        processedText = TextUtils.concat(processedText, "\n");
+                    } else {
+                        break;
+                    }
                 }
             }
 
@@ -255,7 +259,5 @@ public class CommentParser {
             return differentThread;
         }
     }
-
-
 }
 

@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 
 /**
  * Ouroboros - An 8chan browser
- * Copyright (C) 2015  NothingOfNote
+ * Copyright (C) 2015  Luorrak
  * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,9 +69,9 @@ public class SnappyLinearLayoutManager extends LinearLayoutManager implements Sn
 
     private int calcPosForVelocity(int velocity, int currPos) {
         if (velocity < 0) {
-            return (int) Math.max(currPos, 0);
+            return Math.max(currPos, 0);
         } else {
-            return (int) currPos + 1;
+            return currPos + 1;
         }
     }
 

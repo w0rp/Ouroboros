@@ -134,17 +134,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadViewHolder.threadSub.setVisibility(View.VISIBLE);
         }
 
-        //Does comment exist
-        if (com != null){
-            Spannable spannableCom = commentParser.parseCom(com,
-                    boardName,
-                    cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_RESTO)),
-                    fragmentManager,
-                    infiniteDbHelper
-            );
-            threadViewHolder.threadCom.setVisibility(View.VISIBLE);
-            threadViewHolder.threadCom.setText(spannableCom);
-        }
+
 
         if (email != null && email.equals("sage")){
             threadViewHolder.threadEmail.setVisibility(View.VISIBLE);
@@ -181,6 +171,19 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
         // END MediaView ///////////////////////////////////////////////////////////////////////////
 
+        //Does comment exist
+        if (com != null){
+            Spannable spannableCom = commentParser.parseCom(com,
+                    boardName,
+                    cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_RESTO)),
+                    fragmentManager,
+                    infiniteDbHelper
+            );
+            threadViewHolder.threadCom.setVisibility(View.VISIBLE);
+
+            threadViewHolder.threadCom.setText(spannableCom);
+        }
+
 
         if (!replies.equals("0")){
             threadViewHolder.threadReplies.setVisibility(View.VISIBLE);
@@ -209,9 +212,21 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return Util.getThreadView(context);
+    }
+
+    @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread, parent, false);
-        return new ThreadViewHolder(view);
+        switch (viewType) {
+            default:
+            case Util.THREAD_LAYOUT_VERTICAL: {
+                return new ThreadViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread, parent, false));
+            }
+            case Util.THREAD_LAYOUT_HORIZONTAL: {
+                return new ThreadViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread_horizontal, parent, false));
+            }
+        }
     }
 
     // TextHandling ////////////////////////////////////////////////////////////////////////////////

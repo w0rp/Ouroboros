@@ -9,4 +9,13 @@
             android:entryValues="@array/themeValues"
             android:dialogTitle="Set Theme"
             android:defaultValue="0"/>
+
+    <ListPreference
+        android:key="thread_view"
+        android:title="Thread Layout"
+        android:summary="Change Thread Layout"
+        android:entries="@array/threadLayoutNames"
+        android:entryValues="@array/threadLayoutValues"
+        android:dialogTitle="Change Thread Layout"
+        android:defaultValue="0"/>
 </PreferenceScreen>

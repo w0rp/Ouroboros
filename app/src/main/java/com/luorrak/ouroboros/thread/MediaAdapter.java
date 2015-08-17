@@ -2,7 +2,7 @@ package com.luorrak.ouroboros.thread;
 
 /**
  * Ouroboros - An 8chan browser
- * Copyright (C) 2015  NothingOfNote
+ * Copyright (C) 2015  Luorrak
  * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,6 +69,8 @@ import java.util.List;
 
 
 public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> {
+    final int VERTICAL = 0;
+    final int HORIZONTAL = 1;
     String boardName;
     String resto;
     FragmentManager fragmentManager;
@@ -105,17 +108,27 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         updateImageBounds();
         final int[] size = new int[2]; calcSize(size, Double.parseDouble(media.height), Double.parseDouble(media.width));
 
-        if (mediaItems.size() <= 1){
-            mediaViewHolder.mediaImage.getLayoutParams().height = size[H];
-            mediaViewHolder.mediaImage.getLayoutParams().width = maxImgWidth;
-        } else {
-            mediaViewHolder.mediaImage.getLayoutParams().height =
-                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, context.getResources().getDisplayMetrics());
+        final int threadValue = Util.getThreadView(context);
 
-            mediaViewHolder.mediaImage.getLayoutParams().width = maxImgWidth;
-            mediaViewHolder.mediaImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        switch (threadValue){
+            default:
+            case Util.THREAD_LAYOUT_VERTICAL: {
+                if (mediaItems.size() <= 1){
+                    mediaViewHolder.mediaImage.getLayoutParams().height = size[H];
+                    mediaViewHolder.mediaImage.getLayoutParams().width = maxImgWidth;
+                } else {
+                    mediaViewHolder.mediaImage.getLayoutParams().height =
+                            (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, context.getResources().getDisplayMetrics());
+
+                    mediaViewHolder.mediaImage.getLayoutParams().width = maxImgWidth;
+                    mediaViewHolder.mediaImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                }
+                break;
+            }
+            case Util.THREAD_LAYOUT_HORIZONTAL: {
+                break;
+            }
         }
-
 
         if (validExt.contains(media.ext)){
             String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
@@ -143,6 +156,10 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                                             }
                                         }
                                     });
+
+                            if (threadValue == Util.THREAD_LAYOUT_HORIZONTAL){
+                                return;
+                            }
 
                             Ion.with(result.getImageView())
                                     .crossfade(true)
