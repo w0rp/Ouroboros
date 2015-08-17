@@ -20,6 +20,7 @@ package com.luorrak.ouroboros.thread;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
@@ -144,6 +145,8 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                                 return;
                             }
 
+                            generateSwatch(result.getBitmapInfo().bitmap, mediaViewHolder);
+
                             Palette.generateAsync(result.getBitmapInfo().bitmap,
                                     new Palette.PaletteAsyncListener() {
                                         @Override
@@ -179,12 +182,26 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                     context.startActivity(intent);
                 }
             });
-        } else {
-            if (media.ext.equals(".webm")){
-                String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
-                networkHelper.getImageWithCrossfade(mediaViewHolder.mediaImage, imageUrl);
-                mediaViewHolder.playButton.setVisibility(View.VISIBLE);
+        } else if (media.ext.equals(".webm") || media.ext.equals(".mp4")){
+            String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
+            Ion.with(mediaViewHolder.mediaImage)
+                    .smartSize(true)
+                    .crossfade(true)
+                    .load(imageUrl)
+                    .withBitmapInfo()
+                    .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
+                        @Override
+                        public void onCompleted(Exception e, ImageViewBitmapInfo result) {
+                            if (e != null || result.getBitmapInfo() == null) {
+                                return;
+                            }
 
+                            generateSwatch(result.getBitmapInfo().bitmap, mediaViewHolder);
+                        }
+                    });
+            mediaViewHolder.playButton.setVisibility(View.VISIBLE);
+
+            if (media.ext.equals(".webm")){
                 mediaViewHolder.playButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -195,10 +212,6 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                     }
                 });
             } else if (media.ext.equals(".mp4")) {
-                String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
-                networkHelper.getImageWithCrossfade(mediaViewHolder.mediaImage, imageUrl);
-                mediaViewHolder.playButton.setVisibility(View.VISIBLE);
-
                 mediaViewHolder.playButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -210,6 +223,21 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                 });
             }
         }
+    }
+
+    private void generateSwatch(Bitmap bitmap, final MediaViewHolder mediaViewHolder) {
+        Palette.generateAsync(bitmap,
+                new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        Palette.Swatch vibrant =
+                                palette.getLightMutedSwatch();
+                        if (vibrant != null) {
+                            mediaViewHolder.mediaHolder.setBackgroundColor(
+                                    vibrant.getRgb());
+                        }
+                    }
+                });
     }
 
     @Override
