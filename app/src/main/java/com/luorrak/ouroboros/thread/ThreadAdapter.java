@@ -3,8 +3,10 @@ package com.luorrak.ouroboros.thread;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
@@ -15,8 +17,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.ImageViewBitmapInfo;
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.CommentParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
@@ -71,7 +78,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         String name;
         String tripcode;
         final String no;
-        String id;
+        final String id;
         String sub;
         final String com;
         String email;
@@ -82,7 +89,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         //Should make this into an object to make it more obvious
         String[] youtubeData = {null, null}; //youtubeData[0] is video url youtubeData[1] is image url to load for thumbnail
 
-        ThreadViewHolder threadViewHolder = (ThreadViewHolder)holder;
+        final ThreadViewHolder threadViewHolder = (ThreadViewHolder)holder;
 
         //Prevent refresh flickering
         threadViewHolder.threadName.setVisibility(View.GONE);
@@ -94,6 +101,8 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         threadViewHolder.threadEmail.setVisibility(View.GONE);
         threadViewHolder.threadTime.setVisibility(View.GONE);
         threadViewHolder.threadReplies.setVisibility(View.GONE);
+        threadViewHolder.threadEmbed.setVisibility(View.GONE);
+        threadViewHolder.threadEmbedPlayButton.setVisibility(View.GONE);
 
         name = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NAME));
         tripcode = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TRIP));
@@ -165,6 +174,53 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         } else {
             recyclerView.setVisibility(View.GONE);
             mediaAdapter = new MediaAdapter(new ArrayList<Media>(), boardName, resto, fragmentManager, context, viewWidth);
+
+            // Youtube /////////////////////////////////////////////////////////////////////////////
+            if (embed != null){
+                youtubeData = Util.parseYoutube(embed);
+                if (youtubeData[0] != null){
+                    threadViewHolder.threadEmbed.setVisibility(View.VISIBLE);
+                    threadViewHolder.threadEmbedPlayButton.setVisibility(View.VISIBLE);
+                    String imageUrl = "https://" + youtubeData[1];
+
+                    Ion.with(threadViewHolder.threadEmbed)
+                            .load(imageUrl)
+                            .withBitmapInfo()
+                            .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
+                                @Override
+                                public void onCompleted(Exception e, ImageViewBitmapInfo result) {
+                                    if (e != null || result.getBitmapInfo() == null) {
+                                        return;
+                                    }
+
+                                    Palette.generateAsync(result.getBitmapInfo().bitmap,
+                                            new Palette.PaletteAsyncListener() {
+                                                @Override
+                                                public void onGenerated(Palette palette) {
+                                                    Palette.Swatch vibrant =
+                                                            palette.getLightMutedSwatch();
+                                                    if (vibrant != null) {
+                                                        threadViewHolder.mediaHolder.setBackgroundColor(
+                                                                vibrant.getRgb());
+                                                    }
+                                                }
+                                            });
+                                }
+                            });
+
+                    final String youtubeVideoUrl = youtubeData[0];
+                    threadViewHolder.threadEmbedPlayButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(youtubeVideoUrl));
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(intent);
+                        }
+                    });
+
+                }
+            }
+            // End Youtube /////////////////////////////////////////////////////////////////////////
         }
 
         recyclerView.setAdapter(mediaAdapter);
@@ -247,6 +303,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         public TextView threadTime;
         public Button threadReplies;
         public Button threadReplyButton;
+        public ImageView threadEmbed;
+        public ImageView threadEmbedPlayButton;
+        public FrameLayout mediaHolder;
         public SnappyRecyclerView threadMediaItemRecycler;
 
         public ThreadViewHolder(View itemView) {
@@ -261,7 +320,10 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadTime = (TextView) itemView.findViewById(R.id.thread_time);
             threadReplies = (Button) itemView.findViewById(R.id.thread_view_replies_button);
             threadReplyButton = (Button) itemView.findViewById(R.id.thread_submit_reply_button);
+            threadEmbed = (ImageView) itemView.findViewById(R.id.thread_embed);
+            threadEmbedPlayButton = (ImageView) itemView.findViewById(R.id.thread_embed_play_button);
             threadMediaItemRecycler = (SnappyRecyclerView) itemView.findViewById(R.id.thread_media_recycler);
+            mediaHolder = (FrameLayout) itemView.findViewById(R.id.thread_image_holder);
 
             threadReplies.setOnClickListener(this);
             threadReplyButton.setOnClickListener(this);
