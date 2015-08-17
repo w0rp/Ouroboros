@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -46,7 +47,7 @@ import uk.co.senab.photoview.PhotoView;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class DeepZoomFragment extends Fragment {
+public class DeepZoomFragment extends Fragment{
     PhotoView photoView;
     ProgressBar progressBar;
     NetworkHelper networkHelper;
@@ -55,6 +56,7 @@ public class DeepZoomFragment extends Fragment {
     String boardName;
     String resto;
     Media mediaItem;
+    ImageView mediaPlayButton;
     private ActionProvider shareActionProvider;
 
     public Fragment newInstance(String boardName, String resto, int position) {
@@ -95,21 +97,20 @@ public class DeepZoomFragment extends Fragment {
         final LinearLayout deepzoomContainer = (LinearLayout) rootView.findViewById(R.id.deepzoom_container);
         photoView = (PhotoView) rootView.findViewById(R.id.deepzoom_photoview);
         photoView.setMaximumScale(16);
+        mediaPlayButton = (ImageView) rootView.findViewById(R.id.deepzoom_media_play_button);
+        mediaPlayButton.setVisibility(View.GONE);
 
         progressBar = (ProgressBar) rootView.findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
 
         Ion.with(photoView)
                 .deepZoom()
-                .load(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext))
+                .load(ChanUrls.getThumbnailUrl(boardName, mediaItem.fileName))
                 .withBitmapInfo()
                 .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                     @Override
                     public void onCompleted(Exception e, ImageViewBitmapInfo result) {
                         progressBar.setVisibility(View.INVISIBLE);
-                        if (e != null || result.getBitmapInfo() == null) {
-                            return;
-                        }
 
                         Palette.generateAsync(result.getBitmapInfo().bitmap,
                                 new Palette.PaletteAsyncListener() {
@@ -123,9 +124,37 @@ public class DeepZoomFragment extends Fragment {
                                         }
                                     }
                                 });
+
+                        if (mediaItem.ext.equals(".webm") || mediaItem.ext.equals(".mp4")) {
+                            return;
+                        }
+
+                        Ion.with(result.getImageView())
+                                .crossfade(true)
+                                .smartSize(true)
+                                .load(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext))
+                                .withBitmapInfo();
                     }
                 });
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (mediaItem.ext.equals(".webm") || mediaItem.ext.equals(".mp4")){
+            mediaPlayButton.setVisibility(View.VISIBLE);
+            mediaPlayButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.setDataAndType(uri, "video/" + mediaItem.ext.substring(1));
+                    startActivity(intent);
+                }
+            });
+        }
+
     }
 
     @Override
@@ -174,5 +203,9 @@ public class DeepZoomFragment extends Fragment {
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void initVideoIntent(String boardName, String tim, String ext) {
+
     }
 }

@@ -245,6 +245,12 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         return mediaItems.size();
     }
 
+    @Override
+    public void onViewRecycled(MediaViewHolder holder) {
+        holder.mediaImage.setImageDrawable(null);
+        super.onViewRecycled(holder);
+    }
+
     class MediaViewHolder extends RecyclerView.ViewHolder {
         public FrameLayout mediaHolder;
         public ImageView mediaImage;
