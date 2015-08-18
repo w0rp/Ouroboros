@@ -87,6 +87,7 @@ public class DeepZoomFragment extends Fragment{
         }
         ((DeepZoomActivity) getActivity()).newMediaListInstance(infiniteDbHelper, resto);
         mediaItem = ((DeepZoomActivity) getActivity()).getMediaItem(position);
+        getActivity().setTitle(mediaItem.fileName + mediaItem.ext);
     }
 
     @Nullable

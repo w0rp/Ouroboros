@@ -8,13 +8,15 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.DbContract;
-import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
@@ -56,7 +58,8 @@ public class DeepZoomActivity extends AppCompatActivity{
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         fileName = getIntent().getStringExtra(CatalogAdapter.TIM);
         resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
@@ -69,8 +72,23 @@ public class DeepZoomActivity extends AppCompatActivity{
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(selectedMediaItem);
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home){
+            this.onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
