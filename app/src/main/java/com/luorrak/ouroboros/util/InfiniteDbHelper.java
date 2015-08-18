@@ -34,7 +34,7 @@ import com.luorrak.ouroboros.util.DbContract.UserPosts;
 public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     private final String LOG_TAG = InfiniteDbHelper.class.getSimpleName();
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "cache.db";
     SQLiteDatabase db = getWritableDatabase();
 
@@ -351,9 +351,6 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 ThreadEntry.COLUMN_BOARD_NAME + " INTEGER NOT NULL, " +
                 ThreadEntry.COLUMN_THREAD_RESTO + " TEXT NOT NULL, " +
                 ThreadEntry.COLUMN_THREAD_NO + " TEXT NOT NULL, " +
-                ThreadEntry.COLUMN_THREAD_FILENAME + " TEXT, " +
-                ThreadEntry.COLUMN_THREAD_TIMS + " TEXT, " +
-                ThreadEntry.COLUMN_THREAD_EXTS + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_SUB + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_COM + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_EMAIL + " TEXT, " +
