@@ -35,6 +35,7 @@ import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -63,6 +64,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
     private Context context;
     private InfiniteDbHelper infiniteDbHelper;
     int viewWidth;
+    private HashMap<Integer, MediaAdapter> mediaAdapterHashMap;
 
 
     public ThreadAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName, Context context) {
@@ -71,6 +73,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         this.boardName = boardName;
         this.context = context;
         this.infiniteDbHelper = new InfiniteDbHelper(context);
+        mediaAdapterHashMap = new HashMap<Integer, MediaAdapter>();
     }
 
     @Override
@@ -143,8 +146,6 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadViewHolder.threadSub.setVisibility(View.VISIBLE);
         }
 
-
-
         if (email != null && email.equals("sage")){
             threadViewHolder.threadEmail.setVisibility(View.VISIBLE);
         }
@@ -161,20 +162,17 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         // MediaView ///////////////////////////////////////////////////////////////////////////////
         //does image exist?
         MediaAdapter mediaAdapter;
-        SnappyLinearLayoutManager layoutManager = new SnappyLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
-        SnappyRecyclerView recyclerView = (SnappyRecyclerView) threadViewHolder.threadMediaItemRecycler;
-        recyclerView.setLayoutManager(layoutManager);
+
+        ArrayList<Media> mediaArrayList;
         if (serializedMediaList != null) {
-            recyclerView.setVisibility(View.VISIBLE);
-            ArrayList<Media> mediaArrayList = (ArrayList<Media>) Util.deserializeObject(serializedMediaList);
-            mediaAdapter = new MediaAdapter(mediaArrayList, boardName, resto, fragmentManager, context, viewWidth);
+            threadViewHolder.threadMediaItemRecycler.setVisibility(View.VISIBLE);
+            mediaArrayList = (ArrayList<Media>) Util.deserializeObject(serializedMediaList);
             if (mediaArrayList.size() > 1){
-                recyclerView.setScrollbarFadingEnabled(false);
+                threadViewHolder.threadMediaItemRecycler.setScrollbarFadingEnabled(false);
             }
         } else {
-            recyclerView.setVisibility(View.GONE);
-            mediaAdapter = new MediaAdapter(new ArrayList<Media>(), boardName, resto, fragmentManager, context, viewWidth);
-
+            threadViewHolder.threadMediaItemRecycler.setVisibility(View.GONE);
+            mediaArrayList = new ArrayList<>();
             // Youtube /////////////////////////////////////////////////////////////////////////////
             if (embed != null){
                 youtubeData = Util.parseYoutube(embed);
@@ -223,7 +221,12 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             // End Youtube /////////////////////////////////////////////////////////////////////////
         }
 
-        recyclerView.setAdapter(mediaAdapter);
+        // Create an adapter if none exists
+        if (!mediaAdapterHashMap.containsKey(cursor.getPosition())) {
+            mediaAdapterHashMap.put(cursor.getPosition(), new MediaAdapter(mediaArrayList, boardName, resto, fragmentManager, context, viewWidth));
+        }
+
+        threadViewHolder.threadMediaItemRecycler.setAdapter(mediaAdapterHashMap.get(cursor.getPosition()));
 
         // END MediaView ///////////////////////////////////////////////////////////////////////////
 
@@ -277,10 +280,16 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         switch (viewType) {
             default:
             case Util.THREAD_LAYOUT_VERTICAL: {
-                return new ThreadViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread, parent, false));
+                ThreadViewHolder threadViewHolder = new ThreadViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread, parent, false));
+                SnappyLinearLayoutManager layoutManager = new SnappyLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+                threadViewHolder.threadMediaItemRecycler.setLayoutManager(layoutManager);
+                return threadViewHolder;
             }
             case Util.THREAD_LAYOUT_HORIZONTAL: {
-                return new ThreadViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread_horizontal, parent, false));
+                ThreadViewHolder threadViewHolder = new ThreadViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.card_thread_horizontal, parent, false));
+                SnappyLinearLayoutManager layoutManager = new SnappyLinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+                threadViewHolder.threadMediaItemRecycler.setLayoutManager(layoutManager);
+                return threadViewHolder;
             }
         }
     }

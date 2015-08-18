@@ -110,26 +110,32 @@ public class DeepZoomFragment extends Fragment{
                 .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                     @Override
                     public void onCompleted(Exception e, ImageViewBitmapInfo result) {
+                        if (e != null) {
+                            return;
+                        }
+
                         progressBar.setVisibility(View.INVISIBLE);
 
-                        Palette.generateAsync(result.getBitmapInfo().bitmap,
-                                new Palette.PaletteAsyncListener() {
-                                    @Override
-                                    public void onGenerated(Palette palette) {
-                                        Palette.Swatch vibrant =
-                                                palette.getLightMutedSwatch();
-                                        if (vibrant != null) {
-                                            deepzoomContainer.setBackgroundColor(
-                                                    vibrant.getRgb());
+                        if (result.getBitmapInfo() != null){
+                            Palette.generateAsync(result.getBitmapInfo().bitmap,
+                                    new Palette.PaletteAsyncListener() {
+                                        @Override
+                                        public void onGenerated(Palette palette) {
+                                            Palette.Swatch vibrant =
+                                                    palette.getLightMutedSwatch();
+                                            if (vibrant != null) {
+                                                deepzoomContainer.setBackgroundColor(
+                                                        vibrant.getRgb());
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                        }
 
                         if (mediaItem.ext.equals(".webm") || mediaItem.ext.equals(".mp4")) {
                             return;
                         }
 
-                        Ion.with(result.getImageView())
+                        Ion.with(photoView)
                                 .crossfade(true)
                                 .smartSize(true)
                                 .load(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext))
