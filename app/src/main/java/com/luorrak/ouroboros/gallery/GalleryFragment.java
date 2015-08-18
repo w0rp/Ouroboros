@@ -1,7 +1,7 @@
 package com.luorrak.ouroboros.gallery;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -15,11 +15,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Ouroboros - An 8chan browser
@@ -67,6 +70,8 @@ public class GalleryFragment extends Fragment {
         setHasOptionsMenu(true);
         infiniteDbHelper = new InfiniteDbHelper(getActivity());
         networkHelper = new NetworkHelper();
+        ArrayList<Media> mediaArrayList = new ArrayList<>();
+
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
         getActivity().setTitle("Gallery");
         if (getArguments() != null){
@@ -74,41 +79,23 @@ public class GalleryFragment extends Fragment {
             resto = getArguments().getString("resto");
         }
 
-        ArrayList<Media> mediaArrayList = createMediaList();
-        recyclerView = (RecyclerView) view.findViewById(R.id.gallery_list);
-        gridLayoutManager = new GridLayoutManager(getActivity(), 3);
-        recyclerView.setLayoutManager(gridLayoutManager);
-        galleryAdapter = new GalleryAdapter(mediaArrayList, boardName, getFragmentManager(), getActivity());
-        recyclerView.setAdapter(galleryAdapter);
-
-        return view;
-    }
-
-    public ArrayList<Media> createMediaList(){
-        ArrayList<Media> mediaArrayList = new ArrayList<Media>();
         Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
-
         do {
-            String no = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NO));
-            String tim = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
-            String ext = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
-
-            if (tim != null){
-                mediaArrayList.add(createMediaItem(no, tim, ext));
+            byte[] serializedPostMedia = cursor.getBlob(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
+            if(serializedPostMedia != null){
+                mediaArrayList.addAll((Collection<? extends Media>) Util.deserializeObject(serializedPostMedia));
             }
         } while (cursor.moveToNext());
 
         cursor.close();
 
-        return mediaArrayList;
-    }
+        recyclerView = (RecyclerView) view.findViewById(R.id.gallery_list);
+        gridLayoutManager = new GridLayoutManager(getActivity(), 3);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        galleryAdapter = new GalleryAdapter(mediaArrayList, boardName, resto, getFragmentManager(), getActivity());
+        recyclerView.setAdapter(galleryAdapter);
 
-    public Media createMediaItem(String no, String tim, String ext){
-        Media mediaItem = new Media();
-        mediaItem.no = no;
-        mediaItem.fileName = tim;
-        mediaItem.ext = ext;
-        return mediaItem;
+        return view;
     }
 
     @Override

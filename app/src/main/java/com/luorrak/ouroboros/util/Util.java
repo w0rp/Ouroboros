@@ -9,6 +9,13 @@ import com.luorrak.ouroboros.R;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+
 /**
  * Ouroboros - An 8chan browser
  * Copyright (C) 2015  Luorrak
@@ -29,6 +36,9 @@ import org.jsoup.nodes.Document;
 public class Util {
     private static final int THEME_DEFAULT = 0;
     private static final int THEME_DARK = 1;
+
+    public static final int THREAD_LAYOUT_VERTICAL = 0;
+    public static final int THREAD_LAYOUT_HORIZONTAL = 1;
 
 
     public static String[] parseYoutube(String embed) {
@@ -61,5 +71,55 @@ public class Util {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String themeValue = sharedPreferences.getString("theme_preference", "0");
         return Integer.valueOf(themeValue);
+    }
+
+    public static int getThreadView(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String themeValue = sharedPreferences.getString("thread_view", "0");
+        return Integer.valueOf(themeValue);
+    }
+
+    public static int getCatalogColumns(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String themeValue = sharedPreferences.getString("catalog_grid_columns", "3");
+        return Integer.valueOf(themeValue);
+    }
+
+    public static Media createMediaItem(String height, String width, String tim, String ext){
+        Media mediaItem = new Media();
+        mediaItem.height = height;
+        mediaItem.width = width;
+        mediaItem.fileName = tim;
+        mediaItem.ext = ext;
+        return mediaItem;
+    }
+
+    public static byte[] serializeObject (Object object) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        try {
+            ObjectOutput objectOutput = new ObjectOutputStream(outputStream);
+            objectOutput.writeObject(object);
+            objectOutput.close();
+
+            byte[] serializedObject = outputStream.toByteArray();
+            return serializedObject;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public static Object deserializeObject(byte[] bytes) {
+        try {
+            ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(bytes));
+            Object object = inputStream.readObject();
+            inputStream.close();
+
+            return object;
+        } catch (IOException e) {
+            return null;
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.luorrak.ouroboros.thread;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -114,9 +114,6 @@ public class ThreadNetworkFragment extends Fragment {
                         boardName,
                         jsonParser.getThreadResto(post),
                         jsonParser.getThreadNo(post),
-                        jsonParser.getThreadFilename(post),
-                        jsonParser.getThreadTim(post),
-                        jsonParser.getThreadExt(post),
                         jsonParser.getThreadSub(post),
                         jsonParser.getThreadCom(post),
                         jsonParser.getThreadEmail(post),
@@ -126,8 +123,7 @@ public class ThreadNetworkFragment extends Fragment {
                         jsonParser.getThreadLastModified(post),
                         jsonParser.getThreadId(post),
                         jsonParser.getThreadEmbed(post),
-                        jsonParser.getThreadImageHeight(post),
-                        jsonParser.getThreadImageWidth(post)
+                        jsonParser.getMediaFiles(post)
                 );
             }
             return null;

@@ -5,6 +5,8 @@ import android.util.Log;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.luorrak.ouroboros.util.Media;
+import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
 
@@ -178,6 +180,33 @@ public class JsonParser {
     public String getThreadId(JsonObject threadJson){
         JsonElement id = threadJson.get(THREAD_ID);
         return id != null ? id.getAsString() : null;
+    }
+
+    public byte[] getMediaFiles(JsonObject threadJson){
+        if (threadJson.has(THREAD_TIM)){
+            ArrayList<Media> mediaArrayList = new ArrayList<>();
+            String height = getThreadImageHeight(threadJson);
+            String width = getThreadImageWidth(threadJson);
+            String tim = getThreadTim(threadJson);
+            String ext = getThreadExt(threadJson);
+            Media mediaItem = Util.createMediaItem(height, width, tim, ext);
+            mediaArrayList.add(mediaItem);
+
+            if (threadJson.has(THREAD_EXTRA_FILES)){
+                JsonArray extraFiles = threadJson.getAsJsonArray(THREAD_EXTRA_FILES);
+                for (JsonElement fileElement : extraFiles){
+                    JsonObject extraFileJson = fileElement.getAsJsonObject();
+                    height = getThreadImageHeight(extraFileJson);
+                    width = getThreadImageWidth(extraFileJson);
+                    tim = getThreadTim(extraFileJson);
+                    ext = getThreadExt(extraFileJson);
+                    mediaItem = Util.createMediaItem(height, width, tim, ext);
+                    mediaArrayList.add(mediaItem);
+                }
+            }
+            return Util.serializeObject(mediaArrayList);
+        }
+        return null;
     }
 
     public void checkExtraFiles(String label, ArrayList<String> value, JsonObject threadJson){

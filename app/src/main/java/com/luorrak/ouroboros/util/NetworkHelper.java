@@ -98,7 +98,12 @@ public class NetworkHelper {
 
         if (reply.filePath != null){
             for (int i = 0; i < reply.filePath.size(); i++){
-                parameters.add(new FilePart("file", new File(reply.filePath.get(i))));
+                if (i == 0){
+                    parameters.add(new FilePart("file", new File(reply.filePath.get(i))));
+                } else {
+                    int fileNumber = i + 1;
+                    parameters.add(new FilePart("file" + fileNumber, new File(reply.filePath.get(i))));
+                }
             }
         }
 
@@ -256,11 +261,18 @@ public class NetworkHelper {
                 .withBitmapInfo();
     }
 
+    public void getImageWithCrossfade(ImageView imageView, String imageUrl) {
+        Ion.with(imageView)
+                .smartSize(true)
+                .crossfade(true)
+                .load(imageUrl);
+    }
+
     public void downloadFile(String boardName, String tim, String ext, Context context){
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(ChanUrls.getImageUrl(boardName, tim, ext)));
         request.setDescription(tim + ext);
         request.setTitle(tim + ext);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, tim + ext);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS + "/Ouroboros", tim + ext);
 
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);

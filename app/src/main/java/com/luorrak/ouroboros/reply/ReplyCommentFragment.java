@@ -143,7 +143,7 @@ public class ReplyCommentFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_attach_file){
-            if (reply.filePath.size() < 1) {
+            if (reply.filePath.size() < 5) {
                 selectFile();
             } else {
                 Toast.makeText(getActivity(), "Maximum amount of attachments reached", Toast.LENGTH_SHORT).show();

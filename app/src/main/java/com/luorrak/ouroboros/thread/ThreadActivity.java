@@ -1,15 +1,16 @@
 package com.luorrak.ouroboros.thread;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogActivity;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
@@ -42,6 +43,7 @@ public class ThreadActivity extends AppCompatActivity {
         Util.onActivityCreateSetTheme(this, Util.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
+        Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
@@ -57,7 +59,7 @@ public class ThreadActivity extends AppCompatActivity {
 
             String resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
             String boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
-            FragmentManager fragmentManager = getFragmentManager();
+            FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
             fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
@@ -93,8 +95,8 @@ public class ThreadActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id ==android.R.id.home){
-            this.finish();
+        if (id == android.R.id.home){
+            this.onBackPressed();
             return true;
         }
 
@@ -103,13 +105,11 @@ public class ThreadActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        if(getFragmentManager().getBackStackEntryCount() > 1){
-            getFragmentManager().popBackStack();
-        } else if(getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack();
-        } else {
-            this.finish();
-        }
+       if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+       } else {
+           this.finish();
+       }
     }
 
     public void doPositiveClickExternal(String url) {
@@ -119,14 +119,14 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     public void doPositiveClickInternal(String threadNo, String boardName) {
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         //clear dialog fragments
         fragmentManager.popBackStack("threadDialog", FragmentManager.POP_BACK_STACK_INCLUSIVE);
         if (threadNo != "0"){
             ThreadFragment threadFragment = new ThreadFragment().newInstance(threadNo, boardName);
-            fragmentTransaction.add(R.id.placeholder_card, threadFragment)
+            fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
                     .addToBackStack("thread")
                     .commit();
         } else {

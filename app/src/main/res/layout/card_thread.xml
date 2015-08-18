@@ -5,9 +5,8 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     card_view:cardBackgroundColor="?attr/card_background"
-    card_view:cardElevation="2dp"
-    card_view:cardUseCompatPadding="true"
     card_view:cardCornerRadius="4dp"
+    card_view:cardUseCompatPadding="true"
     card_view:cardPreventCornerOverlap="false">
 
     <RelativeLayout
@@ -20,19 +19,23 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|center_vertical" >
 
-            <ImageView
-                android:id="@+id/thread_image_0"
+            <com.luorrak.ouroboros.thread.SnappyRecyclerView
+                android:id="@+id/thread_media_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true" />
+                android:scrollbars="horizontal"/>
+            <ImageView
+                android:id="@+id/thread_embed"
+                android:layout_width="match_parent"
+                android:layout_height="150dp" />
 
             <ImageView
-                android:id="@+id/thread_video_play_button"
+                android:id="@+id/thread_embed_play_button"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center_horizontal|center_vertical"
-                android:src="@drawable/ic_play_circle_outline_black_48dp" />
+                android:src="@drawable/ic_play_circle_outline_black_48dp"/>
+
         </FrameLayout>
 
         <RelativeLayout

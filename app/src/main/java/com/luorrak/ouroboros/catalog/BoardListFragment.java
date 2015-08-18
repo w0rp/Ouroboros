@@ -2,7 +2,7 @@ package com.luorrak.ouroboros.catalog;
 
 
 import android.app.AlertDialog;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -50,7 +50,7 @@ import com.koushikdutta.ion.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BoardListFragment extends Fragment {
+public class BoardListFragment extends android.app.Fragment {
     NavigationBoardListAdapter boardListAdapter;
 
     public BoardListFragment() {

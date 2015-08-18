@@ -14,4 +14,5 @@
     <string name="drawer_close">Close</string>
     <string name="threadlink">#FF6600</string>
     <string name="title_activity_post_comment_activity">post_comment_activity</string>
+    <string name="thread_media_saved_layout_state">0</string>
 </resources>

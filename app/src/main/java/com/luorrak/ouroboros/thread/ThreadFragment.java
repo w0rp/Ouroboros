@@ -1,15 +1,18 @@
 package com.luorrak.ouroboros.thread;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ActionProvider;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
@@ -31,7 +35,11 @@ import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.Util;
+
+import java.util.ArrayList;
 
 /**
  * Ouroboros - An 8chan browser
@@ -50,7 +58,7 @@ import com.luorrak.ouroboros.util.NetworkHelper;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class ThreadFragment extends Fragment{
+public class ThreadFragment extends Fragment {
     // Construction ////////////////////////////////////////////////////////////////////////////////
     private final String LOG_TAG = ThreadFragment.class.getSimpleName();
     private InfiniteDbHelper infiniteDbHelper;
@@ -62,6 +70,8 @@ public class ThreadFragment extends Fragment{
     String resto;
     String boardName;
     Parcelable savedLayoutState ;
+    private boolean isStatusCheckIsRunning;
+    private ActionProvider shareActionProvider;
     private Handler handler;
 
     //Get thread number from link somehow
@@ -77,6 +87,8 @@ public class ThreadFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        isStatusCheckIsRunning = false;
         if (savedInstanceState != null){
             savedLayoutState = savedInstanceState.getParcelable("savedLayout");
             resto = savedInstanceState.getString("resto");
@@ -89,8 +101,7 @@ public class ThreadFragment extends Fragment{
         infiniteDbHelper = new InfiniteDbHelper(getActivity());
         networkFragment = (ThreadNetworkFragment) getFragmentManager().findFragmentByTag("Thread_Task");
         View view = inflater.inflate(R.layout.fragment_thread, container, false);
-        setHasOptionsMenu(true);
-
+        getActivity().invalidateOptionsMenu();
         layoutManager = new LinearLayoutManager(getActivity()){
             @Override
             protected int getExtraLayoutSpace(RecyclerView.State state) {
@@ -113,15 +124,13 @@ public class ThreadFragment extends Fragment{
         }
 
         if (boardName != null){
-            getThread(resto, boardName);
+            handler = new Handler();
+            startStatusCheck();
             threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getFragmentManager(), boardName, getActivity());
             threadAdapter.setHasStableIds(true);
             threadAdapter.hasStableIds();
             recyclerView.setAdapter(threadAdapter);
         }
-
-        handler = new Handler();
-        startStatusCheck();
         return view;
     }
 
@@ -165,12 +174,18 @@ public class ThreadFragment extends Fragment{
         MenuItem replyButton = menu.findItem(R.id.action_reply);
         MenuItem galleryButton = menu.findItem(R.id.action_gallery);
         MenuItem saveAllImagesButton = menu.findItem(R.id.action_save_all_images);
+        MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
+        MenuItem shareButton = menu.findItem(R.id.menu_item_share);
 
         refreshButton.setVisible(true);
         scrollButton.setVisible(true);
         replyButton.setVisible(true);
         galleryButton.setVisible(true);
         saveAllImagesButton.setVisible(true);
+        openExternalButton.setVisible(true);
+        shareButton.setVisible(true);
+
+        shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -212,10 +227,10 @@ public class ThreadFragment extends Fragment{
                                 String ext;
                                 Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
                                 do {
-                                    tim = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
-                                    ext = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
-                                    networkHelper.downloadFile(boardName, tim, ext, getActivity());
-
+                                    ArrayList<Media> mediaArrayList = (ArrayList<Media>) Util.deserializeObject(imageCursor.getBlob(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES)));
+                                    for (Media mediaItem : mediaArrayList){
+                                        networkHelper.downloadFile(boardName, mediaItem.fileName, mediaItem.ext, getActivity());
+                                    }
                                 } while (imageCursor.moveToNext());
 
                                 imageCursor.close();
@@ -229,8 +244,21 @@ public class ThreadFragment extends Fragment{
                         .show();
                 break;
             }
+            case R.id.action_external_browser: {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ChanUrls.getThreadUrlExternal(boardName, resto)));
+                startActivity(browserIntent);
+                break;
+            }
+            case R.id.menu_item_share: {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                String shareBody = ChanUrls.getThreadUrlExternal(boardName, resto);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(shareIntent, "Share via"));
+                break;
+            }
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     public void setActionBarTitle(String title){
@@ -247,7 +275,7 @@ public class ThreadFragment extends Fragment{
     }
 
     public void getThreadJson(final Context context, final String boardName, final String threadNumber){
-        ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
+        final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
         final String threadJsonUrl = ChanUrls.getThreadUrl(boardName, threadNumber);
 
@@ -261,12 +289,12 @@ public class ThreadFragment extends Fragment{
 
                     @Override
                     public void onCompleted(Exception e, JsonObject jsonObject) {
-
                         if (e == null) {
                             networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadAdapter);
                             //new InsertThreadIntoDatabase().execute(jsonObject);
                         } else {
-                            Log.d(LOG_TAG, "Error inserting thred into db");
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Toast.makeText(getActivity(), "Error retrieving thread", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -281,10 +309,14 @@ public class ThreadFragment extends Fragment{
     };
 
     private void startStatusCheck() {
-        statusCheck.run();
+        if (!isStatusCheckIsRunning){
+            isStatusCheckIsRunning = true;
+            statusCheck.run();
+        }
     }
 
     private void stopStatusCheck() {
+        isStatusCheckIsRunning = false;
         handler.removeCallbacks(statusCheck);
     }
 }

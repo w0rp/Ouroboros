@@ -5,9 +5,12 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.view.ActionProvider;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.koushikdutta.async.future.FutureCallback;
@@ -29,6 +33,7 @@ import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.Util;
 
 
 /**
@@ -61,6 +66,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private String boardName = null;
     private InfiniteDbHelper infiniteDbHelper;
     private CatalogNetworkFragment networkFragment;
+    private ActionProvider shareActionProvider;
 
     public CatalogFragment() {
     }
@@ -80,7 +86,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         View view = inflater.inflate(R.layout.fragment_catalog, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.catalogList);
-        layoutManager = new GridLayoutManager(getActivity(), 2);
+        layoutManager = new GridLayoutManager(getActivity(), Util.getCatalogColumns(getActivity()));
         recyclerView.setLayoutManager(layoutManager);
 
         //if not first load
@@ -109,7 +115,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         catalogAdapter = new CatalogAdapter(
                 infiniteDbHelper.getCatalogCursor(),
-                getActivity().getFragmentManager(),
+                getFragmentManager(),
                 boardName, infiniteDbHelper);
         recyclerView.setAdapter(catalogAdapter);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.catalog_swipe_container);
@@ -122,9 +128,14 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
         inflater.inflate(R.menu.menu_main, menu);
-
         MenuItem replyButton = menu.findItem(R.id.action_reply);
+        MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
+        MenuItem shareButton = menu.findItem(R.id.menu_item_share);
+
         replyButton.setVisible(true);
+        openExternalButton.setVisible(true);
+        shareButton.setVisible(true);
+        shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
 
         MenuItem searchButton = menu.findItem(R.id.action_search);
         searchButton.setVisible(true);
@@ -162,10 +173,25 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 intent.putExtra(CatalogAdapter.THREAD_NO, resto);
                 intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
                 getActivity().startActivity(intent);
+                break;
+            }
+            case R.id.action_external_browser: {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ChanUrls.getCatalogUrlExternal(boardName)));
+                startActivity(browserIntent);
+                break;
+            }
+            case R.id.menu_item_share: {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                String shareBody = ChanUrls.getCatalogUrlExternal(boardName);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(shareIntent, "Share via"));
+                break;
             }
             default:
                 return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     public void setActionBarTitle(String title){
@@ -207,7 +233,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
     public void getCatalogJson(final Context context, final String boardName) {
         String catalogJsonUrl = ChanUrls.getCatalogUrl(boardName);
-        ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
+        final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
         Ion.with(context)
                 .load(catalogJsonUrl)
@@ -219,7 +245,9 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         if (e == null) {
                             networkFragment.beginTask(jsonArray, infiniteDbHelper, boardName, catalogAdapter);
                         } else {
-                            Log.d(LOG_TAG, "Error Retrieving Catalog From Server " + e);
+                            progressBar.setVisibility(View.INVISIBLE);
+                            swipeRefreshLayout.setRefreshing(false);
+                            Toast.makeText(getActivity(), "Error retrieving catalog", Toast.LENGTH_SHORT).show();
                         }
 
                         catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());

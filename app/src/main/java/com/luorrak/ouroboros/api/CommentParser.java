@@ -1,9 +1,9 @@
 package com.luorrak.ouroboros.api;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -65,12 +65,12 @@ public class CommentParser {
         List<Node> comLineArray = doc.body().childNodes();
         CharSequence processedText = new SpannableString("");
 
-
+        int i = 1;
         for (Node comLine : comLineArray){
             //legacy stuff to avoid hard crashes
             if (comLine instanceof TextNode){
                 //plain text
-                processedText = TextUtils.concat(processedText, "\nDEVELOPER REQUEST: This post was made before 8chan switched it's comment format in April. If this post was made more recently than april, file a bug report with the developer of this app\n");
+                processedText = TextUtils.concat(processedText, "\nDEVELOPER REQUEST: This post was made before 8chan switched its comment format in April. If this post was made more recently then April, file a bug report with the developer of this app \n");
                 break;
             } else {
                 Element lineElement = (Element) comLine;
@@ -99,7 +99,11 @@ public class CommentParser {
                         CharSequence parsedNode = parseNode(node, currentBoard, resto, fragmentManager, infiniteDbHelper);
                         processedText = TextUtils.concat(processedText, parsedNode);
                     }
-                    processedText = TextUtils.concat(processedText, "\n");
+                    if (i++ != comLineArray.size()){
+                        processedText = TextUtils.concat(processedText, "\n");
+                    } else {
+                        break;
+                    }
                 }
             }
 
@@ -255,7 +259,5 @@ public class CommentParser {
             return differentThread;
         }
     }
-
-
 }
 
