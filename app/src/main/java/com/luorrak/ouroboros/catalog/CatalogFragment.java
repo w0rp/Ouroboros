@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.koushikdutta.async.future.FutureCallback;
@@ -232,7 +233,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
     public void getCatalogJson(final Context context, final String boardName) {
         String catalogJsonUrl = ChanUrls.getCatalogUrl(boardName);
-        ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
+        final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
         Ion.with(context)
                 .load(catalogJsonUrl)
@@ -244,7 +245,9 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         if (e == null) {
                             networkFragment.beginTask(jsonArray, infiniteDbHelper, boardName, catalogAdapter);
                         } else {
-                            Log.d(LOG_TAG, "Error Retrieving Catalog From Server " + e);
+                            progressBar.setVisibility(View.INVISIBLE);
+                            swipeRefreshLayout.setRefreshing(false);
+                            Toast.makeText(getActivity(), "Error retrieving catalog", Toast.LENGTH_SHORT).show();
                         }
 
                         catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());

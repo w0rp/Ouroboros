@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
@@ -274,7 +275,7 @@ public class ThreadFragment extends Fragment {
     }
 
     public void getThreadJson(final Context context, final String boardName, final String threadNumber){
-        ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
+        final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
         final String threadJsonUrl = ChanUrls.getThreadUrl(boardName, threadNumber);
 
@@ -288,12 +289,12 @@ public class ThreadFragment extends Fragment {
 
                     @Override
                     public void onCompleted(Exception e, JsonObject jsonObject) {
-
                         if (e == null) {
                             networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadAdapter);
                             //new InsertThreadIntoDatabase().execute(jsonObject);
                         } else {
-                            Log.d(LOG_TAG, "Error inserting thred into db");
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Toast.makeText(getActivity(), "Error retrieving thread", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
