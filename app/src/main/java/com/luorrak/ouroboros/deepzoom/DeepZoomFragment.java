@@ -87,7 +87,6 @@ public class DeepZoomFragment extends Fragment{
         }
         ((DeepZoomActivity) getActivity()).newMediaListInstance(infiniteDbHelper, resto);
         mediaItem = ((DeepZoomActivity) getActivity()).getMediaItem(position);
-        getActivity().setTitle(mediaItem.fileName + mediaItem.ext);
     }
 
     @Nullable
@@ -182,6 +181,7 @@ public class DeepZoomFragment extends Fragment{
         shareButton.setVisible(true);
         saveImage.setVisible(true);
         openExternalButton.setVisible(true);
+        getActivity().setTitle(mediaItem.fileName + mediaItem.ext);
 
         shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
         super.onCreateOptionsMenu(menu, inflater);
