@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-        <ListPreference
-            android:key="theme_preference"
-            android:title="Theme"
-            android:summary="Change Theme: Requires Restart"
-            android:entries="@array/themeNames"
-            android:entryValues="@array/themeValues"
-            android:dialogTitle="Set Theme"
-            android:defaultValue="0"/>
+    <ListPreference
+        android:key="theme_preference"
+        android:title="Theme"
+        android:summary="Change Theme: Requires Restart"
+        android:entries="@array/themeNames"
+        android:entryValues="@array/themeValues"
+        android:dialogTitle="Set Theme"
+        android:defaultValue="0"/>
 
     <ListPreference
         android:key="thread_view"
@@ -18,4 +18,12 @@
         android:entryValues="@array/threadLayoutValues"
         android:dialogTitle="Change Thread Layout"
         android:defaultValue="0"/>
+
+    <EditTextPreference
+        android:key="catalog_grid_columns"
+        android:title="Catalog Grid Columns"
+        android:summary="Number of columns displayed"
+        android:dialogTitle="How many columns?"
+        android:inputType="number"
+        android:defaultValue="3"/>
 </PreferenceScreen>

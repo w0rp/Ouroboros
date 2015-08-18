@@ -79,6 +79,12 @@ public class Util {
         return Integer.valueOf(themeValue);
     }
 
+    public static int getCatalogColumns(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String themeValue = sharedPreferences.getString("catalog_grid_columns", "3");
+        return Integer.valueOf(themeValue);
+    }
+
     public static Media createMediaItem(String height, String width, String tim, String ext){
         Media mediaItem = new Media();
         mediaItem.height = height;

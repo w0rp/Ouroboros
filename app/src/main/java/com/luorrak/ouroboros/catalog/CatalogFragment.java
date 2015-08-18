@@ -32,6 +32,7 @@ import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.Util;
 
 
 /**
@@ -84,7 +85,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         View view = inflater.inflate(R.layout.fragment_catalog, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.catalogList);
-        layoutManager = new GridLayoutManager(getActivity(), 2);
+        layoutManager = new GridLayoutManager(getActivity(), Util.getCatalogColumns(getActivity()));
         recyclerView.setLayoutManager(layoutManager);
 
         //if not first load
