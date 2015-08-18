@@ -209,7 +209,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     public Cursor getGalleryCursor(String resto) {
         Cursor cursor = db.query(ThreadEntry.TABLE_NAME,
                 null,
-                ThreadEntry.COLUMN_THREAD_TIMS + " IS NOT NULL AND " + ThreadEntry.COLUMN_THREAD_RESTO + "=?",
+                ThreadEntry.COLUMN_THREAD_MEDIA_FILES + " IS NOT NULL AND " + ThreadEntry.COLUMN_THREAD_RESTO + "=?",
                 new String[] {resto},
                 null,
                 null,

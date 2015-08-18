@@ -34,7 +34,11 @@ import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.Util;
+
+import java.util.ArrayList;
 
 /**
  * Ouroboros - An 8chan browser
@@ -222,10 +226,10 @@ public class ThreadFragment extends Fragment {
                                 String ext;
                                 Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
                                 do {
-                                    tim = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
-                                    ext = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
-                                    networkHelper.downloadFile(boardName, tim, ext, getActivity());
-
+                                    ArrayList<Media> mediaArrayList = (ArrayList<Media>) Util.deserializeObject(imageCursor.getBlob(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES)));
+                                    for (Media mediaItem : mediaArrayList){
+                                        networkHelper.downloadFile(boardName, mediaItem.fileName, mediaItem.ext, getActivity());
+                                    }
                                 } while (imageCursor.moveToNext());
 
                                 imageCursor.close();
