@@ -77,7 +77,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
     }
 
     @Override
-    public void onBindViewHolderCursor(RecyclerView.ViewHolder holder, Cursor cursor) {
+    public void onBindViewHolderCursor(RecyclerView.ViewHolder holder, final Cursor cursor) {
         String name;
         String tripcode;
         final String no;
@@ -106,7 +106,6 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         threadViewHolder.threadReplies.setVisibility(View.GONE);
         threadViewHolder.threadEmbed.setVisibility(View.GONE);
         threadViewHolder.threadEmbedPlayButton.setVisibility(View.GONE);
-
         name = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NAME));
         tripcode = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TRIP));
         no = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NO));
@@ -191,18 +190,20 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                                         return;
                                     }
 
-                                    Palette.generateAsync(result.getBitmapInfo().bitmap,
-                                            new Palette.PaletteAsyncListener() {
-                                                @Override
-                                                public void onGenerated(Palette palette) {
-                                                    Palette.Swatch vibrant =
-                                                            palette.getLightMutedSwatch();
-                                                    if (vibrant != null) {
-                                                        threadViewHolder.mediaHolder.setBackgroundColor(
-                                                                vibrant.getRgb());
+                                    if (getItemViewType(cursor.getPosition()) != Util.THREAD_LAYOUT_HORIZONTAL){
+                                        Palette.generateAsync(result.getBitmapInfo().bitmap,
+                                                new Palette.PaletteAsyncListener() {
+                                                    @Override
+                                                    public void onGenerated(Palette palette) {
+                                                        Palette.Swatch vibrant =
+                                                                palette.getLightMutedSwatch();
+                                                        if (vibrant != null) {
+                                                            threadViewHolder.mediaHolder.setBackgroundColor(
+                                                                    vibrant.getRgb());
+                                                        }
                                                     }
-                                                }
-                                            });
+                                                });
+                                    }
                                 }
                             });
 
