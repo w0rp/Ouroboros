@@ -70,7 +70,7 @@ public class CommentParser {
             //legacy stuff to avoid hard crashes
             if (comLine instanceof TextNode){
                 //plain text
-                processedText = TextUtils.concat(processedText, "\nDEVELOPER REQUEST: This post was made before 8chan switched it's comment format in April. If this post was made more recently than april, file a bug report with the developer of this app\n");
+                processedText = TextUtils.concat(processedText, "\nDEVELOPER REQUEST: This post was made before 8chan switched its comment format in April. If this post was made more recently then April, file a bug report with the developer of this app \n");
                 break;
             } else {
                 Element lineElement = (Element) comLine;
