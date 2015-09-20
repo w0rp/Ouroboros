@@ -78,80 +78,40 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
     @Override
     public void onBindViewHolderCursor(RecyclerView.ViewHolder holder, final Cursor cursor) {
-        String name;
-        String tripcode;
-        final String no;
-        final String id;
-        String sub;
-        final String com;
-        String email;
-        long threadTime;
-        final String embed;
-        final String resto;
-        byte[] serializedMediaList;
-        //Should make this into an object to make it more obvious
-        String[] youtubeData = {null, null}; //youtubeData[0] is video url youtubeData[1] is image url to load for thumbnail
-
         final ThreadViewHolder threadViewHolder = (ThreadViewHolder)holder;
 
-        //Prevent refresh flickering
-        threadViewHolder.threadName.setVisibility(View.GONE);
-        threadViewHolder.threadTripcode.setVisibility(View.GONE);
-        threadViewHolder.threadNo.setVisibility(View.GONE);
-        threadViewHolder.id.setVisibility(View.GONE);
-        threadViewHolder.threadSub.setVisibility(View.GONE);
-        threadViewHolder.threadCom.setVisibility(View.GONE);
-        threadViewHolder.threadEmail.setVisibility(View.GONE);
-        threadViewHolder.threadTime.setVisibility(View.GONE);
-        threadViewHolder.threadReplies.setVisibility(View.GONE);
-        threadViewHolder.threadEmbed.setVisibility(View.GONE);
-        threadViewHolder.threadEmbedPlayButton.setVisibility(View.GONE);
-        name = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NAME));
-        tripcode = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TRIP));
-        no = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NO));
-        sub = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_SUB));
-        com = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_COM));
-        email = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EMAIL));
-        threadTime = cursor.getLong(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIME));
-        embed = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EMBED));
-        resto = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_RESTO));
-        id = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_ID));
-        serializedMediaList = cursor.getBlob(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
+        resetThreadViewHolder(threadViewHolder);
+        createThreadObject(threadViewHolder, cursor);
 
-        Cursor repliesCursor = infiniteDbHelper.getReplies(no);
-        String replies = String.valueOf(repliesCursor.getCount());
-        repliesCursor.close();
-
-        if (infiniteDbHelper.isNoUserPost(boardName, no)){
-            name = "(You) " + name;
+        if (infiniteDbHelper.isNoUserPost(boardName, threadViewHolder.threadObject.no)){
+            threadViewHolder.threadObject.name = "(You) " + threadViewHolder.threadObject.name;
         }
-        threadViewHolder.threadName.setText(name);
+        threadViewHolder.threadName.setText(threadViewHolder.threadObject.name);
         threadViewHolder.threadName.setVisibility(View.VISIBLE);
 
-        threadViewHolder.threadTripcode.setText(tripcode);
+        threadViewHolder.threadTripcode.setText(threadViewHolder.threadObject.tripcode);
         threadViewHolder.threadTripcode.setVisibility(View.VISIBLE);
 
-        threadViewHolder.threadNo.setText(no);
+        threadViewHolder.threadNo.setText(threadViewHolder.threadObject.no);
         threadViewHolder.threadNo.setVisibility(View.VISIBLE);
 
-        if (id != null){
-            threadViewHolder.id.setText(commentParser.parseId(id));
+        if (threadViewHolder.threadObject.id != null){
+            threadViewHolder.id.setText(commentParser.parseId(threadViewHolder.threadObject.id));
             threadViewHolder.id.setVisibility(View.VISIBLE);
         }
 
-        //does subject exist
-        if(sub != null){
-            threadViewHolder.threadSub.setText(sub);
+        if(threadViewHolder.threadObject.sub != null){
+            threadViewHolder.threadSub.setText(threadViewHolder.threadObject.sub);
             threadViewHolder.threadSub.setVisibility(View.VISIBLE);
         }
 
-        if (email != null && email.equals("sage")){
+        if (threadViewHolder.threadObject.email != null && threadViewHolder.threadObject.email.equals("sage")){
             threadViewHolder.threadEmail.setVisibility(View.VISIBLE);
         }
 
         threadViewHolder.threadTime.setText(
                 DateUtils.getRelativeTimeSpanString(
-                        threadTime * 1000,
+                        threadViewHolder.threadObject.threadTime * 1000,
                         System.currentTimeMillis(),
                         DateUtils.MINUTE_IN_MILLIS
                 ));
@@ -159,13 +119,11 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
 
         // MediaView ///////////////////////////////////////////////////////////////////////////////
-        //does image exist?
-        MediaAdapter mediaAdapter;
 
         ArrayList<Media> mediaArrayList;
-        if (serializedMediaList != null) {
+        if (threadViewHolder.threadObject.serializedMediaList != null) {
             threadViewHolder.threadMediaItemRecycler.setVisibility(View.VISIBLE);
-            mediaArrayList = (ArrayList<Media>) Util.deserializeObject(serializedMediaList);
+            mediaArrayList = (ArrayList<Media>) Util.deserializeObject(threadViewHolder.threadObject.serializedMediaList);
             if (mediaArrayList.size() > 1){
                 threadViewHolder.threadMediaItemRecycler.setScrollbarFadingEnabled(false);
             }
@@ -173,12 +131,12 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadViewHolder.threadMediaItemRecycler.setVisibility(View.GONE);
             mediaArrayList = new ArrayList<>();
             // Youtube /////////////////////////////////////////////////////////////////////////////
-            if (embed != null){
-                youtubeData = Util.parseYoutube(embed);
-                if (youtubeData[0] != null){
+            if (threadViewHolder.threadObject.embed != null){
+                createEmbedObject(threadViewHolder);
+                if (threadViewHolder.embedObject.dataUrl != null){
                     threadViewHolder.threadEmbed.setVisibility(View.VISIBLE);
                     threadViewHolder.threadEmbedPlayButton.setVisibility(View.VISIBLE);
-                    String imageUrl = "https://" + youtubeData[1];
+                    String imageUrl = "https://" + threadViewHolder.embedObject.imageUrl;
 
                     Ion.with(threadViewHolder.threadEmbed)
                             .load(imageUrl)
@@ -207,7 +165,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                                 }
                             });
 
-                    final String youtubeVideoUrl = youtubeData[0];
+                    final String youtubeVideoUrl = threadViewHolder.embedObject.dataUrl;
                     threadViewHolder.threadEmbedPlayButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -222,9 +180,14 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             // End Youtube /////////////////////////////////////////////////////////////////////////
         }
 
+        if (!threadViewHolder.threadObject.replyCount.equals("0")){
+            threadViewHolder.threadReplies.setVisibility(View.VISIBLE);
+            threadViewHolder.threadReplies.setText(threadViewHolder.threadObject.replyCount + " Replies");
+        }
+
         // Create an adapter if none exists
         if (!mediaAdapterHashMap.containsKey(cursor.getPosition())) {
-            mediaAdapterHashMap.put(cursor.getPosition(), new MediaAdapter(mediaArrayList, boardName, resto, fragmentManager, context, viewWidth));
+            mediaAdapterHashMap.put(cursor.getPosition(), new MediaAdapter(mediaArrayList, boardName, threadViewHolder.threadObject.resto, fragmentManager, context, viewWidth));
         }
 
         threadViewHolder.threadMediaItemRecycler.setAdapter(mediaAdapterHashMap.get(cursor.getPosition()));
@@ -232,8 +195,8 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         // END MediaView ///////////////////////////////////////////////////////////////////////////
 
         //Does comment exist
-        if (com != null){
-            Spannable spannableCom = commentParser.parseCom(com,
+        if (threadViewHolder.threadObject.com != null){
+            Spannable spannableCom = commentParser.parseCom(threadViewHolder.threadObject.com,
                     boardName,
                     cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_RESTO)),
                     fragmentManager,
@@ -244,27 +207,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadViewHolder.threadCom.setText(spannableCom);
         }
 
-
-        if (!replies.equals("0")){
-            threadViewHolder.threadReplies.setVisibility(View.VISIBLE);
-            threadViewHolder.threadReplies.setText(replies + " Replies");
-        }
-
-
         // OnClick /////////////////////////////////////////////////////////////////////////////////
-
-        threadViewHolder.threadReplyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG, "Reply button pressed " + no);
-                Intent intent =  new Intent(context, ReplyCommentActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(CatalogAdapter.THREAD_NO, resto);
-                intent.putExtra(CatalogAdapter.REPLY_NO, no);
-                intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
-                context.startActivity(intent);
-            }
-        });
 
         threadViewHolder.threadCom.setMovementMethod(LinkMovementMethod.getInstance());
         threadViewHolder.threadReplies.setMovementMethod(LinkMovementMethod.getInstance());
@@ -300,7 +243,49 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
     // Utility /////////////////////////////////////////////////////////////////////////////////////
 
+    private void resetThreadViewHolder(ThreadViewHolder threadViewHolder){
+        threadViewHolder.threadName.setVisibility(View.GONE);
+        threadViewHolder.threadTripcode.setVisibility(View.GONE);
+        threadViewHolder.threadNo.setVisibility(View.GONE);
+        threadViewHolder.id.setVisibility(View.GONE);
+        threadViewHolder.threadSub.setVisibility(View.GONE);
+        threadViewHolder.threadCom.setVisibility(View.GONE);
+        threadViewHolder.threadEmail.setVisibility(View.GONE);
+        threadViewHolder.threadTime.setVisibility(View.GONE);
+        threadViewHolder.threadReplies.setVisibility(View.GONE);
+        threadViewHolder.threadEmbed.setVisibility(View.GONE);
+        threadViewHolder.threadEmbedPlayButton.setVisibility(View.GONE);
+    }
 
+    private String getReplyCount(String no){
+        Cursor repliesCursor = infiniteDbHelper.getReplies(no);
+        String replies = String.valueOf(repliesCursor.getCount());
+        repliesCursor.close();
+        return replies;
+    }
+
+    private void createThreadObject(ThreadViewHolder threadViewHolder, Cursor cursor){
+        threadViewHolder.threadObject.name = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NAME));
+        threadViewHolder.threadObject.tripcode = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TRIP));
+        threadViewHolder.threadObject.no = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_NO));
+        threadViewHolder.threadObject.sub = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_SUB));
+        threadViewHolder.threadObject.com = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_COM));
+        threadViewHolder.threadObject.email = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EMAIL));
+        threadViewHolder.threadObject.threadTime = cursor.getLong(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIME));
+        threadViewHolder.threadObject.embed = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EMBED));
+        threadViewHolder.threadObject.resto = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_RESTO));
+        threadViewHolder.threadObject.id = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_ID));
+        threadViewHolder.threadObject.serializedMediaList = cursor.getBlob(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
+        threadViewHolder.threadObject.replyCount = getReplyCount(threadViewHolder.threadObject.no);
+    }
+
+    //This only works for YouTube currently
+    private void createEmbedObject(ThreadViewHolder threadViewHolder){
+        String[] youtubeData = Util.parseYoutube(threadViewHolder.threadObject.embed);
+        threadViewHolder.embedObject.dataUrl = youtubeData[0];
+        threadViewHolder.embedObject.imageUrl = youtubeData[1];
+    }
+    // View Holder /////////////////////////////////////////////////////////////////////////////////
 
     class ThreadViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView threadName;
@@ -318,8 +303,12 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         public FrameLayout mediaHolder;
         public SnappyRecyclerView threadMediaItemRecycler;
 
+        public ThreadObject threadObject;
+        public EmbedObject embedObject;
+
         public ThreadViewHolder(View itemView) {
             super(itemView);
+
             threadName = (TextView) itemView.findViewById(R.id.thread_name);
             threadTripcode = (TextView) itemView.findViewById(R.id.thread_tripcode);
             threadNo = (TextView) itemView.findViewById(R.id.thread_post_no);
@@ -334,6 +323,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadEmbedPlayButton = (ImageView) itemView.findViewById(R.id.thread_embed_play_button);
             threadMediaItemRecycler = (SnappyRecyclerView) itemView.findViewById(R.id.thread_media_recycler);
             mediaHolder = (FrameLayout) itemView.findViewById(R.id.thread_image_holder);
+
+            threadObject = new ThreadObject();
+            embedObject = new EmbedObject();
 
             threadReplies.setOnClickListener(this);
             threadReplyButton.setOnClickListener(this);
@@ -350,8 +342,41 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                             .commit();
                     break;
                 }
+                case R.id.thread_submit_reply_button:{
+                    Log.d(LOG_TAG, "Reply button pressed " + threadObject.no);
+                    Intent intent =  new Intent(context, ReplyCommentActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra(CatalogAdapter.THREAD_NO, threadObject.resto);
+                    intent.putExtra(CatalogAdapter.REPLY_NO, threadObject.no);
+                    intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+                    context.startActivity(intent);
+                }
             }
         }
+    }
+
+    //Cursor object ////////////////////////////////////////////////////////////////////////////////
+
+    class ThreadObject {
+        public String name;
+        public String tripcode;
+        public String no;
+        public String sub;
+        public String com;
+        public String email;
+        public long threadTime;
+        public String embed;
+        public String resto;
+        public String id;
+        public byte[] serializedMediaList;
+        public String replyCount;
+    }
+
+    //Embed object /////////////////////////////////////////////////////////////////////////////////
+
+    class  EmbedObject {
+        public String imageUrl;
+        public String dataUrl;
     }
 
 }
