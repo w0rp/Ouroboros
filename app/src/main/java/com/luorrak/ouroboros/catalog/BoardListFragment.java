@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.util.ChanUrls;
+import com.luorrak.ouroboros.util.DragAndDropRecyclerView.RecyclerViewTouchHelper;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -70,6 +72,10 @@ public class BoardListFragment extends android.app.Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         boardListAdapter = new NavigationBoardListAdapter(boardListCursor, getFragmentManager(), getActivity());
 
+        ItemTouchHelper.Callback callback = new RecyclerViewTouchHelper(boardListAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
+
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(boardListAdapter);
         return view;
@@ -110,7 +116,7 @@ public class BoardListFragment extends android.app.Fragment {
                                                             return;
                                                         }
                                                         InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());
-                                                        infiniteDbHelper.insertBoardEntry(boardName);
+                                                        infiniteDbHelper.insertBoardEntry(boardName, boardListAdapter.getCursor().getCount());
                                                         boardListAdapter.changeCursor(infiniteDbHelper.getBoardCursor());
                                                     }
                                                 });

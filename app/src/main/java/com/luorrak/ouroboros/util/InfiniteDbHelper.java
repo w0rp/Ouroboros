@@ -221,11 +221,12 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     // Board Helper Functions //////////////////////////////////////////////////////////////////////
 
-    public void insertBoardEntry(String board){
+    public void insertBoardEntry(String board, int orderId){
         long newRowId;
 
         ContentValues values = new ContentValues();
         values.put(BoardEntry.COLUMN_BOARDS, board);
+        values.put(BoardEntry.BOARD_ORDER, orderId);
 
         try {
             db.insertOrThrow(
@@ -254,7 +255,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 null, //selection args
                 null, //group by
                 null, //having
-                null  //orderby
+                BoardEntry.BOARD_ORDER + " ASC"  //orderby
         );
 
         cursor.moveToFirst();
@@ -262,26 +263,59 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         return cursor;
     }
 
-    public String findBoardKey(String board){
-
-        String[] columns = {BoardEntry._ID};
-
+    public int findIdbyBoardOrder(int boardOrder){
         Cursor cursor = db.query(
-                BoardEntry.TABLE_NAME, //table name
-                columns, //columns to search
-                BoardEntry.COLUMN_BOARDS + " = '" + board + "'", //where clause "Where board in db == board provided"
-                null, //Filter if multiple boards
-                null, //Group by
-                null, //having
-                null //orderby
+                BoardEntry.TABLE_NAME,
+                null,
+                BoardEntry.BOARD_ORDER + " = ?",
+                new String[] {String.valueOf(boardOrder)},
+                null,
+                null,
+                null
         );
-
         cursor.moveToFirst();
-        String board_key = cursor.getString(
-                cursor.getColumnIndex(BoardEntry._ID)
+        return cursor.getInt(cursor.getColumnIndex("_id"));
+    }
+
+    public void updateBoardOrder(int id, int newOrderValue){
+        ContentValues values = new ContentValues();
+        values.put(BoardEntry.BOARD_ORDER, newOrderValue);
+
+        String selection = BoardEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(id)};
+
+        db.update(
+                BoardEntry.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs
         );
-        cursor.close();
-        return board_key;
+    }
+
+    public void swapBoardOrder(int fromPosition, int toPosition){
+        ContentValues values = new ContentValues();
+        //SELECT orderID FROM BoardEntry.TABLE_NAME WHERE orderId > toPosition
+        int positionOne;
+        int positionTwo;
+        //Drag Down
+        if (fromPosition < toPosition){
+            for (int i = fromPosition; i < toPosition; i++) {
+                //find first _id
+                positionOne = findIdbyBoardOrder(i);
+                positionTwo = findIdbyBoardOrder(i + 1);
+                updateBoardOrder(positionOne, i + 1);
+                updateBoardOrder(positionTwo, i);
+            }
+        //DragUp
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                positionOne = findIdbyBoardOrder(i);
+                positionTwo = findIdbyBoardOrder(i - 1);
+                updateBoardOrder(positionOne, i - 1);
+                updateBoardOrder(positionTwo, i);
+            }
+        }
+
     }
 
     // User Posts Functions ////////////////////////////////////////////////////////////////////////
@@ -318,7 +352,8 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
 
         final String SQL_CREATE_BOARD_TABLE = "CREATE TABLE IF NOT EXISTS " + BoardEntry.TABLE_NAME + " (" +
                 BoardEntry._ID + " INTEGER PRIMARY KEY, " +
-                BoardEntry.COLUMN_BOARDS + " TEXT UNIQUE NOT NULL);";
+                BoardEntry.COLUMN_BOARDS + " TEXT UNIQUE NOT NULL, " +
+                BoardEntry.BOARD_ORDER +" INTEGER NOT NULL);";
 
         final String SQL_CREATE_CATALOG_TABLE = " CREATE TABLE " + CatalogEntry.TABLE_NAME + " (" +
 

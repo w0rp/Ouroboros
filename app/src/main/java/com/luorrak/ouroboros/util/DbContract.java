@@ -26,6 +26,8 @@ public class DbContract {
 
         //name of the board submitted by user
         public static final String COLUMN_BOARDS = "board_name";
+
+        public static final String BOARD_ORDER = "board_order";
     }
 
     public static final class CatalogEntry implements BaseColumns{

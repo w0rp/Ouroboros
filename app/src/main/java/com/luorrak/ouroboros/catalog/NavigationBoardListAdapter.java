@@ -6,9 +6,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +15,7 @@ import android.widget.Button;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
+import com.luorrak.ouroboros.util.DragAndDropRecyclerView.TouchHelperInterface;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 
 /**
@@ -36,7 +35,7 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class NavigationBoardListAdapter extends CursorRecyclerAdapter {
+public class NavigationBoardListAdapter extends CursorRecyclerAdapter implements TouchHelperInterface{
     InfiniteDbHelper infiniteDbHelper;
     private FragmentManager fragmentManager;
     Context context;
@@ -58,6 +57,19 @@ public class NavigationBoardListAdapter extends CursorRecyclerAdapter {
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.board_list_item, parent, false);
         return new NavigationBoardListViewHolder(view);
+    }
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        //Save item position
+        infiniteDbHelper.swapBoardOrder(fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        // TODO: 10/1/2015  update data in database with swipe to dismiss
+        notifyItemRemoved(position);
     }
 
     class NavigationBoardListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
