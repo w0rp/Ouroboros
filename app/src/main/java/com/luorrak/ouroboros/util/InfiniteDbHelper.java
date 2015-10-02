@@ -239,6 +239,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         }
     }
 
+    @Deprecated
     public void deleteBoardEntry(String board){
         db.delete(BoardEntry.TABLE_NAME,
                 BoardEntry.COLUMN_BOARDS + "=?",
@@ -259,7 +260,6 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         );
 
         cursor.moveToFirst();
-
         return cursor;
     }
 
@@ -274,7 +274,9 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 null
         );
         cursor.moveToFirst();
-        return cursor.getInt(cursor.getColumnIndex("_id"));
+        int id = cursor.getInt(cursor.getColumnIndex("_id"));
+        cursor.close();
+        return id;
     }
 
     public void updateBoardOrder(int id, int newOrderValue){
@@ -315,9 +317,19 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 updateBoardOrder(positionTwo, i);
             }
         }
-
     }
 
+    public void removeBoardEntry(int position){
+        Cursor cursor = getBoardCursor();
+        int boardListCount = cursor.getCount() - 1;
+        swapBoardOrder(position, boardListCount);
+        cursor.close();
+        db.delete(
+                BoardEntry.TABLE_NAME,
+                BoardEntry.BOARD_ORDER + " =?",
+                new String[] {String.valueOf(boardListCount)}
+        );
+    }
     // User Posts Functions ////////////////////////////////////////////////////////////////////////
 
     public void insertUserPostEntry(String board, String no){

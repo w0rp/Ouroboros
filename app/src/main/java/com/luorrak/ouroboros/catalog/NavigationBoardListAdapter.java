@@ -61,15 +61,14 @@ public class NavigationBoardListAdapter extends CursorRecyclerAdapter implements
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
-        //Save item position
         infiniteDbHelper.swapBoardOrder(fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
     }
 
     @Override
     public void onItemDismiss(int position) {
-        // TODO: 10/1/2015  update data in database with swipe to dismiss
-        notifyItemRemoved(position);
+        infiniteDbHelper.removeBoardEntry(position);
+        changeCursor(infiniteDbHelper.getBoardCursor());
     }
 
     class NavigationBoardListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
