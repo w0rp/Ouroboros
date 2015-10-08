@@ -1,7 +1,6 @@
 package com.luorrak.ouroboros.thread;
 
 import android.app.AlertDialog;
-import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,7 +9,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
@@ -176,6 +176,7 @@ public class ThreadFragment extends Fragment {
         MenuItem saveAllImagesButton = menu.findItem(R.id.action_save_all_images);
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
         MenuItem shareButton = menu.findItem(R.id.menu_item_share);
+        MenuItem watchlistButton = menu.findItem(R.id.action_add_watchlist);
 
         refreshButton.setVisible(true);
         scrollButton.setVisible(true);
@@ -184,6 +185,7 @@ public class ThreadFragment extends Fragment {
         saveAllImagesButton.setVisible(true);
         openExternalButton.setVisible(true);
         shareButton.setVisible(true);
+        watchlistButton.setVisible(true);
 
         shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
         super.onCreateOptionsMenu(menu, inflater);
@@ -223,8 +225,6 @@ public class ThreadFragment extends Fragment {
                         .setMessage("Are you sure you want to download all images?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                String tim;
-                                String ext;
                                 Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
                                 do {
                                     ArrayList<Media> mediaArrayList = (ArrayList<Media>) Util.deserializeObject(imageCursor.getBlob(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES)));
@@ -256,6 +256,20 @@ public class ThreadFragment extends Fragment {
                 shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(shareIntent, "Share via"));
                 break;
+            }
+            case R.id.action_add_watchlist: {
+                //// TODO: 10/6/2015 watchlist support on thread activity
+                Cursor cursor = infiniteDbHelper.getWatchlistCursor();
+                int count = cursor.getCount();
+                cursor.close();
+
+                Cursor threadcursor = infiniteDbHelper.getThreadCursor(resto);
+                byte[] serializedMediaList = threadcursor.getBlob(threadcursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
+                threadcursor.close();
+
+                final boolean b = serializedMediaList != null ? true : true;
+                infiniteDbHelper.insertWatchlistEntry(String.valueOf(getActivity().getTitle()), boardName, resto, serializedMediaList, count);
+                Snackbar.make(getView(),"Thread Added To Watchlist", Snackbar.LENGTH_LONG).show();
             }
         }
         return true;
@@ -294,7 +308,7 @@ public class ThreadFragment extends Fragment {
                             //new InsertThreadIntoDatabase().execute(jsonObject);
                         } else {
                             progressBar.setVisibility(View.INVISIBLE);
-                            Toast.makeText(getActivity(), "Error retrieving thread", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(getView(), "Error retrieving thread", Snackbar.LENGTH_LONG).show();
                         }
                     }
                 });

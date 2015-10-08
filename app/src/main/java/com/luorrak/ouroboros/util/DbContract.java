@@ -199,4 +199,38 @@ public class DbContract {
 
         public static final String COLUMN_NO = "user_post_no";
     }
+
+    public static final class WatchlistEntry implements BaseColumns{
+        public static final String TABLE_NAME = "watchlist";
+
+        /*
+        Thread Title, either subject text or '/board/threadno
+        Type: String
+        */
+        public static final String COLUMN_TITLE = "watchlist_title";
+
+        /*
+        Board name
+        Type: String
+        */
+        public static final String COLUMN_BOARD = "watchlist_board";
+
+        /*
+        Thread Number. Resto
+        Type: String
+        */
+        public static final String COLUMN_NO = "watchlist_no";
+
+        /*
+        Serialized media objects
+        Type: Blob
+        */
+        public static final String COLUMN_MEDIA_FILES = "watchlist_serialized_media";
+
+        /*
+        Order of object
+        Type: int
+        */
+        public static final String WATCHLIST_ORDER = "watchlist_order";
+    }
 }

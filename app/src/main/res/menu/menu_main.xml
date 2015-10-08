@@ -75,4 +75,11 @@
         android:actionProviderClass=
             "android.widget.ShareActionProvider"
         android:visible="false"/>
+
+    <item
+        android:id="@+id/action_add_watchlist"
+        android:orderInCategory="220"
+        android:title="watchlist"
+        app:showAsAction="collapseActionView|ifRoom"
+        android:visible="false"/>
 </menu>

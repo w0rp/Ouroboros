@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,7 +28,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
@@ -146,7 +146,7 @@ public class ReplyCommentFragment extends Fragment {
             if (reply.filePath.size() < 5) {
                 selectFile();
             } else {
-                Toast.makeText(getActivity(), "Maximum amount of attachments reached", Toast.LENGTH_SHORT).show();
+                Snackbar.make(getView(), "Maximum amount of attachments reached", Snackbar.LENGTH_LONG).show();
             }
         }
 
@@ -179,7 +179,7 @@ public class ReplyCommentFragment extends Fragment {
             reply.password = Long.toHexString(random.nextLong());
 
             //Add networking call to post data.
-            networkHelper.postReply(getActivity(), reply, sharedPreferences, new JsonParser(), new InfiniteDbHelper(getActivity()));
+            networkHelper.postReply(getActivity(), reply, sharedPreferences, new JsonParser(), new InfiniteDbHelper(getActivity()), getView());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -218,8 +218,7 @@ public class ReplyCommentFragment extends Fragment {
         if (requestCode == FILE_SELECT_CODE && resultCode == Activity.RESULT_OK) {
             String filePath = getPath(getActivity(), data.getData());
             if (filePath == null){
-                Toast.makeText(getActivity(), "Could not retrieve file", Toast.LENGTH_SHORT).show();
-                return;
+                Snackbar.make(getView(), "Could not retrieve file", Snackbar.LENGTH_LONG).show();
             } else {
                 reply.filePath.add(filePath);
                 addAttachmentPreview(filePath, getView());

@@ -8,13 +8,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -59,7 +59,7 @@ public class NetworkHelper {
     private boolean genericCaptcha = false;
     private Reply reply;
     public void postReply(final Context context, Reply reply, final SharedPreferences sharedPreferences,
-                          final JsonParser jsonParser, final InfiniteDbHelper infiniteDbHelper){
+                          final JsonParser jsonParser, final InfiniteDbHelper infiniteDbHelper, final View view){
         this.reply = reply;
         String postUrl = ChanUrls.getReplyUrl();
         String referalUrl = ChanUrls.getThreadHtmlUrl(reply.board, reply.resto);
@@ -126,39 +126,34 @@ public class NetworkHelper {
                         ProgressBar progressBar = (ProgressBar) ((Activity)context).findViewById(R.id.progress_bar);
                         progressBar.setVisibility(View.INVISIBLE);
                         if (e != null){
-                            Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
-                            toast.show();
+                            Snackbar.make(view, "Data did NOT post successfully", Snackbar.LENGTH_LONG).show();
                             return;
                         }
                         if (jsonObjectResponse.getHeaders().code() == 200 ){
                             captchaTest(jsonObjectResponse.getResult());
                             if (needDNSBLCaptcha){
-                                Toast toast = Toast.makeText(context, "Please fill out DNSBL Captcha", Toast.LENGTH_SHORT);
-                                toast.show();
+                                Snackbar.make(view, "Please fill out DNSBL Captcha", Snackbar.LENGTH_LONG).show();
 
                                 EditText captchaText = (EditText) ((Activity) context).findViewById(R.id.post_comment_captcha_editText); //messy
                                 captchaText.setVisibility(View.VISIBLE);
 
-                                getDnsblCaptcha(context);
+                                getDnsblCaptcha(context, view);
                                 return;
                             } else if (genericCaptcha){
-                                Toast toast = Toast.makeText(context, "Please fill out Captcha", Toast.LENGTH_SHORT);
-                                toast.show();
+                                Snackbar.make(view, "Please fill out Captcha", Snackbar.LENGTH_LONG).show();
 
                                 EditText captchaText = (EditText) ((Activity) context).findViewById(R.id.post_comment_captcha_editText); //messy
                                 captchaText.setVisibility(View.VISIBLE);
 
-                                getCaptcha(context);
+                                getCaptcha(context, view);
                                 return;
                             } else if (jsonObjectResponse.getResult().has("error")){
                                 //unknown error
-                                Toast toast = Toast.makeText(context, jsonObjectResponse.getResult().get("error").getAsString(), Toast.LENGTH_SHORT);
-                                toast.show();
+                                Snackbar.make(view, jsonObjectResponse.getResult().get("error").getAsString(), Snackbar.LENGTH_LONG).show();
                                 return;
                             }
 
-                            Toast toast = Toast.makeText(context, "Data posted successfully", Toast.LENGTH_SHORT);
-                            toast.show();
+                            Snackbar.make(view, "Data posted successfully", Snackbar.LENGTH_LONG).show();
 
                             boardName = jsonParser.getSubmittedBoardName(jsonObjectResponse.getResult());
                             userPostNo = jsonParser.getUserPostNo(jsonObjectResponse.getResult());
@@ -175,15 +170,14 @@ public class NetworkHelper {
                         } else {
                             //There is a crash here sometimes.
                             Log.e(LOG_TAG, "Failed Post " + jsonObjectResponse.getHeaders().message() + " code " + jsonObjectResponse.getHeaders().code());
-                            Toast toast = Toast.makeText(context, "Data did NOT post successfully", Toast.LENGTH_SHORT);
-                            toast.show();
+                            Snackbar.make(view, "Data did NOT post successfully", Snackbar.LENGTH_LONG).show();
                         }
 
                     }
                 });
     }
 
-    private void getCaptcha(final Context context) {
+    private void getCaptcha(final Context context, final View view) {
         Ion.with(context)
                 .load(ChanUrls.getCaptchaEntrypoint())
                 .asString()
@@ -191,8 +185,7 @@ public class NetworkHelper {
                     @Override
                     public void onCompleted(Exception e, String rawHTML) {
                         if (e != null){
-                            Toast toast = Toast.makeText(context, "Error retrieving CAPTCHA", Toast.LENGTH_SHORT);
-                            toast.show();
+                            Snackbar.make(view, "Error retrieving CAPTCHA", Snackbar.LENGTH_LONG).show();
                             return;
                         }
                         ImageView captchaImage = (ImageView) ((Activity) context).findViewById(R.id.post_comment_captcha_image); //messy
@@ -228,7 +221,7 @@ public class NetworkHelper {
         }
     }
 
-    public void getDnsblCaptcha(final Context context){
+    public void getDnsblCaptcha(final Context context, final View view){
         Ion.with(context)
                 .load(ChanUrls.getDnsblUrl())
                 .asString()
@@ -236,8 +229,7 @@ public class NetworkHelper {
                     @Override
                     public void onCompleted(Exception e, String rawHTML) {
                         if (e != null){
-                            Toast toast = Toast.makeText(context, "Error retrieving DNSBL CAPTCHA", Toast.LENGTH_SHORT);
-                            toast.show();
+                            Snackbar.make(view, "Error retrieving DNSBL CAPTCHA", Snackbar.LENGTH_LONG).show();
                             return;
                         }
 

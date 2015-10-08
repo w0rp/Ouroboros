@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -24,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.koushikdutta.async.future.FutureCallback;
@@ -247,7 +247,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         } else {
                             progressBar.setVisibility(View.INVISIBLE);
                             swipeRefreshLayout.setRefreshing(false);
-                            Toast.makeText(getActivity(), "Error retrieving catalog", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(getView(), "Error retrieving catalog", Snackbar.LENGTH_LONG).show();
                         }
 
                         catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());

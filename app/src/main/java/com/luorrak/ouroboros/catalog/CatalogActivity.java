@@ -3,11 +3,13 @@ package com.luorrak.ouroboros.catalog;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +20,8 @@ import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseFragment;
 import com.luorrak.ouroboros.settings.SettingsFragment;
+import com.luorrak.ouroboros.util.DragAndDropRecyclerView.WatchListTouchHelper;
+import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Util;
 
 /**
@@ -42,6 +46,9 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
     private String board;
     DrawerLayout drawerLayout;
     ProgressBar progressBar;
+    InfiniteDbHelper infiniteDbHelper;
+    RecyclerView watchList;
+    WatchListAdapter watchListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +56,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         super.onCreate(savedInstanceState);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
+        infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         setContentView(R.layout.activity_catalog);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
@@ -64,6 +72,19 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //temp board list
+        watchList = (RecyclerView) findViewById(R.id.watch_list);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        watchList.setLayoutManager(layoutManager);
+
+        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), getFragmentManager(), getApplicationContext());
+        watchList.setAdapter(watchListAdapter);
+
+        ItemTouchHelper.Callback callback = new WatchListTouchHelper(watchListAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(watchList);
+        //end temp board list
 
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);
@@ -117,5 +138,11 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         }
         drawerLayout.closeDrawers();
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
     }
 }

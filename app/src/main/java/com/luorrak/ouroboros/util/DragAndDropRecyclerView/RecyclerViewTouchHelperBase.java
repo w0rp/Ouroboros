@@ -20,11 +20,11 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class RecyclerViewTouchHelper extends ItemTouchHelper.Callback {
+public class RecyclerViewTouchHelperBase extends ItemTouchHelper.Callback {
 
     private TouchHelperInterface mAdapter;
 
-    public RecyclerViewTouchHelper(TouchHelperInterface adapter) {
+    public RecyclerViewTouchHelperBase(TouchHelperInterface adapter) {
         mAdapter = adapter;
     }
 
@@ -46,13 +46,14 @@ public class RecyclerViewTouchHelper extends ItemTouchHelper.Callback {
         mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
     }
 
+
     @Override
     public boolean isLongPressDragEnabled() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isItemViewSwipeEnabled() {
-        return true;
+        return false;
     }
 }

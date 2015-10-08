@@ -13,6 +13,7 @@ import com.luorrak.ouroboros.util.DbContract.BoardEntry;
 import com.luorrak.ouroboros.util.DbContract.CatalogEntry;
 import com.luorrak.ouroboros.util.DbContract.ThreadEntry;
 import com.luorrak.ouroboros.util.DbContract.UserPosts;
+import com.luorrak.ouroboros.util.DbContract.WatchlistEntry;
 
 /**
  * Ouroboros - An 8chan browser
@@ -34,7 +35,7 @@ import com.luorrak.ouroboros.util.DbContract.UserPosts;
 public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     private final String LOG_TAG = InfiniteDbHelper.class.getSimpleName();
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "cache.db";
     SQLiteDatabase db = getWritableDatabase();
 
@@ -49,8 +50,6 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     public boolean insertCatalogEntry (String board, String no, String filename, String tim, String ext, String sub, String comment,
                                        Integer replies, Integer images, Integer sticky, Integer locked, String embed){
-        long newRowId;
-
         ContentValues values = new ContentValues();
         values.put(CatalogEntry.COLUMN_BOARD_NAME, board); //LOOK UP KEY FOR THIS
         values.put(CatalogEntry.COLUMN_CATALOG_NO, no);
@@ -126,8 +125,6 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     public boolean insertThreadEntry(String board, String resto, String no, String sub, String com,
                                      String email, String name, String trip, String time, String last_modified,
                                      String id, String embed, byte[] mediaFiles){
-        long newRowId;
-
         ContentValues values = new ContentValues();
         values.put(ThreadEntry.COLUMN_BOARD_NAME, board);
         values.put(ThreadEntry.COLUMN_THREAD_RESTO, resto);
@@ -357,6 +354,111 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 new String[] {boardName, no}) > 0; // selection
     }
 
+    // Watchlist Functions /////////////////////////////////////////////////////////////////////////
+
+    public void insertWatchlistEntry(String title, String board, String no, byte[] serializedMediaList, int orderId){
+        ContentValues values = new ContentValues();
+        values.put(WatchlistEntry.COLUMN_TITLE, title);
+        values.put(WatchlistEntry.COLUMN_BOARD, board);
+        values.put(WatchlistEntry.COLUMN_NO, no);
+        values.put(WatchlistEntry.COLUMN_MEDIA_FILES, serializedMediaList);
+        values.put(WatchlistEntry.WATCHLIST_ORDER, orderId);
+
+        try {
+            db.insertOrThrow(
+                    WatchlistEntry.TABLE_NAME,
+                    null,
+                    values
+            );
+        } catch (SQLException e){
+            Log.e(LOG_TAG, "Error Inserting row into " + WatchlistEntry.TABLE_NAME);
+        }
+    }
+
+    public Cursor getWatchlistCursor(){
+
+        Cursor cursor = db.query(
+                WatchlistEntry.TABLE_NAME,
+                null,
+                null, //selection
+                null, //selection args
+                null, //group by
+                null, //having
+                WatchlistEntry.WATCHLIST_ORDER + " ASC"  //orderby
+        );
+
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public int findIdbyWatchlistOrder(int watchlistOrder){
+        Cursor cursor = db.query(
+                WatchlistEntry.TABLE_NAME,
+                null,
+                WatchlistEntry.WATCHLIST_ORDER + " = ?",
+                new String[] {String.valueOf(watchlistOrder)},
+                null,
+                null,
+                null
+        );
+        cursor.moveToFirst();
+        int id = cursor.getInt(cursor.getColumnIndex("_id"));
+        cursor.close();
+        return id;
+    }
+
+
+    public void updateWatchlistOrder(int id, int newOrderValue){
+        ContentValues values = new ContentValues();
+        values.put(WatchlistEntry.WATCHLIST_ORDER, newOrderValue);
+
+        String selection = BoardEntry._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(id)};
+
+        db.update(
+                WatchlistEntry.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs
+        );
+    }
+
+    public void swapWatchlistOrder(int fromPosition, int toPosition){
+        ContentValues values = new ContentValues();
+        //SELECT orderID FROM BoardEntry.TABLE_NAME WHERE orderId > toPosition
+        int positionOne;
+        int positionTwo;
+        //Drag Down
+        if (fromPosition < toPosition){
+            for (int i = fromPosition; i < toPosition; i++) {
+                //find first _id
+                positionOne = findIdbyWatchlistOrder(i);
+                positionTwo = findIdbyWatchlistOrder(i + 1);
+                updateWatchlistOrder(positionOne, i + 1);
+                updateWatchlistOrder(positionTwo, i);
+            }
+            //DragUp
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                positionOne = findIdbyWatchlistOrder(i);
+                positionTwo = findIdbyWatchlistOrder(i - 1);
+                updateWatchlistOrder(positionOne, i - 1);
+                updateWatchlistOrder(positionTwo, i);
+            }
+        }
+    }
+
+    public void removeWatchlistEntry(int position){
+        Cursor cursor = getWatchlistCursor();
+        int boardListCount = cursor.getCount() - 1;
+        swapWatchlistOrder(position, boardListCount);
+        cursor.close();
+        db.delete(
+                WatchlistEntry.TABLE_NAME,
+                WatchlistEntry.WATCHLIST_ORDER + " =?",
+                new String[] {String.valueOf(boardListCount)}
+        );
+    }
     // Database Lifecycle Functions ////////////////////////////////////////////////////////////////
 
     @Override
@@ -421,6 +523,15 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 UserPosts.COLUMN_BOARDS + " TEXT NOT NULL, " +
                 UserPosts.COLUMN_NO + " TEXT NOT NULL);";
 
+        final String SQL_CREATE_WATCHLIST_TABLE = "CREATE TABLE IF NOT EXISTS " + WatchlistEntry.TABLE_NAME + " (" +
+                WatchlistEntry._ID + " INTEGER PRIMARY KEY, " +
+
+                WatchlistEntry.COLUMN_TITLE + " TEXT, " +
+                WatchlistEntry.COLUMN_BOARD + " TEXT NOT NULL, " +
+                WatchlistEntry.COLUMN_NO + " TEXT NOT NULL, " +
+                WatchlistEntry.COLUMN_MEDIA_FILES + " BLOB, " +
+                WatchlistEntry.WATCHLIST_ORDER + " INTEGER NOT NULL);";
+
         Log.d(LOG_TAG, "SQL STRINGS");
         Log.d(LOG_TAG, SQL_CREATE_BOARD_TABLE);
         Log.d(LOG_TAG, SQL_CREATE_CATALOG_TABLE);
@@ -429,12 +540,14 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         db.execSQL(SQL_CREATE_CATALOG_TABLE);
         db.execSQL(SQL_CREATE_THREAD_TABLE);
         db.execSQL(SQL_CREATE_USER_POSTS_TABLE);
+        db.execSQL(SQL_CREATE_WATCHLIST_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + CatalogEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ThreadEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + BoardEntry.TABLE_NAME);
 
         onCreate(db);
     }
