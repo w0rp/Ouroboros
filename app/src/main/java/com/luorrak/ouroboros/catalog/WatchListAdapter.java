@@ -8,8 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
@@ -91,14 +91,14 @@ public class WatchListAdapter extends CursorRecyclerAdapter implements TouchHelp
 
     class WatchListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public ImageView watchlistThumbnail;
-        public TextView watchlistTitle;
+        public Button watchlistTitle;
 
         public watchlistObject watchlistObject;
 
         public WatchListViewHolder(View itemView) {
             super(itemView);
             watchlistThumbnail = (ImageView) itemView.findViewById(R.id.watchlist_thumbnail);
-            watchlistTitle = (TextView) itemView.findViewById(R.id.watchlist_title);
+            watchlistTitle = (Button) itemView.findViewById(R.id.watchlist_title);
 
             watchlistObject = new watchlistObject();
 
