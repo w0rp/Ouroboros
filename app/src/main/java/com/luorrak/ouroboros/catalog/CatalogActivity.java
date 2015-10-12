@@ -73,7 +73,6 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //temp board list
         watchList = (RecyclerView) findViewById(R.id.watch_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         watchList.setLayoutManager(layoutManager);
@@ -84,7 +83,6 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         ItemTouchHelper.Callback callback = new WatchListTouchHelper(watchListAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(watchList);
-        //end temp board list
 
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);

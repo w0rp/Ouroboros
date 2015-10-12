@@ -1,7 +1,6 @@
 package com.luorrak.ouroboros.catalog;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -260,9 +259,6 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (boardName != null){
             getCatalogJson(getActivity(), boardName);
         }
-    }
-
-    public void show(FragmentManager fragmentManager, String s) {
     }
 }
 

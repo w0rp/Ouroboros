@@ -3,38 +3,43 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:elevation="16dp"
-    >
+    android:elevation="16dp">
 
-    <RelativeLayout
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <include
-            android:id="@+id/app_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            layout="@layout/toolbar" />
-
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/app_bar"
-            android:layout_marginTop="-6dp"
-            android:layout_marginBottom="-6dp"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:elevation="17dp"
-            android:indeterminate="true"
-            android:visibility="invisible" />
         <RelativeLayout
-            android:layout_below="@+id/progress_bar"
-            android:id="@+id/activity_catalog_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <!--Catalog fragment goes here -->
+
+            <include
+                android:id="@+id/app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                layout="@layout/toolbar" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/app_bar"
+                android:layout_marginTop="-6dp"
+                android:layout_marginBottom="-6dp"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:elevation="17dp"
+                android:indeterminate="true"
+                android:visibility="invisible" />
+            <RelativeLayout
+                android:layout_below="@+id/progress_bar"
+                android:id="@+id/activity_catalog_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <!--Catalog fragment goes here -->
+            </RelativeLayout>
         </RelativeLayout>
-    </RelativeLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_view"

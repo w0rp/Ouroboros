@@ -131,6 +131,7 @@ public class ThreadFragment extends Fragment {
             threadAdapter.hasStableIds();
             recyclerView.setAdapter(threadAdapter);
         }
+
         return view;
     }
 
@@ -258,7 +259,6 @@ public class ThreadFragment extends Fragment {
                 break;
             }
             case R.id.action_add_watchlist: {
-                //// TODO: 10/6/2015 watchlist support on thread activity
                 Cursor cursor = infiniteDbHelper.getWatchlistCursor();
                 int count = cursor.getCount();
                 cursor.close();
@@ -267,24 +267,17 @@ public class ThreadFragment extends Fragment {
                 byte[] serializedMediaList = threadcursor.getBlob(threadcursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
                 threadcursor.close();
 
-                final boolean b = serializedMediaList != null ? true : true;
                 infiniteDbHelper.insertWatchlistEntry(String.valueOf(getActivity().getTitle()), boardName, resto, serializedMediaList, count);
-                Snackbar.make(getView(),"Thread Added To Watchlist", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(getView(), "Thread Added To Watchlist", Snackbar.LENGTH_LONG).show();
+                ((ThreadActivity) getActivity()).updateWatchlist();
             }
         }
         return true;
     }
 
-    public void setActionBarTitle(String title){
-        getActivity().setTitle(title);
-    }
-
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
 
-
     public void getThread(String threadNo, String boardName){
-        //hacks to get this to work
-
         getThreadJson(getActivity(), boardName, threadNo);
     }
 
