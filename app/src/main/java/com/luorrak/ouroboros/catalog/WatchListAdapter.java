@@ -1,10 +1,11 @@
 package com.luorrak.ouroboros.catalog;
 
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,12 +44,12 @@ import java.util.ArrayList;
  */
 public class WatchListAdapter extends CursorRecyclerAdapter implements TouchHelperInterface{
     InfiniteDbHelper infiniteDbHelper;
-    private FragmentManager fragmentManager;
+    private DrawerLayout drawerLayout;
     Context context;
 
-    public WatchListAdapter(Cursor cursor, FragmentManager fragmentManager, Context context) {
+    public WatchListAdapter(Cursor cursor, Context context, DrawerLayout drawerLayout) {
         super(cursor);
-        this.fragmentManager = fragmentManager;
+        this.drawerLayout = drawerLayout;
         this.context = context;
         infiniteDbHelper = new InfiniteDbHelper(context);
     }
@@ -109,6 +110,7 @@ public class WatchListAdapter extends CursorRecyclerAdapter implements TouchHelp
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.watchlist_title: {
+                    drawerLayout.closeDrawer(Gravity.RIGHT);
                     Context context = v.getContext();
                     Intent intent = new Intent(context, ThreadActivity.class);
                     intent.putExtra(CatalogAdapter.THREAD_NO, watchlistObject.no);

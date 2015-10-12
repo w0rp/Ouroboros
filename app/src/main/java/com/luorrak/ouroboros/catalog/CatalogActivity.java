@@ -77,7 +77,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         watchList.setLayoutManager(layoutManager);
 
-        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), getFragmentManager(), getApplicationContext());
+        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), getApplicationContext(), drawerLayout);
         watchList.setAdapter(watchListAdapter);
 
         ItemTouchHelper.Callback callback = new WatchListTouchHelper(watchListAdapter);
