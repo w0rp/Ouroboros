@@ -324,7 +324,7 @@ public abstract class CursorRecyclerAdapter<VH
 
 class CursorFilter extends Filter {
 
-    CursorFilterClient mClient;
+    private CursorFilterClient mClient;
 
     interface CursorFilterClient {
         CharSequence convertToString(Cursor cursor);

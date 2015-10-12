@@ -44,11 +44,11 @@ import com.luorrak.ouroboros.util.Util;
 
 public class CatalogActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private String board;
-    DrawerLayout drawerLayout;
-    ProgressBar progressBar;
-    InfiniteDbHelper infiniteDbHelper;
-    RecyclerView watchList;
-    WatchListAdapter watchListAdapter;
+    private DrawerLayout drawerLayout;
+    private ProgressBar progressBar;
+    private InfiniteDbHelper infiniteDbHelper;
+    private RecyclerView watchList;
+    private WatchListAdapter watchListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

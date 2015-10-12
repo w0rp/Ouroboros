@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class NetworkHelper {
-    public final String LOG_TAG = NetworkHelper.class.getSimpleName();
+    private final String LOG_TAG = NetworkHelper.class.getSimpleName();
     private boolean needDNSBLCaptcha = false;
     private boolean genericCaptcha = false;
     private Reply reply;
@@ -205,7 +205,7 @@ public class NetworkHelper {
                 });
     }
 
-    public String captchaTest(JsonObject jsonObject) {
+    private String captchaTest(JsonObject jsonObject) {
         JsonElement error = jsonObject.get("error");
 
         if (error == null){
@@ -221,7 +221,7 @@ public class NetworkHelper {
         }
     }
 
-    public void getDnsblCaptcha(final Context context, final View view){
+    private void getDnsblCaptcha(final Context context, final View view){
         Ion.with(context)
                 .load(ChanUrls.getDnsblUrl())
                 .asString()

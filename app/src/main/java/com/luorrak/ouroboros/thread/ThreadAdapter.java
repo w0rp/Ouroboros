@@ -58,12 +58,12 @@ import java.util.HashMap;
 public class ThreadAdapter extends CursorRecyclerAdapter {
     private final String LOG_TAG = ThreadAdapter.class.getSimpleName();
 
-    CommentParser commentParser = new CommentParser();
+    private CommentParser commentParser = new CommentParser();
     private FragmentManager fragmentManager;
     private String boardName;
     private Context context;
     private InfiniteDbHelper infiniteDbHelper;
-    int viewWidth;
+    private int viewWidth;
     private HashMap<Integer, MediaAdapter> mediaAdapterHashMap;
 
 

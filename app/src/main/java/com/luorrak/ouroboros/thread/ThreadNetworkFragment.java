@@ -35,8 +35,8 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
  */
 
 public class ThreadNetworkFragment extends Fragment {
-    Activity activity;
-    InsertThreadIntoDatabaseTask insertThreadIntoDatabaseTask;
+    private Activity activity;
+    private InsertThreadIntoDatabaseTask insertThreadIntoDatabaseTask;
 
     public void beginTask(JsonObject jsonObject, InfiniteDbHelper infiniteDbHelper, String boardName, String resto, ThreadAdapter threadAdapter){
         insertThreadIntoDatabaseTask = new InsertThreadIntoDatabaseTask(activity, infiniteDbHelper, boardName, resto, threadAdapter);

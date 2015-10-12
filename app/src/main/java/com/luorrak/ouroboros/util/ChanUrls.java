@@ -21,15 +21,15 @@ import android.net.Uri;
  */
 public class ChanUrls {
 
-    public static final String SCHEME = "https";
-    public static final String DOMAIN_NAME = "8ch.net";
-    public static final String CATALOG_ENDPOINT = "catalog.json"; //http(s)://siteurl/board/catalog.json
-    public static final String THREAD_FOLDER = "res"; //http(s):///siteurl/board/res/threadnumber.json
-    public static final String THREAD_ENDPOINT = ".json";
-    public static final String IMAGE_THUMBNAIL_DIRECTORY = "thumb";
-    public static final String IMAGE_DIRECTORY = "src"; //http(s)://siteurl/board/src/tim.ext
-    public static final String POST_ENDPOINT = "post.php";
-    public static final String DNSBL_ENDPOINT = "dnsbls_bypass.php"; //https://8ch.net/dnsbls_bypass.php
+    private static final String SCHEME = "https";
+    private static final String DOMAIN_NAME = "8ch.net";
+    private static final String CATALOG_ENDPOINT = "catalog.json"; //http(s)://siteurl/board/catalog.json
+    private static final String THREAD_FOLDER = "res"; //http(s):///siteurl/board/res/threadnumber.json
+    private static final String THREAD_ENDPOINT = ".json";
+    private static final String IMAGE_THUMBNAIL_DIRECTORY = "thumb";
+    private static final String IMAGE_DIRECTORY = "src"; //http(s)://siteurl/board/src/tim.ext
+    private static final String POST_ENDPOINT = "post.php";
+    private static final String DNSBL_ENDPOINT = "dnsbls_bypass.php"; //https://8ch.net/dnsbls_bypass.php
 
     public static String getCatalogUrl(String boardName){
         Uri.Builder builder = new Uri.Builder();

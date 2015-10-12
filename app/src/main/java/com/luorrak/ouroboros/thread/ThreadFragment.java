@@ -67,9 +67,9 @@ public class ThreadFragment extends Fragment {
     private ThreadAdapter threadAdapter;
     private LinearLayoutManager layoutManager;
     private ThreadNetworkFragment networkFragment;
-    String resto;
-    String boardName;
-    Parcelable savedLayoutState ;
+    private String resto;
+    private String boardName;
+    private Parcelable savedLayoutState ;
     private boolean isStatusCheckIsRunning;
     private ActionProvider shareActionProvider;
     private Handler handler;
@@ -277,11 +277,11 @@ public class ThreadFragment extends Fragment {
 
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
 
-    public void getThread(String threadNo, String boardName){
+    private void getThread(String threadNo, String boardName){
         getThreadJson(getActivity(), boardName, threadNo);
     }
 
-    public void getThreadJson(final Context context, final String boardName, final String threadNumber){
+    private void getThreadJson(final Context context, final String boardName, final String threadNumber){
         final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
         final String threadJsonUrl = ChanUrls.getThreadUrl(boardName, threadNumber);
@@ -307,7 +307,7 @@ public class ThreadFragment extends Fragment {
                 });
     }
 
-    Runnable statusCheck = new Runnable() {
+    private Runnable statusCheck = new Runnable() {
         @Override
         public void run() {
             getThread(resto, boardName);

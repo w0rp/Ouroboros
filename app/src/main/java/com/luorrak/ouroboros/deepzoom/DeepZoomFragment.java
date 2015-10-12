@@ -48,15 +48,15 @@ import uk.co.senab.photoview.PhotoView;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class DeepZoomFragment extends Fragment{
-    PhotoView photoView;
-    ProgressBar progressBar;
-    NetworkHelper networkHelper;
-    InfiniteDbHelper infiniteDbHelper;
-    int position;
-    String boardName;
-    String resto;
-    Media mediaItem;
-    ImageView mediaPlayButton;
+    private PhotoView photoView;
+    private ProgressBar progressBar;
+    private NetworkHelper networkHelper;
+    private InfiniteDbHelper infiniteDbHelper;
+    private int position;
+    private String boardName;
+    private String resto;
+    private Media mediaItem;
+    private ImageView mediaPlayButton;
     private ActionProvider shareActionProvider;
 
     public Fragment newInstance(String boardName, String resto, int position) {
@@ -210,9 +210,5 @@ public class DeepZoomFragment extends Fragment{
             }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void initVideoIntent(String boardName, String tim, String ext) {
-
     }
 }

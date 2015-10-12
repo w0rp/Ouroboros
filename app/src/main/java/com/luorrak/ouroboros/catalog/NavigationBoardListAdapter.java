@@ -40,11 +40,11 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class NavigationBoardListAdapter extends CursorRecyclerAdapter implements TouchHelperInterface{
-    InfiniteDbHelper infiniteDbHelper;
+    private InfiniteDbHelper infiniteDbHelper;
     private FragmentManager fragmentManager;
-    Context context;
-    View parentView;
-    OnStartDragListener dragStartListener;
+    private Context context;
+    private View parentView;
+    private OnStartDragListener dragStartListener;
     public NavigationBoardListAdapter(Cursor cursor, FragmentManager fragmentManager, Context context, InfiniteDbHelper infiniteDbHelper, View parentView, OnStartDragListener dragStartListener) {
         super(cursor);
         this.fragmentManager = fragmentManager;

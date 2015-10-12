@@ -36,8 +36,8 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     private final String LOG_TAG = InfiniteDbHelper.class.getSimpleName();
     private static final int DATABASE_VERSION = 4;
-    public static final String DATABASE_NAME = "cache.db";
-    SQLiteDatabase db = getWritableDatabase();
+    private static final String DATABASE_NAME = "cache.db";
+    private SQLiteDatabase db = getWritableDatabase();
 
     // Constructor /////////////////////////////////////////////////////////////////////////////////
 
@@ -260,7 +260,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         return cursor;
     }
 
-    public int findIdbyBoardOrder(int boardOrder){
+    private int findIdbyBoardOrder(int boardOrder){
         Cursor cursor = db.query(
                 BoardEntry.TABLE_NAME,
                 null,
@@ -276,7 +276,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         return id;
     }
 
-    public void updateBoardOrder(int id, int newOrderValue){
+    private void updateBoardOrder(int id, int newOrderValue){
         ContentValues values = new ContentValues();
         values.put(BoardEntry.BOARD_ORDER, newOrderValue);
 
@@ -391,7 +391,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         return cursor;
     }
 
-    public int findIdbyWatchlistOrder(int watchlistOrder){
+    private int findIdbyWatchlistOrder(int watchlistOrder){
         Cursor cursor = db.query(
                 WatchlistEntry.TABLE_NAME,
                 null,
@@ -408,7 +408,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     }
 
 
-    public void updateWatchlistOrder(int id, int newOrderValue){
+    private void updateWatchlistOrder(int id, int newOrderValue){
         ContentValues values = new ContentValues();
         values.put(WatchlistEntry.WATCHLIST_ORDER, newOrderValue);
 

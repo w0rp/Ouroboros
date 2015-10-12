@@ -43,10 +43,10 @@ import com.luorrak.ouroboros.util.Util;
  */
 public class ThreadActivity extends AppCompatActivity {
     private Toolbar toolbar;
-    InfiniteDbHelper infiniteDbHelper;
-    DrawerLayout drawerLayout;
-    RecyclerView watchList;
-    WatchListAdapter watchListAdapter;
+    private InfiniteDbHelper infiniteDbHelper;
+    private DrawerLayout drawerLayout;
+    private RecyclerView watchList;
+    private WatchListAdapter watchListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -54,8 +54,8 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
  * A simple {@link Fragment} subclass.
  */
 public class BoardListFragment extends android.app.Fragment implements OnStartDragListener {
-    NavigationBoardListAdapter boardListAdapter;
-    ItemTouchHelper touchHelper;
+    private NavigationBoardListAdapter boardListAdapter;
+    private ItemTouchHelper touchHelper;
 
     public BoardListFragment() {
     }

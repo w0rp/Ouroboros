@@ -41,13 +41,13 @@ import java.util.List;
 
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
-    NetworkHelper networkHelper = new NetworkHelper();
-    String boardName;
-    String resto;
-    FragmentManager fragmentManager;
-    ArrayList<Media> mediaItems;
-    List<String> validExt = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
-    Context context;
+    private NetworkHelper networkHelper = new NetworkHelper();
+    private String boardName;
+    private String resto;
+    private FragmentManager fragmentManager;
+    private ArrayList<Media> mediaItems;
+    private List<String> validExt = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
+    private Context context;
     public GalleryAdapter(ArrayList<Media> mediaItems, String boardName, String resto, FragmentManager fragmentManager, Context context) {
         this.mediaItems = mediaItems;
         this.boardName = boardName;
@@ -64,7 +64,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
     @Override
     public void onBindViewHolder(GalleryViewHolder holder, int position) {
-        final GalleryViewHolder galleryViewHolder = (GalleryViewHolder)holder;
+        final GalleryViewHolder galleryViewHolder = holder;
         final Media media = mediaItems.get(position);
         galleryViewHolder.playButton.setVisibility(View.GONE);
 

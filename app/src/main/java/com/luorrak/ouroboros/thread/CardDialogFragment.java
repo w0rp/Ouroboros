@@ -32,7 +32,7 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
  */
 public class CardDialogFragment extends Fragment {
     private final String LOG_TAG = CardDialogFragment.class.getSimpleName();
-    Cursor cursor;
+    private Cursor cursor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState){

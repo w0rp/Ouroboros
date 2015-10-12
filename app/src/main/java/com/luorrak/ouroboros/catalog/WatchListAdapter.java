@@ -43,9 +43,9 @@ import java.util.ArrayList;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class WatchListAdapter extends CursorRecyclerAdapter implements TouchHelperInterface{
-    InfiniteDbHelper infiniteDbHelper;
+    private InfiniteDbHelper infiniteDbHelper;
     private DrawerLayout drawerLayout;
-    Context context;
+    private Context context;
 
     public WatchListAdapter(Cursor cursor, Context context, DrawerLayout drawerLayout) {
         super(cursor);

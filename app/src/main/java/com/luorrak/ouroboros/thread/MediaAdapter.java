@@ -72,12 +72,12 @@ import java.util.List;
 public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> {
     final int VERTICAL = 0;
     final int HORIZONTAL = 1;
-    String boardName;
-    String resto;
-    FragmentManager fragmentManager;
-    ArrayList<Media> mediaItems;
-    List<String> validExt = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
-    Context context;
+    private String boardName;
+    private String resto;
+    private FragmentManager fragmentManager;
+    private ArrayList<Media> mediaItems;
+    private List<String> validExt = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
+    private Context context;
 
     private final int W = 0, H = 1;
     private int maxImgWidth;
@@ -102,7 +102,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     @Override
     public void onBindViewHolder(MediaViewHolder holder, int position) {
         NetworkHelper networkHelper = new NetworkHelper();
-        final MediaViewHolder mediaViewHolder = (MediaViewHolder)holder;
+        final MediaViewHolder mediaViewHolder = holder;
         final Media media = mediaItems.get(position);
         mediaViewHolder.playButton.setVisibility(View.GONE);
 

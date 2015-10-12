@@ -193,7 +193,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         return true;
     }
 
-    public void setActionBarTitle(String title){
+    private void setActionBarTitle(String title){
         getActivity().setTitle(title);
     }
 
@@ -230,7 +230,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
-    public void getCatalogJson(final Context context, final String boardName) {
+    private void getCatalogJson(final Context context, final String boardName) {
         String catalogJsonUrl = ChanUrls.getCatalogUrl(boardName);
         final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);

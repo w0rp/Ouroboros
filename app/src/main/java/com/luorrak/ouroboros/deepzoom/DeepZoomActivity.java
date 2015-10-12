@@ -107,7 +107,7 @@ public class DeepZoomActivity extends AppCompatActivity{
         }
     }
 
-    public int findMediaItemIndex(String fileName){
+    private int findMediaItemIndex(String fileName){
         for (int i = 0; i < mediaList.size(); i++){
             if (mediaList.get(i).fileName.equals(fileName)){
                 return i;

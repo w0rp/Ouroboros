@@ -47,11 +47,11 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
     public final static String TIM = "com.luorrak.ouroboros.TIM";
     public final static String EXT = "com.luorrak.ouroboros.EXT";
 
-    NetworkHelper networkHelper = new NetworkHelper();
-    CommentParser commentParser = new CommentParser();
+    private NetworkHelper networkHelper = new NetworkHelper();
+    private CommentParser commentParser = new CommentParser();
     private FragmentManager fragmentManager;
-    String boardName;
-    InfiniteDbHelper infiniteDbHelper;
+    private String boardName;
+    private InfiniteDbHelper infiniteDbHelper;
     public CatalogAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName, InfiniteDbHelper infiniteDbHelper) {
         super(cursor);
         this.fragmentManager = fragmentManager;
