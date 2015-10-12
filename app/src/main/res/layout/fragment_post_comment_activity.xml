@@ -38,7 +38,7 @@
                 android:id="@+id/post_comment_editText_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapSentences"
+                android:inputType="textCapSentences|textMultiLine"
                 android:hint="Enter your comment" />
             <ImageView
                 android:id="@+id/post_comment_captcha_image"
