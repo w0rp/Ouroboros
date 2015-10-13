@@ -107,6 +107,12 @@ public class ThreadActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
+    }
+
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
