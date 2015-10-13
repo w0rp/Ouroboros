@@ -290,7 +290,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         screenWidth = size.x;
         screenHeight = size.y;
 
-        maxImgWidth = (int) (screenWidth * 0.9);
+        maxImgWidth = (int) (screenWidth * 0.945);
         maxImgHeight = (int) (screenHeight * 0.8);
         minImgHeight = (int) (screenHeight * 0.15);
     }

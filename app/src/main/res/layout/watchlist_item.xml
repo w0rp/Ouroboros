@@ -19,6 +19,7 @@
             android:id="@+id/watchlist_title"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:paddingLeft="4dp"
             android:gravity="left|center_vertical"
             android:singleLine="true"
             android:textSize="18sp"
