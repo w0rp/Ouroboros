@@ -62,6 +62,7 @@
             android:background="?attr/colorPrimary"
             android:text="Watchlist"
             android:gravity="bottom"
+            android:paddingLeft="4dp"
             android:textSize="24sp"
             android:textColor="#fff"/>
         <View

@@ -8,10 +8,11 @@
 
     <ImageView
         android:id="@+id/boardlist_handle"
-        android:paddingLeft="16dp"
+        android:layout_marginLeft="24dp"
+        android:layout_gravity="center"
         android:layout_width="10dp"
-        android:layout_height="50dp"
-        android:src="@drawable/ic_reorder_black_24dp"
+        android:layout_height="16dp"
+        android:src="@drawable/ic_reorder_black_18dp"
         android:layout_weight="1"/>
     <Button
         android:id="@+id/boardlist_boardname_button"

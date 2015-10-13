@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
@@ -92,6 +91,10 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
             CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
             android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
+        } else {
+            BoardListFragment boardListFragment = new BoardListFragment();
+            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
         }
     }
 
@@ -113,10 +116,6 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
                 android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
                 progressBar.setVisibility(View.INVISIBLE);
-                break;
-            }
-            case R.id.drawer_item_watchlist:{
-                Toast.makeText(getApplicationContext(), "Feature not yet implemented", Toast.LENGTH_SHORT).show();
                 break;
             }
             case R.id.drawer_item_settings: {
