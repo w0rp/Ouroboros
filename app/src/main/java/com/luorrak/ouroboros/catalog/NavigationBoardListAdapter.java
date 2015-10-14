@@ -2,7 +2,6 @@ package com.luorrak.ouroboros.catalog;
 
 import android.app.AlertDialog;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -113,9 +112,7 @@ public class NavigationBoardListAdapter extends CursorRecyclerAdapter implements
             switch (v.getId()){
                 case R.id.boardlist_boardname_button:{
                     String buttonText = boardNameBtn.getText().toString();
-                    CatalogFragment catalogFragment = new CatalogFragment().newInstance(buttonText.substring(1, buttonText.length()-1));
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
+                    ((CatalogActivity)context).launchBoardFragment(buttonText.substring(1, buttonText.length()-1));
                     break;
                 }
                 case R.id.boardlist_delete_button:{

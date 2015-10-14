@@ -1,5 +1,6 @@
 package com.luorrak.ouroboros.catalog;
 
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
@@ -57,12 +58,21 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         setContentView(R.layout.activity_catalog);
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         if (savedInstanceState == null){
             board = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
+            if (board == null){
+                BoardListFragment boardListFragment = new BoardListFragment();
+                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
+            } else {
+                CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
+                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
+            }
         }
 
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -86,16 +96,6 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);
         drawerToggle.syncState();
-
-        if (board != null){
-            CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
-            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
-        } else {
-            BoardListFragment boardListFragment = new BoardListFragment();
-            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
-        }
     }
 
     @Override
@@ -140,6 +140,21 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
     @Override
     protected void onResume() {
         super.onResume();
-        watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
+        if (watchListAdapter != null){
+            watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("board", board);
+        super.onSaveInstanceState(outState);
+    }
+
+    public void launchBoardFragment(String board){
+        this.board = board; //The real reason for this method being here
+        CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
     }
 }

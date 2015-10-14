@@ -110,7 +110,9 @@ public class ThreadActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
+        if (watchListAdapter != null){
+            watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
+        }
     }
 
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////
