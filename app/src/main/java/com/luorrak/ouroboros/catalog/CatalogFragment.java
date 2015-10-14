@@ -1,7 +1,6 @@
 package com.luorrak.ouroboros.catalog;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -9,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -24,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.koushikdutta.async.future.FutureCallback;
@@ -194,7 +193,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         return true;
     }
 
-    public void setActionBarTitle(String title){
+    private void setActionBarTitle(String title){
         getActivity().setTitle(title);
     }
 
@@ -231,7 +230,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
-    public void getCatalogJson(final Context context, final String boardName) {
+    private void getCatalogJson(final Context context, final String boardName) {
         String catalogJsonUrl = ChanUrls.getCatalogUrl(boardName);
         final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
@@ -247,7 +246,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         } else {
                             progressBar.setVisibility(View.INVISIBLE);
                             swipeRefreshLayout.setRefreshing(false);
-                            Toast.makeText(getActivity(), "Error retrieving catalog", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(getView(), "Error retrieving catalog", Snackbar.LENGTH_LONG).show();
                         }
 
                         catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());
@@ -260,9 +259,6 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (boardName != null){
             getCatalogJson(getActivity(), boardName);
         }
-    }
-
-    public void show(FragmentManager fragmentManager, String s) {
     }
 }
 

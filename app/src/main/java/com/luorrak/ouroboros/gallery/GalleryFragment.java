@@ -44,13 +44,13 @@ import java.util.Collection;
 
 public class GalleryFragment extends Fragment {
 
-    RecyclerView recyclerView;
-    GridLayoutManager gridLayoutManager;
-    GalleryAdapter galleryAdapter;
-    String boardName;
-    String resto;
-    InfiniteDbHelper infiniteDbHelper;
-    NetworkHelper networkHelper;
+    private RecyclerView recyclerView;
+    private GridLayoutManager gridLayoutManager;
+    private GalleryAdapter galleryAdapter;
+    private String boardName;
+    private String resto;
+    private InfiniteDbHelper infiniteDbHelper;
+    private NetworkHelper networkHelper;
 
     public GalleryFragment(){
     }

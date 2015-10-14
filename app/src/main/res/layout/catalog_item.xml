@@ -22,7 +22,9 @@
             android:id="@+id/catalog_text_layout"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_below="@+id/catalog_picture">
+            android:layout_below="@+id/catalog_picture"
+            android:paddingLeft="1dp"
+            android:paddingRight="1dp">
             <TextView
                 android:id="@+id/catalog_sub_text"
                 android:layout_width="wrap_content"

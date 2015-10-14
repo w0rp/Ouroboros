@@ -2,12 +2,14 @@ package com.luorrak.ouroboros.catalog;
 
 
 import android.app.AlertDialog;
-import android.support.v4.app.Fragment;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,14 +18,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.util.ChanUrls;
-import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
+import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.util.ChanUrls;
+import com.luorrak.ouroboros.util.DragAndDropRecyclerView.BoardListTouchHelper;
+import com.luorrak.ouroboros.util.DragAndDropRecyclerView.OnStartDragListener;
+import com.luorrak.ouroboros.util.InfiniteDbHelper;
 
 /**
  * Ouroboros - An 8chan browser
@@ -50,8 +53,9 @@ import com.koushikdutta.ion.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BoardListFragment extends android.app.Fragment {
-    NavigationBoardListAdapter boardListAdapter;
+public class BoardListFragment extends android.app.Fragment implements OnStartDragListener {
+    private NavigationBoardListAdapter boardListAdapter;
+    private ItemTouchHelper touchHelper;
 
     public BoardListFragment() {
     }
@@ -68,10 +72,15 @@ public class BoardListFragment extends android.app.Fragment {
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.board_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        boardListAdapter = new NavigationBoardListAdapter(boardListCursor, getFragmentManager(), getActivity());
+        boardListAdapter = new NavigationBoardListAdapter(boardListCursor, getFragmentManager(), getActivity(), infiniteDbHelper, view, this);
+
+        ItemTouchHelper.Callback callback = new BoardListTouchHelper(boardListAdapter);
+        touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(boardListAdapter);
+
         return view;
     }
 
@@ -106,11 +115,11 @@ public class BoardListFragment extends android.app.Fragment {
                                                     @Override
                                                     public void onCompleted(Exception e, Response<String> stringResponse) {
                                                         if (e != null || stringResponse.getHeaders().code() == 404){
-                                                            Toast.makeText(getActivity(), "Server Error! Does board exist?", Toast.LENGTH_LONG).show();
+                                                            Snackbar.make(getView(), "Server Error! Does board exist?", Snackbar.LENGTH_LONG).show();
                                                             return;
                                                         }
                                                         InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());
-                                                        infiniteDbHelper.insertBoardEntry(boardName);
+                                                        infiniteDbHelper.insertBoardEntry(boardName, boardListAdapter.getCursor().getCount());
                                                         boardListAdapter.changeCursor(infiniteDbHelper.getBoardCursor());
                                                     }
                                                 });
@@ -127,5 +136,10 @@ public class BoardListFragment extends android.app.Fragment {
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        touchHelper.startDrag(viewHolder);
     }
 }

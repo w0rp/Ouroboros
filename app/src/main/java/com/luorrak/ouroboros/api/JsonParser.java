@@ -133,12 +133,12 @@ public class JsonParser {
         return fileName != null ? fileName.getAsString() : null;
     }
 
-    public String getThreadTim(JsonObject threadJson){
+    private String getThreadTim(JsonObject threadJson){
         JsonElement tim = threadJson.get(THREAD_TIM);
         return tim != null ? tim.getAsString() : null;
     }
 
-    public String getThreadExt(JsonObject threadJson){
+    private String getThreadExt(JsonObject threadJson){
         JsonElement ext = threadJson.get(THREAD_EXT);
         return ext != null ? ext.getAsString() : null;
     }
@@ -224,12 +224,12 @@ public class JsonParser {
         return embed != null ? embed.getAsString() : null;
     }
 
-    public String getThreadImageHeight(JsonObject threadJson) {
+    private String getThreadImageHeight(JsonObject threadJson) {
         JsonElement imageHeight = threadJson.get(THREAD_IMAGE_HEIGHT);
         return imageHeight != null ? imageHeight.getAsString() : "0";
     }
 
-    public String getThreadImageWidth(JsonObject threadJson) {
+    private String getThreadImageWidth(JsonObject threadJson) {
         JsonElement imageWidth = threadJson.get(THREAD_IMAGE_WIDTH);
         return imageWidth != null ? imageWidth.getAsString() : "0";
     }

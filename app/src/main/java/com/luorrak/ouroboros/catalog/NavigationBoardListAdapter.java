@@ -2,21 +2,23 @@ package com.luorrak.ouroboros.catalog;
 
 import android.app.AlertDialog;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.support.v4.widget.DrawerLayout;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
+import com.luorrak.ouroboros.util.DragAndDropRecyclerView.OnStartDragListener;
+import com.luorrak.ouroboros.util.DragAndDropRecyclerView.TouchHelperInterface;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 
 /**
@@ -36,22 +38,36 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class NavigationBoardListAdapter extends CursorRecyclerAdapter {
-    InfiniteDbHelper infiniteDbHelper;
+public class NavigationBoardListAdapter extends CursorRecyclerAdapter implements TouchHelperInterface{
+    private InfiniteDbHelper infiniteDbHelper;
     private FragmentManager fragmentManager;
-    Context context;
-    public NavigationBoardListAdapter(Cursor cursor, FragmentManager fragmentManager, Context context) {
+    private Context context;
+    private View parentView;
+    private OnStartDragListener dragStartListener;
+    public NavigationBoardListAdapter(Cursor cursor, FragmentManager fragmentManager, Context context, InfiniteDbHelper infiniteDbHelper, View parentView, OnStartDragListener dragStartListener) {
         super(cursor);
         this.fragmentManager = fragmentManager;
         this.context = context;
-        infiniteDbHelper = new InfiniteDbHelper(context);
+        this.infiniteDbHelper = infiniteDbHelper;
+        this.parentView = parentView;
+        this.dragStartListener = dragStartListener;
     }
 
     @Override
-    public void onBindViewHolderCursor(RecyclerView.ViewHolder holder, Cursor cursor) {
-        NavigationBoardListViewHolder navigationBoardListViewHolder = (NavigationBoardListViewHolder) holder;
-        String boardName = cursor.getString(cursor.getColumnIndex(DbContract.BoardEntry.COLUMN_BOARDS));
-        navigationBoardListViewHolder.boardNameBtn.setText("/" + boardName + "/");
+    public void onBindViewHolderCursor(final RecyclerView.ViewHolder holder, Cursor cursor) {
+        final NavigationBoardListViewHolder navigationBoardListViewHolder = (NavigationBoardListViewHolder) holder;
+        navigationBoardListViewHolder.handleView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+                    dragStartListener.onStartDrag(navigationBoardListViewHolder);
+                }
+                return false;
+            }
+        });
+        navigationBoardListViewHolder.boardObject.boardName = cursor.getString(cursor.getColumnIndex(DbContract.BoardEntry.COLUMN_BOARDS));
+        navigationBoardListViewHolder.boardObject.boardOrder = cursor.getInt(cursor.getColumnIndex(DbContract.BoardEntry.BOARD_ORDER));
+        navigationBoardListViewHolder.boardNameBtn.setText("/" + navigationBoardListViewHolder.boardObject.boardName + "/");
     }
 
     @Override
@@ -60,14 +76,32 @@ public class NavigationBoardListAdapter extends CursorRecyclerAdapter {
         return new NavigationBoardListViewHolder(view);
     }
 
-    class NavigationBoardListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        infiniteDbHelper.swapBoardOrder(fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onItemDismiss(final int position) {
+        //Disabled
+    }
+
+
+
+    class NavigationBoardListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public Button boardNameBtn;
         public Button deleteItemBtn;
+        public ImageView handleView;
+        public BoardObject boardObject;
 
         public NavigationBoardListViewHolder(View itemView) {
             super(itemView);
             boardNameBtn = (Button) itemView.findViewById(R.id.boardlist_boardname_button);
             deleteItemBtn = (Button) itemView.findViewById(R.id.boardlist_delete_button);
+            handleView = (ImageView) itemView.findViewById(R.id.boardlist_handle);
+            boardObject = new BoardObject();
+
             boardNameBtn.setAllCaps(false);
             boardNameBtn.setOnClickListener(this);
             deleteItemBtn.setOnClickListener(this);
@@ -78,9 +112,7 @@ public class NavigationBoardListAdapter extends CursorRecyclerAdapter {
             switch (v.getId()){
                 case R.id.boardlist_boardname_button:{
                     String buttonText = boardNameBtn.getText().toString();
-                    CatalogFragment catalogFragment = new CatalogFragment().newInstance(buttonText.substring(1, buttonText.length()-1));
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
+                    ((CatalogActivity)context).launchBoardFragment(buttonText.substring(1, buttonText.length()-1));
                     break;
                 }
                 case R.id.boardlist_delete_button:{
@@ -91,9 +123,7 @@ public class NavigationBoardListAdapter extends CursorRecyclerAdapter {
                             .setPositiveButton("Delete Board",
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int whichButton) {
-                                            //Add board to database, should consider doing some error checking as well.
-                                            InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(context);
-                                            infiniteDbHelper.deleteBoardEntry(buttonText.substring(1, buttonText.length() - 1));
+                                            infiniteDbHelper.removeBoardEntry(boardObject.boardOrder);
                                             changeCursor(infiniteDbHelper.getBoardCursor());
                                         }
                                     })
@@ -108,5 +138,10 @@ public class NavigationBoardListAdapter extends CursorRecyclerAdapter {
                 }
             }
         }
+    }
+
+    class BoardObject {
+        public String boardName;
+        public int boardOrder;
     }
 }

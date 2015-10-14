@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,7 +28,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
@@ -127,7 +127,7 @@ public class ReplyCommentFragment extends Fragment {
     }
 
 
-    public void setActionBarTitle(String title){
+    private void setActionBarTitle(String title){
         getActivity().setTitle(title);
     }
 
@@ -146,7 +146,7 @@ public class ReplyCommentFragment extends Fragment {
             if (reply.filePath.size() < 5) {
                 selectFile();
             } else {
-                Toast.makeText(getActivity(), "Maximum amount of attachments reached", Toast.LENGTH_SHORT).show();
+                Snackbar.make(getView(), "Maximum amount of attachments reached", Snackbar.LENGTH_LONG).show();
             }
         }
 
@@ -179,7 +179,7 @@ public class ReplyCommentFragment extends Fragment {
             reply.password = Long.toHexString(random.nextLong());
 
             //Add networking call to post data.
-            networkHelper.postReply(getActivity(), reply, sharedPreferences, new JsonParser(), new InfiniteDbHelper(getActivity()));
+            networkHelper.postReply(getActivity(), reply, sharedPreferences, new JsonParser(), new InfiniteDbHelper(getActivity()), getView());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -218,8 +218,7 @@ public class ReplyCommentFragment extends Fragment {
         if (requestCode == FILE_SELECT_CODE && resultCode == Activity.RESULT_OK) {
             String filePath = getPath(getActivity(), data.getData());
             if (filePath == null){
-                Toast.makeText(getActivity(), "Could not retrieve file", Toast.LENGTH_SHORT).show();
-                return;
+                Snackbar.make(getView(), "Could not retrieve file", Snackbar.LENGTH_LONG).show();
             } else {
                 reply.filePath.add(filePath);
                 addAttachmentPreview(filePath, getView());
@@ -258,7 +257,7 @@ public class ReplyCommentFragment extends Fragment {
      * @author paulburke
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static String getPath(final Context context, final Uri uri) {
+    private static String getPath(final Context context, final Uri uri) {
 
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
@@ -330,8 +329,8 @@ public class ReplyCommentFragment extends Fragment {
      * @param selectionArgs (Optional) Selection arguments used in the query.
      * @return The value of the _data column, which is typically a file path.
      */
-    public static String getDataColumn(Context context, Uri uri, String selection,
-                                       String[] selectionArgs) {
+    private static String getDataColumn(Context context, Uri uri, String selection,
+                                        String[] selectionArgs) {
 
         Cursor cursor = null;
         final String column = "_data";
@@ -358,7 +357,7 @@ public class ReplyCommentFragment extends Fragment {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is ExternalStorageProvider.
      */
-    public static boolean isExternalStorageDocument(Uri uri) {
+    private static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
@@ -366,7 +365,7 @@ public class ReplyCommentFragment extends Fragment {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is DownloadsProvider.
      */
-    public static boolean isDownloadsDocument(Uri uri) {
+    private static boolean isDownloadsDocument(Uri uri) {
         return "com.android.providers.downloads.documents".equals(uri.getAuthority());
     }
 
@@ -374,7 +373,7 @@ public class ReplyCommentFragment extends Fragment {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is MediaProvider.
      */
-    public static boolean isMediaDocument(Uri uri) {
+    private static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 }

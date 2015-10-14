@@ -3,10 +3,15 @@ package com.luorrak.ouroboros.thread;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,6 +19,8 @@ import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogActivity;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
+import com.luorrak.ouroboros.catalog.WatchListAdapter;
+import com.luorrak.ouroboros.util.DragAndDropRecyclerView.WatchListTouchHelper;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Util;
 
@@ -36,7 +43,10 @@ import com.luorrak.ouroboros.util.Util;
  */
 public class ThreadActivity extends AppCompatActivity {
     private Toolbar toolbar;
-    InfiniteDbHelper infiniteDbHelper;
+    private InfiniteDbHelper infiniteDbHelper;
+    private DrawerLayout drawerLayout;
+    private RecyclerView watchList;
+    private WatchListAdapter watchListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,22 +62,32 @@ public class ThreadActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if (findViewById(R.id.placeholder_card_dialog) != null){
-            if(savedInstanceState != null){
-                return;
-            }
-
-            String resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
-            String boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
-            fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
-                    .commit();
-
+        if(savedInstanceState != null){
+            return;
         }
 
+        String resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
+        String boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
+        fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
+                .commit();
 
+
+        //Watchlist Layout
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        watchList = (RecyclerView) findViewById(R.id.watch_list);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        watchList.setLayoutManager(layoutManager);
+
+        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), getApplicationContext(), drawerLayout);
+        watchList.setAdapter(watchListAdapter);
+
+        ItemTouchHelper.Callback callback = new WatchListTouchHelper(watchListAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(watchList);
     }
 
     @Override
@@ -85,6 +105,14 @@ public class ThreadActivity extends AppCompatActivity {
             infiniteDbHelper.deleteThreadCache();
         }
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (watchListAdapter != null){
+            watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
+        }
     }
 
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////
@@ -139,5 +167,10 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     public void doNegativeClick() {
+    }
+
+    public void updateWatchlist(){
+        Snackbar.make(findViewById(android.R.id.content), "Foobar", Snackbar.LENGTH_LONG);
+        watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
     }
 }

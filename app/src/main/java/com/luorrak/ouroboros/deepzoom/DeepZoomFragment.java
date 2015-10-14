@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
@@ -17,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.ImageViewBitmapInfo;
@@ -48,15 +48,15 @@ import uk.co.senab.photoview.PhotoView;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class DeepZoomFragment extends Fragment{
-    PhotoView photoView;
-    ProgressBar progressBar;
-    NetworkHelper networkHelper;
-    InfiniteDbHelper infiniteDbHelper;
-    int position;
-    String boardName;
-    String resto;
-    Media mediaItem;
-    ImageView mediaPlayButton;
+    private PhotoView photoView;
+    private ProgressBar progressBar;
+    private NetworkHelper networkHelper;
+    private InfiniteDbHelper infiniteDbHelper;
+    private int position;
+    private String boardName;
+    private String resto;
+    private Media mediaItem;
+    private ImageView mediaPlayButton;
     private ActionProvider shareActionProvider;
 
     public Fragment newInstance(String boardName, String resto, int position) {
@@ -191,7 +191,7 @@ public class DeepZoomFragment extends Fragment{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_save_image: {
-                Toast.makeText(getActivity(), "Downloading...", Toast.LENGTH_SHORT).show();
+                Snackbar.make(getView(), "Downloading...", Snackbar.LENGTH_LONG).show();
                 networkHelper.downloadFile(boardName, mediaItem.fileName, mediaItem.ext, getActivity());
                 break;
             }
@@ -210,9 +210,5 @@ public class DeepZoomFragment extends Fragment{
             }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void initVideoIntent(String boardName, String tim, String ext) {
-
     }
 }

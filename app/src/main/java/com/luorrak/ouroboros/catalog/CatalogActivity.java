@@ -1,23 +1,27 @@
 package com.luorrak.ouroboros.catalog;
 
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseFragment;
 import com.luorrak.ouroboros.settings.SettingsFragment;
+import com.luorrak.ouroboros.util.DragAndDropRecyclerView.WatchListTouchHelper;
+import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Util;
 
 /**
@@ -40,8 +44,11 @@ import com.luorrak.ouroboros.util.Util;
 
 public class CatalogActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private String board;
-    DrawerLayout drawerLayout;
-    ProgressBar progressBar;
+    private DrawerLayout drawerLayout;
+    private ProgressBar progressBar;
+    private InfiniteDbHelper infiniteDbHelper;
+    private RecyclerView watchList;
+    private WatchListAdapter watchListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +56,23 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         super.onCreate(savedInstanceState);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
+        infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         setContentView(R.layout.activity_catalog);
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         if (savedInstanceState == null){
             board = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
+            if (board == null){
+                BoardListFragment boardListFragment = new BoardListFragment();
+                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
+            } else {
+                CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
+                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
+            }
         }
 
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -65,15 +82,20 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        watchList = (RecyclerView) findViewById(R.id.watch_list);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        watchList.setLayoutManager(layoutManager);
+
+        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), getApplicationContext(), drawerLayout);
+        watchList.setAdapter(watchListAdapter);
+
+        ItemTouchHelper.Callback callback = new WatchListTouchHelper(watchListAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(watchList);
+
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.setDrawerListener(drawerToggle);
         drawerToggle.syncState();
-
-        if (board != null){
-            CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
-            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
-        }
     }
 
     @Override
@@ -96,10 +118,6 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
                 progressBar.setVisibility(View.INVISIBLE);
                 break;
             }
-            case R.id.drawer_item_watchlist:{
-                Toast.makeText(getApplicationContext(), "Feature not yet implemented", Toast.LENGTH_SHORT).show();
-                break;
-            }
             case R.id.drawer_item_settings: {
                 SettingsFragment settingsFragment = new SettingsFragment();
                 android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -117,5 +135,26 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         }
         drawerLayout.closeDrawers();
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (watchListAdapter != null){
+            watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("board", board);
+        super.onSaveInstanceState(outState);
+    }
+
+    public void launchBoardFragment(String board){
+        this.board = board; //The real reason for this method being here
+        CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
     }
 }

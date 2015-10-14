@@ -34,8 +34,8 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
  */
 
 public class CatalogNetworkFragment extends Fragment {
-    Activity activity;
-    InsertCatalogIntoDatabase insertCatalogIntoDatabaseTask;
+    private Activity activity;
+    private InsertCatalogIntoDatabase insertCatalogIntoDatabaseTask;
 
     public void beginTask(JsonArray jsonArray, InfiniteDbHelper infiniteDbHelper, String boardName, CatalogAdapter catalogAdapter){
         insertCatalogIntoDatabaseTask = new InsertCatalogIntoDatabase(activity, infiniteDbHelper, boardName, catalogAdapter);

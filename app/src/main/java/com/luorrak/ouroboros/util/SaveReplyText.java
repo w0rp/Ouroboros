@@ -26,8 +26,8 @@ public class SaveReplyText implements TextWatcher {
     public final static String emailEditTextKey = "emailEditTextKey";
     public final static String subjectEditTextKey = "subjectEditTextKey";
     public final static String commentEditTextKey = "commentEditTextKey";
-    SharedPreferences sharedPreferences;
-    String field;
+    private SharedPreferences sharedPreferences;
+    private String field;
 
         public SaveReplyText(SharedPreferences sharedPreferences, String field){
             this.sharedPreferences = sharedPreferences;

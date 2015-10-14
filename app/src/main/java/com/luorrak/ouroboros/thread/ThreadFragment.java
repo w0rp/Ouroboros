@@ -1,7 +1,6 @@
 package com.luorrak.ouroboros.thread;
 
 import android.app.AlertDialog;
-import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,7 +9,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
@@ -67,9 +67,9 @@ public class ThreadFragment extends Fragment {
     private ThreadAdapter threadAdapter;
     private LinearLayoutManager layoutManager;
     private ThreadNetworkFragment networkFragment;
-    String resto;
-    String boardName;
-    Parcelable savedLayoutState ;
+    private String resto;
+    private String boardName;
+    private Parcelable savedLayoutState ;
     private boolean isStatusCheckIsRunning;
     private ActionProvider shareActionProvider;
     private Handler handler;
@@ -131,6 +131,7 @@ public class ThreadFragment extends Fragment {
             threadAdapter.hasStableIds();
             recyclerView.setAdapter(threadAdapter);
         }
+
         return view;
     }
 
@@ -176,6 +177,7 @@ public class ThreadFragment extends Fragment {
         MenuItem saveAllImagesButton = menu.findItem(R.id.action_save_all_images);
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
         MenuItem shareButton = menu.findItem(R.id.menu_item_share);
+        MenuItem watchlistButton = menu.findItem(R.id.action_add_watchlist);
 
         refreshButton.setVisible(true);
         scrollButton.setVisible(true);
@@ -184,6 +186,7 @@ public class ThreadFragment extends Fragment {
         saveAllImagesButton.setVisible(true);
         openExternalButton.setVisible(true);
         shareButton.setVisible(true);
+        watchlistButton.setVisible(true);
 
         shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
         super.onCreateOptionsMenu(menu, inflater);
@@ -223,8 +226,6 @@ public class ThreadFragment extends Fragment {
                         .setMessage("Are you sure you want to download all images?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                String tim;
-                                String ext;
                                 Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
                                 do {
                                     ArrayList<Media> mediaArrayList = (ArrayList<Media>) Util.deserializeObject(imageCursor.getBlob(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES)));
@@ -257,24 +258,30 @@ public class ThreadFragment extends Fragment {
                 startActivity(Intent.createChooser(shareIntent, "Share via"));
                 break;
             }
+            case R.id.action_add_watchlist: {
+                Cursor cursor = infiniteDbHelper.getWatchlistCursor();
+                int count = cursor.getCount();
+                cursor.close();
+
+                Cursor threadcursor = infiniteDbHelper.getThreadCursor(resto);
+                byte[] serializedMediaList = threadcursor.getBlob(threadcursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
+                threadcursor.close();
+
+                infiniteDbHelper.insertWatchlistEntry(String.valueOf(getActivity().getTitle()), boardName, resto, serializedMediaList, count);
+                Snackbar.make(getView(), "Thread Added To Watchlist", Snackbar.LENGTH_LONG).show();
+                ((ThreadActivity) getActivity()).updateWatchlist();
+            }
         }
         return true;
     }
 
-    public void setActionBarTitle(String title){
-        getActivity().setTitle(title);
-    }
-
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
 
-
-    public void getThread(String threadNo, String boardName){
-        //hacks to get this to work
-
+    private void getThread(String threadNo, String boardName){
         getThreadJson(getActivity(), boardName, threadNo);
     }
 
-    public void getThreadJson(final Context context, final String boardName, final String threadNumber){
+    private void getThreadJson(final Context context, final String boardName, final String threadNumber){
         final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
         final String threadJsonUrl = ChanUrls.getThreadUrl(boardName, threadNumber);
@@ -294,13 +301,13 @@ public class ThreadFragment extends Fragment {
                             //new InsertThreadIntoDatabase().execute(jsonObject);
                         } else {
                             progressBar.setVisibility(View.INVISIBLE);
-                            Toast.makeText(getActivity(), "Error retrieving thread", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(getView(), "Error retrieving thread", Snackbar.LENGTH_LONG).show();
                         }
                     }
                 });
     }
 
-    Runnable statusCheck = new Runnable() {
+    private Runnable statusCheck = new Runnable() {
         @Override
         public void run() {
             getThread(resto, boardName);
