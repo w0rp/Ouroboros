@@ -278,11 +278,13 @@ public class ThreadFragment extends Fragment {
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
 
     private void getThread(String threadNo, String boardName){
-        getThreadJson(getActivity(), boardName, threadNo);
+        if (getActivity() != null){
+            getThreadJson(getActivity(), boardName, threadNo);
+        }
     }
 
     private void getThreadJson(final Context context, final String boardName, final String threadNumber){
-        final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
+        final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar); //Null pointer activity
         progressBar.setVisibility(View.VISIBLE);
         final String threadJsonUrl = ChanUrls.getThreadUrl(boardName, threadNumber);
 

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -46,7 +45,7 @@ public class DeepZoomActivity extends AppCompatActivity{
     private String resto;
     private String boardName;
     private InfiniteDbHelper infiniteDbHelper;
-    private ViewPager mPager;
+    private DeepzoomViewPager mPager;
     private PagerAdapter mPagerAdapter;
 
     @Override
@@ -68,7 +67,7 @@ public class DeepZoomActivity extends AppCompatActivity{
         newMediaListInstance(infiniteDbHelper, resto);
         int selectedMediaItem = findMediaItemIndex(fileName);
 
-        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager = (DeepzoomViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(selectedMediaItem);
@@ -76,7 +75,6 @@ public class DeepZoomActivity extends AppCompatActivity{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
