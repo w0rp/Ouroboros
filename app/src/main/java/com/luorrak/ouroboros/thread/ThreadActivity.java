@@ -1,5 +1,6 @@
 package com.luorrak.ouroboros.thread;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,8 +13,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
@@ -62,9 +65,6 @@ public class ThreadActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if(savedInstanceState != null){
-            return;
-        }
 
         String resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
         String boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
@@ -79,7 +79,7 @@ public class ThreadActivity extends AppCompatActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         watchList = (RecyclerView) findViewById(R.id.watch_list);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         watchList.setLayoutManager(layoutManager);
 
         watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), getApplicationContext(), drawerLayout);
@@ -88,6 +88,11 @@ public class ThreadActivity extends AppCompatActivity {
         ItemTouchHelper.Callback callback = new WatchListTouchHelper(watchListAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(watchList);
+    }
+
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        return super.onCreateView(parent, name, context, attrs);
     }
 
     @Override
