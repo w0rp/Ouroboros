@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -58,7 +59,7 @@ import java.util.ArrayList;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class ThreadFragment extends Fragment {
+public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionExpandListener {
     // Construction ////////////////////////////////////////////////////////////////////////////////
     private final String LOG_TAG = ThreadFragment.class.getSimpleName();
     private InfiniteDbHelper infiniteDbHelper;
@@ -191,7 +192,6 @@ public class ThreadFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Log.d(LOG_TAG, "query=" + newText);
                 threadAdapter.setFilterQueryProvider(new FilterQueryProvider() {
                     @Override
                     public Cursor runQuery(CharSequence constraint) {
@@ -203,6 +203,8 @@ public class ThreadFragment extends Fragment {
             }
         });
 
+        MenuItemCompat.setOnActionExpandListener(searchButton, this);
+
         refreshButton.setVisible(true);
         scrollButton.setVisible(true);
         replyButton.setVisible(true);
@@ -213,6 +215,18 @@ public class ThreadFragment extends Fragment {
         watchlistButton.setVisible(true);
 
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onMenuItemActionExpand(MenuItem item) {
+        stopStatusCheck();
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemActionCollapse(MenuItem item) {
+        startStatusCheck();
+        return true;
     }
 
     @Override
