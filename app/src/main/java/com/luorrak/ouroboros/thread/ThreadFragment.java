@@ -12,10 +12,9 @@ import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ActionProvider;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FilterQueryProvider;
 import android.widget.ProgressBar;
 
 import com.google.gson.JsonObject;
@@ -71,7 +71,6 @@ public class ThreadFragment extends Fragment {
     private String boardName;
     private Parcelable savedLayoutState ;
     private boolean isStatusCheckIsRunning;
-    private ActionProvider shareActionProvider;
     private Handler handler;
 
     //Get thread number from link somehow
@@ -170,14 +169,39 @@ public class ThreadFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem refreshButton = menu.findItem(R.id.action_refresh);
         MenuItem scrollButton = menu.findItem(R.id.action_scroll_bottom);
         MenuItem replyButton = menu.findItem(R.id.action_reply);
+        MenuItem watchlistButton = menu.findItem(R.id.action_add_watchlist);
+        MenuItem refreshButton = menu.findItem(R.id.action_refresh);
         MenuItem galleryButton = menu.findItem(R.id.action_gallery);
         MenuItem saveAllImagesButton = menu.findItem(R.id.action_save_all_images);
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
         MenuItem shareButton = menu.findItem(R.id.menu_item_share);
-        MenuItem watchlistButton = menu.findItem(R.id.action_add_watchlist);
+
+        MenuItem searchButton = menu.findItem(R.id.action_search);
+        searchButton.setVisible(true);
+        SearchView searchView = (SearchView) searchButton.getActionView();
+        searchView.setIconifiedByDefault(false);
+        searchView.setSubmitButtonEnabled(false);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.d(LOG_TAG, "query=" + newText);
+                threadAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+                    @Override
+                    public Cursor runQuery(CharSequence constraint) {
+                        return infiniteDbHelper.searchThreadForString(constraint.toString(), resto);
+                    }
+                });
+                threadAdapter.getFilter().filter(newText);
+                return true;
+            }
+        });
 
         refreshButton.setVisible(true);
         scrollButton.setVisible(true);
@@ -188,7 +212,6 @@ public class ThreadFragment extends Fragment {
         shareButton.setVisible(true);
         watchlistButton.setVisible(true);
 
-        shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
