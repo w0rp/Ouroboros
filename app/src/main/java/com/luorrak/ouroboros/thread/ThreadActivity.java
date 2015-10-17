@@ -1,12 +1,12 @@
 package com.luorrak.ouroboros.thread;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -68,7 +68,7 @@ public class ThreadActivity extends AppCompatActivity {
 
         String resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
         String boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
         fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
@@ -138,8 +138,8 @@ public class ThreadActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-       if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            getSupportFragmentManager().popBackStack();
+       if(getFragmentManager().getBackStackEntryCount() > 0) {
+           getFragmentManager().popBackStack();
        } else {
            this.finish();
        }
@@ -152,7 +152,7 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     public void doPositiveClickInternal(String threadNo, String boardName) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         //clear dialog fragments
