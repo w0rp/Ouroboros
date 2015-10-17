@@ -157,6 +157,17 @@
                 android:clickable="true"
                 android:background="?android:attr/selectableItemBackground"/>
             <Button
+                android:id="@+id/thread_more_option_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/thread_divider"
+                android:layout_toRightOf="@+id/thread_submit_reply_button"
+                android:padding="1dp"
+                android:text="More"
+                android:textSize="16sp"
+                android:clickable="true"
+                android:background="?android:attr/selectableItemBackground"/>
+            <Button
                 android:id="@+id/thread_view_replies_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
