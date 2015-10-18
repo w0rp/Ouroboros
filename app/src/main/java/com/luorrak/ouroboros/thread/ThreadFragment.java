@@ -75,7 +75,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     private Handler handler;
 
     //Get thread number from link somehow
-    public static ThreadFragment newInstance(String resto, String boardName){
+    public ThreadFragment newInstance(String resto, String boardName){
         ThreadFragment threadFragment = new ThreadFragment();
         Bundle args = new Bundle();
         args.putString("resto", resto);
@@ -148,11 +148,6 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     public void onResume() {
         startStatusCheck();
         super.onResume();
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
     }
 
     @Override
