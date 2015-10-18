@@ -357,6 +357,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                     intent.putExtra(CatalogAdapter.REPLY_NO, threadObject.no);
                     intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
                     context.startActivity(intent);
+                    break;
                 }
                 //Adapted from Chanobol - // FIXME: 10/17/2015 to menu layout
                 case R.id.thread_more_option_menu: {
@@ -378,7 +379,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                         }
                     });
                     popupMenu.show();
-
+                    break;
                 }
             }
         }
