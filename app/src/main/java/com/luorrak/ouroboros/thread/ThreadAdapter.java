@@ -1,11 +1,12 @@
 package com.luorrak.ouroboros.thread;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.design.widget.Snackbar;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,11 +15,14 @@ import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.koushikdutta.async.future.FutureCallback;
@@ -187,7 +191,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
         // Create an adapter if none exists
         if (!mediaAdapterHashMap.containsKey(cursor.getPosition())) {
-            mediaAdapterHashMap.put(cursor.getPosition(), new MediaAdapter(mediaArrayList, boardName, threadViewHolder.threadObject.resto, fragmentManager, context, viewWidth));
+            mediaAdapterHashMap.put(cursor.getPosition(), new MediaAdapter(mediaArrayList, boardName, threadViewHolder.threadObject.resto, context));
         }
 
         threadViewHolder.threadMediaItemRecycler.setAdapter(mediaAdapterHashMap.get(cursor.getPosition()));
@@ -202,9 +206,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                     fragmentManager,
                     infiniteDbHelper
             );
+            threadViewHolder.threadObject.parsedCom = spannableCom;
             threadViewHolder.threadCom.setVisibility(View.VISIBLE);
-
-            threadViewHolder.threadCom.setText(spannableCom);
+            threadViewHolder.threadCom.setText(threadViewHolder.threadObject.parsedCom);
         }
 
         // OnClick /////////////////////////////////////////////////////////////////////////////////
@@ -298,6 +302,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         public TextView threadTime;
         public Button threadReplies;
         public Button threadReplyButton;
+        public Button threadMoreMenuButton;
         public ImageView threadEmbed;
         public ImageView threadEmbedPlayButton;
         public FrameLayout mediaHolder;
@@ -319,6 +324,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadTime = (TextView) itemView.findViewById(R.id.thread_time);
             threadReplies = (Button) itemView.findViewById(R.id.thread_view_replies_button);
             threadReplyButton = (Button) itemView.findViewById(R.id.thread_submit_reply_button);
+            threadMoreMenuButton = (Button) itemView.findViewById(R.id.thread_more_option_menu);
             threadEmbed = (ImageView) itemView.findViewById(R.id.thread_embed);
             threadEmbedPlayButton = (ImageView) itemView.findViewById(R.id.thread_embed_play_button);
             threadMediaItemRecycler = (SnappyRecyclerView) itemView.findViewById(R.id.thread_media_recycler);
@@ -329,10 +335,11 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
             threadReplies.setOnClickListener(this);
             threadReplyButton.setOnClickListener(this);
+            threadMoreMenuButton.setOnClickListener(this);
         }
 
         @Override
-        public void onClick(View v) {
+        public void onClick(final View v) {
             switch (v.getId()){
                 case R.id.thread_view_replies_button:{
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -350,6 +357,29 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                     intent.putExtra(CatalogAdapter.REPLY_NO, threadObject.no);
                     intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
                     context.startActivity(intent);
+                    break;
+                }
+                //Adapted from Chanobol - // FIXME: 10/17/2015 to menu layout
+                case R.id.thread_more_option_menu: {
+                    PopupMenu popupMenu = new PopupMenu(context, v);
+                    Menu m = popupMenu.getMenu();
+                    final int COPY = 0;
+                    m.add(Menu.NONE, COPY, Menu.NONE, "Copy Text");
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case COPY: {
+                                    Util.copyToClipboard(context, threadObject.parsedCom.toString());
+                                    Snackbar.make(v, "Text Copied to Clipboard", Snackbar.LENGTH_LONG).show();
+                                    break;
+                                }
+                            }
+                            return false;
+                        }
+                    });
+                    popupMenu.show();
+                    break;
                 }
             }
         }
@@ -363,6 +393,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         public String no;
         public String sub;
         public String com;
+        public Spannable parsedCom;
         public String email;
         public long threadTime;
         public String embed;

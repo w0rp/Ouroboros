@@ -201,6 +201,40 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         return cursor;
     }
 
+    public Cursor searchThreadForString(String searchString, String resto) {
+        Cursor cursor;
+        if (searchString == null || searchString.length() == 0){
+            cursor = getThreadCursor(resto);
+        } else {
+            cursor = db.query(
+                    ThreadEntry.TABLE_NAME, //table name
+                    null, //columns to search
+                    ThreadEntry.COLUMN_THREAD_RESTO + "= ? AND (" +
+                            ThreadEntry.COLUMN_THREAD_COM + " LIKE ? OR " +
+                            ThreadEntry.COLUMN_THREAD_SUB + " LIKE ? OR "  +
+                            ThreadEntry.COLUMN_THREAD_ID + " LIKE ? OR " +
+                            ThreadEntry.COLUMN_THREAD_NAME + " LIKE ? OR " +
+                            ThreadEntry.COLUMN_THREAD_TRIP + " LIKE ? OR " +
+                            ThreadEntry.COLUMN_THREAD_NO + " LIKE ?)", //where clause
+                    new String[] {resto,
+                            "%" + searchString + "%",
+                            "%" + searchString + "%",
+                            "%" + searchString + "%",
+                            "%" + searchString + "%",
+                            "%" + searchString + "%",
+                            "%" + searchString + "%"}, //where arguements
+                    null, //Group by
+                    null, //having
+                    null,
+                    null//orderby
+            );
+        }
+        if (cursor != null){
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+
     // Gallery Function ////////////////////////////////////////////////////////////////////////////
 
     public Cursor getGalleryCursor(String resto) {

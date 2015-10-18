@@ -1,7 +1,7 @@
 package com.luorrak.ouroboros.gallery;
 
 import android.app.AlertDialog;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -15,9 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.Util;
 
@@ -92,7 +92,7 @@ public class GalleryFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.gallery_list);
         gridLayoutManager = new GridLayoutManager(getActivity(), 3);
         recyclerView.setLayoutManager(gridLayoutManager);
-        galleryAdapter = new GalleryAdapter(mediaArrayList, boardName, resto, getFragmentManager(), getActivity());
+        galleryAdapter = new GalleryAdapter(mediaArrayList, boardName, resto, getActivity());
         recyclerView.setAdapter(galleryAdapter);
 
         return view;

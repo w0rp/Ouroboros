@@ -3,7 +3,6 @@ package com.luorrak.ouroboros.gallery;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,15 +43,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     private NetworkHelper networkHelper = new NetworkHelper();
     private String boardName;
     private String resto;
-    private FragmentManager fragmentManager;
     private ArrayList<Media> mediaItems;
     private List<String> validExt = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
     private Context context;
-    public GalleryAdapter(ArrayList<Media> mediaItems, String boardName, String resto, FragmentManager fragmentManager, Context context) {
+    public GalleryAdapter(ArrayList<Media> mediaItems, String boardName, String resto, Context context) {
         this.mediaItems = mediaItems;
         this.boardName = boardName;
         this.resto = resto;
-        this.fragmentManager = fragmentManager;
         this.context = context;
     }
 

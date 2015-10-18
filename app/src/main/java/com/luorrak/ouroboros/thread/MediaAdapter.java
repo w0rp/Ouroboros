@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -74,7 +73,6 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     final int HORIZONTAL = 1;
     private String boardName;
     private String resto;
-    private FragmentManager fragmentManager;
     private ArrayList<Media> mediaItems;
     private List<String> validExt = Arrays.asList(".png", ".jpg", ".jpeg", ".gif");
     private Context context;
@@ -85,11 +83,10 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     private int minImgHeight;
 
 
-    public MediaAdapter(ArrayList<Media> mediaItems, String boardName, String resto, FragmentManager fragmentManager, Context context, int maxImgWidth) {
+    public MediaAdapter(ArrayList<Media> mediaItems, String boardName, String resto, Context context) {
         this.mediaItems = mediaItems;
         this.boardName = boardName;
         this.resto = resto;
-        this.fragmentManager = fragmentManager;
         this.context = context;
     }
 
