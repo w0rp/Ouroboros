@@ -190,11 +190,14 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         }
 
         // Create an adapter if none exists
+        threadViewHolder.threadMediaItemRecycler.setAdapter(new MediaAdapter(mediaArrayList, boardName, threadViewHolder.threadObject.resto, context));
+        /*
         if (!mediaAdapterHashMap.containsKey(cursor.getPosition())) {
             mediaAdapterHashMap.put(cursor.getPosition(), new MediaAdapter(mediaArrayList, boardName, threadViewHolder.threadObject.resto, context));
         }
-
         threadViewHolder.threadMediaItemRecycler.setAdapter(mediaAdapterHashMap.get(cursor.getPosition()));
+        */
+
 
         // END MediaView ///////////////////////////////////////////////////////////////////////////
 

@@ -137,8 +137,6 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     }
 
     // Life Cycle //////////////////////////////////////////////////////////////////////////////////
-
-
     @Override
     public void onPause() {
         stopStatusCheck();
