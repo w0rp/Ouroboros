@@ -2,6 +2,7 @@ package com.luorrak.ouroboros.thread;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -176,7 +177,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
         MenuItem searchButton = menu.findItem(R.id.action_search);
         searchButton.setVisible(true);
-        SearchView searchView = (SearchView) searchButton.getActionView();
+        final SearchView searchView = (SearchView) searchButton.getActionView();
         searchView.setIconifiedByDefault(false);
         searchView.setSubmitButtonEnabled(false);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -220,6 +221,15 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
     @Override
     public boolean onMenuItemActionCollapse(MenuItem item) {
+        int backStackCount = getFragmentManager().getBackStackEntryCount();
+        if (backStackCount > 0) {
+            FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(backStackCount - 1);
+            String str = backEntry.getName();
+            if (str == "threadDialog"){
+                getActivity().onBackPressed();
+                return false;
+            }
+        }
         startStatusCheck();
         return true;
     }
