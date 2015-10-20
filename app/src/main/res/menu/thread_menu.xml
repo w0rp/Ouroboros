@@ -1,6 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/action_scroll_bottom"
         android:orderInCategory="100"
@@ -23,8 +22,7 @@
         android:icon="@drawable/ic_search_white_24dp"
         app:showAsAction="collapseActionView|ifRoom"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        android:visible="false"
-        />
+        android:visible="false" />
 
     <item
         android:id="@+id/action_add_watchlist"

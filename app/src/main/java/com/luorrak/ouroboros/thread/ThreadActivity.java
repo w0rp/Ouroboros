@@ -50,6 +50,7 @@ public class ThreadActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private RecyclerView watchList;
     private WatchListAdapter watchListAdapter;
+    ThreadFragment threadFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +69,16 @@ public class ThreadActivity extends AppCompatActivity {
 
         String resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
         String boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
+
+        if (savedInstanceState != null){
+            threadFragment = (ThreadFragment) getFragmentManager().getFragment(savedInstanceState, "threadFragment");
+        } else {
+            threadFragment = new ThreadFragment().newInstance(resto, boardName);
+        }
+
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
                 .commit();
-
 
         //Watchlist Layout
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -97,7 +102,6 @@ public class ThreadActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.thread_menu, menu);
         return true;
     }
@@ -118,6 +122,13 @@ public class ThreadActivity extends AppCompatActivity {
         if (watchListAdapter != null){
             watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        getFragmentManager().putFragment(outState, "threadFragment", threadFragment);
     }
 
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////

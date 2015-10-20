@@ -2,6 +2,7 @@ package com.luorrak.ouroboros.thread;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -75,7 +76,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     private Handler handler;
 
     //Get thread number from link somehow
-    public static ThreadFragment newInstance(String resto, String boardName){
+    public ThreadFragment newInstance(String resto, String boardName){
         ThreadFragment threadFragment = new ThreadFragment();
         Bundle args = new Bundle();
         args.putString("resto", resto);
@@ -136,8 +137,6 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     }
 
     // Life Cycle //////////////////////////////////////////////////////////////////////////////////
-
-
     @Override
     public void onPause() {
         stopStatusCheck();
@@ -148,11 +147,6 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     public void onResume() {
         startStatusCheck();
         super.onResume();
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
     }
 
     @Override
@@ -181,7 +175,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
         MenuItem searchButton = menu.findItem(R.id.action_search);
         searchButton.setVisible(true);
-        SearchView searchView = (SearchView) searchButton.getActionView();
+        final SearchView searchView = (SearchView) searchButton.getActionView();
         searchView.setIconifiedByDefault(false);
         searchView.setSubmitButtonEnabled(false);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -225,6 +219,15 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
     @Override
     public boolean onMenuItemActionCollapse(MenuItem item) {
+        int backStackCount = getFragmentManager().getBackStackEntryCount();
+        if (backStackCount > 0) {
+            FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(backStackCount - 1);
+            String str = backEntry.getName();
+            if (str == "threadDialog"){
+                getActivity().onBackPressed();
+                return false;
+            }
+        }
         startStatusCheck();
         return true;
     }
