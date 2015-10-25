@@ -1,6 +1,5 @@
 package com.luorrak.ouroboros.catalog;
 
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -49,14 +48,14 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
 
     private NetworkHelper networkHelper = new NetworkHelper();
     private CommentParser commentParser = new CommentParser();
-    private FragmentManager fragmentManager;
     private String boardName;
     private InfiniteDbHelper infiniteDbHelper;
-    public CatalogAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName, InfiniteDbHelper infiniteDbHelper) {
+    private Context context;
+    public CatalogAdapter(Cursor cursor, String boardName, InfiniteDbHelper infiniteDbHelper, Context context) {
         super(cursor);
-        this.fragmentManager = fragmentManager;
         this.boardName = boardName;
         this.infiniteDbHelper = infiniteDbHelper;
+        this.context = context;
     }
 
     @Override
@@ -93,6 +92,11 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
             catalogViewHolder.catalogComText.setVisibility(View.GONE);
         }
 
+        if (getItemViewType(cursor.getPosition()) == Util.CATALOG_LAYOUT_LIST){
+            replyCount = replyCount + " Replies";
+            imageReplyCount = imageReplyCount + " Images";
+        }
+
         catalogViewHolder.replyCount.setText(replyCount);
         catalogViewHolder.imageReplyCount.setText(imageReplyCount);
 
@@ -113,10 +117,23 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.catalog_item, parent, false);
-        return new CatalogViewHolder(view);
+    public int getItemViewType(int position) {
+        return Util.getCatalogView(context);
     }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            default:
+                case Util.CATALOG_LAYOUT_GRID: {
+                    return new CatalogViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.catalog_grid_item, parent, false));
+                }
+                case Util.CATALOG_LAYOUT_LIST: {
+                    return new CatalogViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.catalog_list_item, parent, false));
+                }
+        }
+    }
+
 
     class CatalogViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView catalogSubText;

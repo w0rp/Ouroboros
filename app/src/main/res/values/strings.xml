@@ -3,7 +3,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="reply_count_mock_text">123 Replies</string>
-    <string name="image_reply_count_mock_text">54i</string>
+    <string name="image_reply_count_mock_text">54 Images</string>
     <string name="reply">Reply</string>
     <string name="navigation_warning_ok">Proceed</string>
     <string name="navigation_warning_cancel">Cancel</string>

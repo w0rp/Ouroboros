@@ -86,7 +86,7 @@ public class BoardListFragment extends android.app.Fragment implements OnStartDr
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_catalog, menu);
         MenuItem addBoard = menu.findItem(R.id.action_add_board);
         addBoard.setVisible(true);
         super.onCreateOptionsMenu(menu, inflater);

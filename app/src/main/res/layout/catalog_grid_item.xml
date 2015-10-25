@@ -56,8 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:text="@string/image_reply_count_mock_text"
-                />
+                android:text="@string/image_reply_count_mock_text" />
         </RelativeLayout>
 
     </RelativeLayout>

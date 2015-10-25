@@ -160,7 +160,6 @@ public class DeepZoomFragment extends Fragment{
                 }
             });
         }
-
     }
 
     @Override
@@ -173,7 +172,7 @@ public class DeepZoomFragment extends Fragment{
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_deep_zoom, menu);
         MenuItem saveImage = menu.findItem(R.id.action_save_image);
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
         MenuItem shareButton = menu.findItem(R.id.menu_item_share);
