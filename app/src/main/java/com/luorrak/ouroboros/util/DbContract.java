@@ -116,20 +116,6 @@ public class DbContract {
         Type: String
          */
         public static final String COLUMN_THREAD_FILENAME = "filename";
-        /*
-        renamed filename
-        WARNING: can be null
-        WARNING: WILL RETURN STRING ARRAY
-        Type: String
-         */
-        public static final String COLUMN_THREAD_TIMS = "tims";
-        /*
-        filename extensions
-        WARNING: can be null
-        WARNING: WILL RETURN STRING ARRAY
-        Type: String
-         */
-        public static final String COLUMN_THREAD_EXTS = "exts";
 
         public static final String COLUMN_THREAD_IMAGE_HEIGHT = "image_01_height";
 

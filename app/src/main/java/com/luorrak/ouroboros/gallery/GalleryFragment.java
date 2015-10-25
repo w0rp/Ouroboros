@@ -1,10 +1,15 @@
 package com.luorrak.ouroboros.gallery;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -114,17 +119,12 @@ public class GalleryFragment extends Fragment {
                         .setMessage("Are you sure you want to download all images?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                String tim;
-                                String ext;
-                                Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
-                                do {
-                                    tim = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_TIMS));
-                                    ext = imageCursor.getString(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_EXTS));
-                                    networkHelper.downloadFile(boardName, tim, ext, getActivity());
-
-                                } while (imageCursor.moveToNext());
-
-                                imageCursor.close();
+                                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                                        ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, Util.REQUEST_STORAGE_PERMISSION);
+                                } else {
+                                    startDownload();
+                                }
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -137,5 +137,41 @@ public class GalleryFragment extends Fragment {
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void startDownload(){
+        Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
+        do {
+            ArrayList<Media> mediaArrayList = (ArrayList<Media>) Util.deserializeObject(imageCursor.getBlob(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES)));
+            for (Media mediaItem : mediaArrayList){
+                networkHelper.downloadFile(boardName, mediaItem.fileName, mediaItem.ext, getActivity());
+            }
+        } while (imageCursor.moveToNext());
+
+        imageCursor.close();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case Util.REQUEST_STORAGE_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the task you need to do.
+                    startDownload();
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Snackbar.make(getView(), "Requires Permission", Snackbar.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 }

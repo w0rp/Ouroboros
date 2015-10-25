@@ -36,6 +36,8 @@ import java.io.ObjectOutputStream;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Util {
+    public static final int REQUEST_STORAGE_PERMISSION = 55;
+
     private static final int THEME_DEFAULT = 0;
     private static final int THEME_DARK = 1;
 
