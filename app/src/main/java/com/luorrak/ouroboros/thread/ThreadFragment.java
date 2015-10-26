@@ -265,25 +265,12 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                 break;
             }
             case R.id.action_save_all_images: {
-                new AlertDialog.Builder(getActivity())
-                        .setTitle("Download All Images")
-                        .setMessage("Are you sure you want to download all images?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                                        ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, Util.REQUEST_STORAGE_PERMISSION);
-                                } else {
-                                    startDownload();
-                                }
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        })
-                        .show();
+                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, Util.REQUEST_STORAGE_PERMISSION);
+                } else {
+                    showDownloadAllDialog();
+                }
                 break;
             }
             case R.id.action_external_browser: {
@@ -349,6 +336,22 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                     }
                 });
     }
+    public void showDownloadAllDialog() {
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Download All Images")
+                .setMessage("Are you sure you want to download all images?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startDownload();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
+    }
 
     public void startDownload(){
         Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
@@ -358,32 +361,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                 networkHelper.downloadFile(boardName, mediaItem.fileName, mediaItem.ext, getActivity());
             }
         } while (imageCursor.moveToNext());
-
         imageCursor.close();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case Util.REQUEST_STORAGE_PERMISSION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the task you need to do.
-                    startDownload();
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    Snackbar.make(getView(), "Requires Permission", Snackbar.LENGTH_LONG).show();
-                }
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
     }
 
     private Runnable statusCheck = new Runnable() {
