@@ -103,7 +103,7 @@ public class ThreadActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.thread_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_thread, menu);
         return true;
     }
 

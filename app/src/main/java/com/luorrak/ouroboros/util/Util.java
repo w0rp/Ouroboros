@@ -86,6 +86,13 @@ public class Util {
         return Integer.valueOf(themeValue);
     }
 
+    public static void setThreadView(Context context, int layoutValue) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("thread_view", String.valueOf(layoutValue));
+        editor.apply();
+    }
+
     public static int getCatalogView(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String themeValue = sharedPreferences.getString("catalog_view", "1");

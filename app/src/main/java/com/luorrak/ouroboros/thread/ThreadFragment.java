@@ -176,6 +176,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         MenuItem saveAllImagesButton = menu.findItem(R.id.action_save_all_images);
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
         MenuItem shareButton = menu.findItem(R.id.menu_item_share);
+        MenuItem menuLayout = menu.findItem(R.id.action_menu_layout);
 
         MenuItem searchButton = menu.findItem(R.id.action_search);
         searchButton.setVisible(true);
@@ -211,6 +212,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         openExternalButton.setVisible(true);
         shareButton.setVisible(true);
         watchlistButton.setVisible(true);
+        menuLayout.setVisible(true);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -298,6 +300,20 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                 infiniteDbHelper.insertWatchlistEntry(String.valueOf(getActivity().getTitle()), boardName, resto, serializedMediaList, count);
                 Snackbar.make(getView(), "Thread Added To Watchlist", Snackbar.LENGTH_LONG).show();
                 ((ThreadActivity) getActivity()).updateWatchlist();
+            }
+            case R.id.action_layout_vertical: {
+                Util.setThreadView(getActivity(), Util.THREAD_LAYOUT_VERTICAL);
+                ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.placeholder_card, threadFragment).commit();
+                break;
+            }
+            case R.id.action_layout_horizontal: {
+                Util.setThreadView(getActivity(), Util.THREAD_LAYOUT_HORIZONTAL);
+                ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);;
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.placeholder_card, threadFragment).commit();
+                break;
             }
         }
         return true;
