@@ -44,8 +44,8 @@ public class Util {
     public static final int THREAD_LAYOUT_VERTICAL = 0;
     public static final int THREAD_LAYOUT_HORIZONTAL = 1;
 
-    public static final int CATALOG_LAYOUT_GRID = 0;
-    public static final int CATALOG_LAYOUT_LIST = 1;
+    public static final int CATALOG_LAYOUT_LIST = 0;
+    public static final int CATALOG_LAYOUT_GRID= 1;
 
 
     public static String[] parseYoutube(String embed) {
@@ -95,7 +95,7 @@ public class Util {
 
     public static int getCatalogView(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String themeValue = sharedPreferences.getString("catalog_view", "1");
+        String themeValue = sharedPreferences.getString("catalog_view", "0");
         return Integer.valueOf(themeValue);
     }
 

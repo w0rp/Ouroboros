@@ -83,6 +83,4 @@
         android:title="Open In External Browser"
         app:showAsAction="never"
         android:visible="false"/>
-
-
 </menu>
