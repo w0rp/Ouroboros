@@ -13,7 +13,7 @@
     <EditTextPreference
         android:key="catalog_grid_columns"
         android:title="Catalog Grid Columns"
-        android:summary="Number of columns displayed"
+        android:summary="Number of Columns in Grid Layout"
         android:dialogTitle="How many columns?"
         android:inputType="number"
         android:defaultValue="3"/>

@@ -54,11 +54,11 @@
         android:visible="false">
         <menu>
             <item
-                android:id="@+id/action_layout_grid"
-                android:title="Grid Layout" />
-            <item
                 android:id="@+id/action_layout_list"
                 android:title="List Layout" />
+            <item
+                android:id="@+id/action_layout_grid"
+                android:title="Grid Layout" />
         </menu>
     </item>
 </menu>
