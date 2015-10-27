@@ -82,8 +82,8 @@ public class Util {
 
     public static int getThreadView(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String themeValue = sharedPreferences.getString("thread_view", "0");
-        return Integer.valueOf(themeValue);
+        String threadView = sharedPreferences.getString("thread_view", "0");
+        return Integer.valueOf(threadView);
     }
 
     public static void setThreadView(Context context, int layoutValue) {
@@ -95,8 +95,8 @@ public class Util {
 
     public static int getCatalogView(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String themeValue = sharedPreferences.getString("catalog_view", "0");
-        return Integer.valueOf(themeValue);
+        String catalogView = sharedPreferences.getString("catalog_view", "0");
+        return Integer.valueOf(catalogView);
     }
 
     public static void setCatalogView(Context context, int layoutValue) {
@@ -108,8 +108,8 @@ public class Util {
 
     public static int getCatalogColumns(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String themeValue = sharedPreferences.getString("catalog_grid_columns", "3");
-        return Integer.valueOf(themeValue);
+        String catalogGridColumns = sharedPreferences.getString("catalog_grid_columns", "3");
+        return Integer.valueOf(catalogGridColumns);
     }
 
     public static Media createMediaItem(String height, String width, String tim, String ext){
@@ -119,6 +119,12 @@ public class Util {
         mediaItem.fileName = tim;
         mediaItem.ext = ext;
         return mediaItem;
+    }
+
+    public static String getDefaultName(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String defaultName = sharedPreferences.getString("default_name", "");
+        return defaultName;
     }
 
     public static byte[] serializeObject (Object object) {

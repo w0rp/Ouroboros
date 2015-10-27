@@ -14,7 +14,15 @@
         android:key="catalog_grid_columns"
         android:title="Catalog Grid Columns"
         android:summary="Number of Columns in Grid Layout"
-        android:dialogTitle="How many columns?"
+        android:dialogTitle="Enter Columns"
         android:inputType="number"
         android:defaultValue="3"/>
+
+    <EditTextPreference
+        android:key="default_name"
+        android:title="Default Name"
+        android:summary="A Default Name to be Used"
+        android:dialogTitle="Enter name"
+        android:inputType="text"
+        android:defaultValue=""/>
 </PreferenceScreen>

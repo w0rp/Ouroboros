@@ -106,7 +106,9 @@ public class ReplyCommentFragment extends Fragment {
         EditText subjetText = (EditText) view.findViewById(R.id.post_comment_editText_subject);
         EditText commentText = (EditText) view.findViewById(R.id.post_comment_editText_comment);
 
-        nameText.setText(sharedPreferences.getString(SaveReplyText.nameEditTextKey, ""));
+        String defaultName = Util.getDefaultName(getActivity());
+
+        nameText.setText(sharedPreferences.getString(SaveReplyText.nameEditTextKey, defaultName));
         emailText.setText(sharedPreferences.getString(SaveReplyText.emailEditTextKey, ""));
         subjetText.setText(sharedPreferences.getString(SaveReplyText.subjectEditTextKey, ""));
         commentText.setText(sharedPreferences.getString(SaveReplyText.commentEditTextKey, ""));
@@ -115,6 +117,7 @@ public class ReplyCommentFragment extends Fragment {
         emailText.addTextChangedListener(new SaveReplyText(sharedPreferences, SaveReplyText.emailEditTextKey));
         subjetText.addTextChangedListener(new SaveReplyText(sharedPreferences, SaveReplyText.subjectEditTextKey));
         commentText.addTextChangedListener(new SaveReplyText(sharedPreferences, SaveReplyText.commentEditTextKey));
+
 
 
         if (replyNo != null){
