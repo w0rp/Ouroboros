@@ -1,5 +1,6 @@
 package com.luorrak.ouroboros.thread;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -7,12 +8,15 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -172,6 +176,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         MenuItem saveAllImagesButton = menu.findItem(R.id.action_save_all_images);
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
         MenuItem shareButton = menu.findItem(R.id.menu_item_share);
+        MenuItem menuLayout = menu.findItem(R.id.action_menu_layout);
 
         MenuItem searchButton = menu.findItem(R.id.action_search);
         searchButton.setVisible(true);
@@ -207,6 +212,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         openExternalButton.setVisible(true);
         shareButton.setVisible(true);
         watchlistButton.setVisible(true);
+        menuLayout.setVisible(true);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -261,28 +267,12 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                 break;
             }
             case R.id.action_save_all_images: {
-                new AlertDialog.Builder(getActivity())
-                        .setTitle("Download All Images")
-                        .setMessage("Are you sure you want to download all images?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
-                                do {
-                                    ArrayList<Media> mediaArrayList = (ArrayList<Media>) Util.deserializeObject(imageCursor.getBlob(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES)));
-                                    for (Media mediaItem : mediaArrayList){
-                                        networkHelper.downloadFile(boardName, mediaItem.fileName, mediaItem.ext, getActivity());
-                                    }
-                                } while (imageCursor.moveToNext());
-
-                                imageCursor.close();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        })
-                        .show();
+                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, Util.REQUEST_STORAGE_PERMISSION);
+                } else {
+                    showDownloadAllDialog();
+                }
                 break;
             }
             case R.id.action_external_browser: {
@@ -310,6 +300,20 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                 infiniteDbHelper.insertWatchlistEntry(String.valueOf(getActivity().getTitle()), boardName, resto, serializedMediaList, count);
                 Snackbar.make(getView(), "Thread Added To Watchlist", Snackbar.LENGTH_LONG).show();
                 ((ThreadActivity) getActivity()).updateWatchlist();
+            }
+            case R.id.action_layout_vertical: {
+                Util.setThreadView(getActivity(), Util.THREAD_LAYOUT_VERTICAL);
+                ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.placeholder_card, threadFragment).commit();
+                break;
+            }
+            case R.id.action_layout_horizontal: {
+                Util.setThreadView(getActivity(), Util.THREAD_LAYOUT_HORIZONTAL);
+                ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);;
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.placeholder_card, threadFragment).commit();
+                break;
             }
         }
         return true;
@@ -347,6 +351,33 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                         }
                     }
                 });
+    }
+    public void showDownloadAllDialog() {
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Download All Images")
+                .setMessage("Are you sure you want to download all images?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startDownload();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
+    }
+
+    public void startDownload(){
+        Cursor imageCursor = infiniteDbHelper.getGalleryCursor(resto);
+        do {
+            ArrayList<Media> mediaArrayList = (ArrayList<Media>) Util.deserializeObject(imageCursor.getBlob(imageCursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES)));
+            for (Media mediaItem : mediaArrayList){
+                networkHelper.downloadFile(boardName, mediaItem.fileName, mediaItem.ext, getActivity());
+            }
+        } while (imageCursor.moveToNext());
+        imageCursor.close();
     }
 
     private Runnable statusCheck = new Runnable() {

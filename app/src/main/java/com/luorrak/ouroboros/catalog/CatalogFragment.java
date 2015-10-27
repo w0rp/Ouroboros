@@ -1,6 +1,7 @@
 package com.luorrak.ouroboros.catalog;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,6 +14,7 @@ import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -59,7 +61,6 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private final String LOG_TAG = CatalogFragment.class.getSimpleName();
     private CatalogAdapter catalogAdapter;
-    private GridLayoutManager layoutManager;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private String boardName = null;
@@ -85,8 +86,13 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         View view = inflater.inflate(R.layout.fragment_catalog, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.catalogList);
-        layoutManager = new GridLayoutManager(getActivity(), Util.getCatalogColumns(getActivity()));
-        recyclerView.setLayoutManager(layoutManager);
+        int catalogViewType = Util.getCatalogView(getActivity());
+
+        if (catalogViewType == Util.CATALOG_LAYOUT_GRID){
+            recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), Util.getCatalogColumns(getActivity())));
+        } else {
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        }
 
         //if not first load
         if (savedInstanceState != null){
@@ -114,8 +120,9 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         catalogAdapter = new CatalogAdapter(
                 infiniteDbHelper.getCatalogCursor(),
-                getFragmentManager(),
-                boardName, infiniteDbHelper);
+                boardName,
+                infiniteDbHelper,
+                getActivity());
         recyclerView.setAdapter(catalogAdapter);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.catalog_swipe_container);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -126,13 +133,15 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     // Options Menu ////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_catalog, menu);
         MenuItem replyButton = menu.findItem(R.id.action_reply);
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
+        MenuItem menuLayout = menu.findItem(R.id.action_menu_layout);
         MenuItem shareButton = menu.findItem(R.id.menu_item_share);
 
         replyButton.setVisible(true);
         openExternalButton.setVisible(true);
+        menuLayout.setVisible(true);
         shareButton.setVisible(true);
         shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
 
@@ -187,6 +196,20 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 startActivity(Intent.createChooser(shareIntent, "Share via"));
                 break;
             }
+            case R.id.action_layout_grid: {
+                Util.setCatalogView(getActivity(), Util.CATALOG_LAYOUT_GRID);
+                CatalogFragment catalogFragment = new CatalogFragment().newInstance(boardName);
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
+                break;
+            }
+            case R.id.action_layout_list: {
+                Util.setCatalogView(getActivity(), Util.CATALOG_LAYOUT_LIST);
+                CatalogFragment catalogFragment = new CatalogFragment().newInstance(boardName);
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
+                break;
+            }
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -202,7 +225,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable("SavedLayout", layoutManager.onSaveInstanceState());
+        outState.putParcelable("SavedLayout", recyclerView.getLayoutManager().onSaveInstanceState());
         outState.putString("boardName", boardName);
         super.onSaveInstanceState(outState);
     }

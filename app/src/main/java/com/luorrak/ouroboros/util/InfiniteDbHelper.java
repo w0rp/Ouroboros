@@ -581,7 +581,9 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + CatalogEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ThreadEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + BoardEntry.TABLE_NAME);
+        if (oldVersion < 4){
+            db.execSQL("DROP TABLE IF EXISTS " + BoardEntry.TABLE_NAME);
+        }
 
         onCreate(db);
     }

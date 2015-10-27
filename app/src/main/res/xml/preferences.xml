@@ -10,20 +10,19 @@
         android:dialogTitle="Set Theme"
         android:defaultValue="0"/>
 
-    <ListPreference
-        android:key="thread_view"
-        android:title="Thread Layout"
-        android:summary="Change Thread Layout"
-        android:entries="@array/threadLayoutNames"
-        android:entryValues="@array/threadLayoutValues"
-        android:dialogTitle="Change Thread Layout"
-        android:defaultValue="0"/>
-
     <EditTextPreference
         android:key="catalog_grid_columns"
         android:title="Catalog Grid Columns"
-        android:summary="Number of columns displayed"
-        android:dialogTitle="How many columns?"
+        android:summary="Number of Columns in Grid Layout"
+        android:dialogTitle="Enter Columns"
         android:inputType="number"
         android:defaultValue="3"/>
+
+    <EditTextPreference
+        android:key="default_name"
+        android:title="Default Name"
+        android:summary="A Default Name to be Used"
+        android:dialogTitle="Enter name"
+        android:inputType="text"
+        android:defaultValue=""/>
 </PreferenceScreen>
