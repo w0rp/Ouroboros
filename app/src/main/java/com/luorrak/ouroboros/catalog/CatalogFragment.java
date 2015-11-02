@@ -270,7 +270,9 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         } else {
                             progressBar.setVisibility(View.INVISIBLE);
                             swipeRefreshLayout.setRefreshing(false);
-                            Snackbar.make(getView(), "Error retrieving catalog", Snackbar.LENGTH_LONG).show();
+                            if (getActivity() != null){
+                                Snackbar.make(getView(), "Error retrieving catalog", Snackbar.LENGTH_LONG).show();
+                            }
                         }
 
                         catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());

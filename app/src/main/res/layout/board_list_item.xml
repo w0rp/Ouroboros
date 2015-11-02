@@ -12,7 +12,7 @@
         android:layout_gravity="center"
         android:layout_width="10dp"
         android:layout_height="16dp"
-        android:src="@drawable/ic_reorder_black_18dp"
+        android:src="?attr/board_reorder_icon"
         android:layout_weight="1"/>
     <Button
         android:id="@+id/boardlist_boardname_button"
