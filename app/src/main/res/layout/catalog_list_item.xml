@@ -69,15 +69,15 @@
             android:orientation="horizontal">
             <ImageView
                 android:id="@+id/catalog_lock_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:visibility="gone"
                 android:src="?attr/catalog_lock_icon" />
 
             <ImageView
                 android:id="@+id/catalog_sticky_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:visibility="gone"
                 android:src="?attr/catalog_sticky_icon" />
             <TextView
