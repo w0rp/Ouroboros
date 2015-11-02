@@ -25,4 +25,12 @@
         android:dialogTitle="Enter name"
         android:inputType="text"
         android:defaultValue=""/>
+
+    <EditTextPreference
+        android:key="post_password"
+        android:title="Password"
+        android:summary="Password Used to Delete Posts"
+        android:dialogTitle="Enter name"
+        android:inputType="text"
+        android:defaultValue=""/>
 </PreferenceScreen>

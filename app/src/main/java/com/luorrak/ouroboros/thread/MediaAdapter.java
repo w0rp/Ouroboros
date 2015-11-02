@@ -43,6 +43,7 @@ import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
@@ -106,7 +107,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         updateImageBounds();
         final int[] size = new int[2]; calcSize(size, Double.parseDouble(media.height), Double.parseDouble(media.width));
 
-        final int threadValue = Util.getThreadView(context);
+        final int threadValue = SettingsHelper.getThreadView(context);
 
         switch (threadValue){
             default:

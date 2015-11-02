@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 /**
@@ -30,7 +31,7 @@ public class OpenSourceLicenseFragment extends android.app.Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Util.onActivityCreateSetTheme(getActivity(), Util.getTheme(getActivity()));
+        Util.onActivityCreateSetTheme(getActivity(), SettingsHelper.getTheme(getActivity()));
         super.onCreateView(inflater, container, savedInstanceState);
 
         getActivity().setTitle("License");

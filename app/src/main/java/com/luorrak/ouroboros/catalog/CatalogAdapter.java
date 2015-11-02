@@ -19,6 +19,7 @@ import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 /**
@@ -118,7 +119,7 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
 
     @Override
     public int getItemViewType(int position) {
-        return Util.getCatalogView(context);
+        return SettingsHelper.getCatalogView(context);
     }
 
     @Override

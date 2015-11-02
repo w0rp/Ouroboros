@@ -41,6 +41,7 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.Reply;
 import com.luorrak.ouroboros.util.SaveReplyText;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
@@ -106,7 +107,7 @@ public class ReplyCommentFragment extends Fragment {
         EditText subjetText = (EditText) view.findViewById(R.id.post_comment_editText_subject);
         EditText commentText = (EditText) view.findViewById(R.id.post_comment_editText_comment);
 
-        String defaultName = Util.getDefaultName(getActivity());
+        String defaultName = SettingsHelper.getDefaultName(getActivity());
 
         nameText.setText(sharedPreferences.getString(SaveReplyText.nameEditTextKey, defaultName));
         emailText.setText(sharedPreferences.getString(SaveReplyText.emailEditTextKey, ""));
@@ -175,7 +176,7 @@ public class ReplyCommentFragment extends Fragment {
             EditText captchaText = (EditText) getActivity().findViewById(R.id.post_comment_captcha_editText);
             ImageView captchaImage = (ImageView) getActivity().findViewById(R.id.post_comment_captcha_image);
 
-            Random random = new Random();
+
 
             reply.name = nameText.getText().toString();
             reply.email = emailText.getText().toString();
@@ -189,7 +190,7 @@ public class ReplyCommentFragment extends Fragment {
             reply.resto = resto;
             reply.board = boardName;
 
-            reply.password = Long.toHexString(random.nextLong());
+            reply.password = SettingsHelper.getPostPassword(getContext());
 
             //Add networking call to post data.
             networkHelper.postReply(getActivity(), reply, sharedPreferences, new JsonParser(), new InfiniteDbHelper(getActivity()), getView());

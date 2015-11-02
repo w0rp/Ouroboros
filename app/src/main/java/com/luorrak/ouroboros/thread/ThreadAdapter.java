@@ -3,10 +3,12 @@ package com.luorrak.ouroboros.thread;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,14 +30,18 @@ import android.widget.TextView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.Response;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.CommentParser;
 import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
+import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Media;
+import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
@@ -223,7 +229,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return Util.getThreadView(context);
+        return SettingsHelper.getThreadView(context);
     }
 
     @Override
@@ -292,6 +298,49 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         threadViewHolder.embedObject.dataUrl = youtubeData[0];
         threadViewHolder.embedObject.imageUrl = youtubeData[1];
     }
+
+    public void showDeletePostDialog(final View v, final ThreadObject threadObject) {
+        new AlertDialog.Builder(context)
+                .setTitle("Delete Post")
+                .setMessage("Are you sure you want to delete this post?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        ((ThreadActivity) context).setProgressBarStatus(true);
+                        Ion.with(context)
+                                .load(ChanUrls.getDeletePostUrl())
+                                .setBodyParameter("board", boardName)
+                                .setBodyParameter("delete_" + threadObject.no, "on")
+                                .setBodyParameter("password", SettingsHelper.getPostPassword(context))
+                                .setBodyParameter("delete", "Delete")
+                                .setBodyParameter("reason", "")
+                                .asString()
+                                .withResponse()
+                                .setCallback(new FutureCallback<Response<String>>() {
+                                    @Override
+                                    public void onCompleted(Exception e, Response<String> result) {
+                                        ((ThreadActivity) context).setProgressBarStatus(false);
+                                        if (e != null) {
+                                            Snackbar.make(v, "Error: " + e.toString(), Snackbar.LENGTH_LONG).show();
+                                            return;
+                                        }
+
+                                        if (result.getHeaders().code() == 303) {
+                                            Snackbar.make(v, "Post Deleted", Snackbar.LENGTH_LONG).show();
+                                        } else {
+                                            Snackbar.make(v, "Something Went Wrong", Snackbar.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
+    }
+
     // View Holder /////////////////////////////////////////////////////////////////////////////////
 
     class ThreadViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -367,7 +416,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                     PopupMenu popupMenu = new PopupMenu(context, v);
                     Menu m = popupMenu.getMenu();
                     final int COPY = 0;
+                    final int DELETE = 1;
                     m.add(Menu.NONE, COPY, Menu.NONE, "Copy Text");
+                    m.add(Menu.NONE, DELETE, Menu.NONE, "Delete Post");
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
@@ -375,6 +426,10 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                                 case COPY: {
                                     Util.copyToClipboard(context, threadObject.parsedCom.toString());
                                     Snackbar.make(v, "Text Copied to Clipboard", Snackbar.LENGTH_LONG).show();
+                                    break;
+                                }
+                                case DELETE: {
+                                    showDeletePostDialog(v, threadObject);
                                     break;
                                 }
                             }

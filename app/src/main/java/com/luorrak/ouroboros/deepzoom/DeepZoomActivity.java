@@ -16,6 +16,7 @@ import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Media;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class DeepZoomActivity extends AppCompatActivity{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Util.onActivityCreateSetTheme(this, Util.getTheme(this));
+        Util.onActivityCreateSetTheme(this, SettingsHelper.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deepzoom);
         Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
