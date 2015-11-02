@@ -108,9 +108,10 @@ public class ReplyCommentFragment extends Fragment {
         EditText commentText = (EditText) view.findViewById(R.id.post_comment_editText_comment);
 
         String defaultName = SettingsHelper.getDefaultName(getActivity());
+        String defaultEmail = SettingsHelper.getDefaultEmail(getActivity());
 
         nameText.setText(sharedPreferences.getString(SaveReplyText.nameEditTextKey, defaultName));
-        emailText.setText(sharedPreferences.getString(SaveReplyText.emailEditTextKey, ""));
+        emailText.setText(sharedPreferences.getString(SaveReplyText.emailEditTextKey, defaultEmail));
         subjetText.setText(sharedPreferences.getString(SaveReplyText.subjectEditTextKey, ""));
         commentText.setText(sharedPreferences.getString(SaveReplyText.commentEditTextKey, ""));
 

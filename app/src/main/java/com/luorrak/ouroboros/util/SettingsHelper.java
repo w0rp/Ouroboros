@@ -67,6 +67,12 @@ public class SettingsHelper {
         return defaultName;
     }
 
+    public static String getDefaultEmail(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String defaultEmail = sharedPreferences.getString("default_email", "");
+        return defaultEmail;
+    }
+
     public static String getPostPassword(Context context){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String postPassword = sharedPreferences.getString("post_password", "");
