@@ -18,6 +18,7 @@ import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
@@ -26,6 +27,7 @@ import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.catalog.WatchListAdapter;
 import com.luorrak.ouroboros.util.DragAndDropRecyclerView.WatchListTouchHelper;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 /**
@@ -55,7 +57,7 @@ public class ThreadActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Util.onActivityCreateSetTheme(this, Util.getTheme(this));
+        Util.onActivityCreateSetTheme(this, SettingsHelper.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_thread);
         Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
@@ -203,6 +205,15 @@ public class ThreadActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    public void setProgressBarStatus(boolean status) {
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        if (status) {
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            progressBar.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void doNegativeClick() {

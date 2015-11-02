@@ -43,6 +43,7 @@ import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
@@ -302,14 +303,14 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                 ((ThreadActivity) getActivity()).updateWatchlist();
             }
             case R.id.action_layout_vertical: {
-                Util.setThreadView(getActivity(), Util.THREAD_LAYOUT_VERTICAL);
+                SettingsHelper.setThreadView(getActivity(), Util.THREAD_LAYOUT_VERTICAL);
                 ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.placeholder_card, threadFragment).commit();
                 break;
             }
             case R.id.action_layout_horizontal: {
-                Util.setThreadView(getActivity(), Util.THREAD_LAYOUT_HORIZONTAL);
+                SettingsHelper.setThreadView(getActivity(), Util.THREAD_LAYOUT_HORIZONTAL);
                 ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);;
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.placeholder_card, threadFragment).commit();
@@ -328,8 +329,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     }
 
     private void getThreadJson(final Context context, final String boardName, final String threadNumber){
-        final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar); //Null pointer activity
-        progressBar.setVisibility(View.VISIBLE);
+        ((ThreadActivity) getActivity()).setProgressBarStatus(true);
         final String threadJsonUrl = ChanUrls.getThreadUrl(boardName, threadNumber);
 
         Log.d(LOG_TAG, "thread json url "+ threadJsonUrl);
@@ -346,7 +346,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                             networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadAdapter);
                             //new InsertThreadIntoDatabase().execute(jsonObject);
                         } else {
-                            progressBar.setVisibility(View.INVISIBLE);
+                            ((ThreadActivity) getActivity()).setProgressBarStatus(false);
                             Snackbar.make(getView(), "Error retrieving thread", Snackbar.LENGTH_LONG).show();
                         }
                     }

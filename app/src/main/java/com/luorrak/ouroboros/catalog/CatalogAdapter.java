@@ -19,6 +19,7 @@ import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 /**
@@ -46,6 +47,9 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
     public final static String TIM = "com.luorrak.ouroboros.TIM";
     public final static String EXT = "com.luorrak.ouroboros.EXT";
 
+    private final int LOCKED = 1;
+    private final int STICKY = 1;
+
     private NetworkHelper networkHelper = new NetworkHelper();
     private CommentParser commentParser = new CommentParser();
     private String boardName;
@@ -70,6 +74,8 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
         String tim = cursor.getString(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_TIM));
         String replyCount = String.valueOf(cursor.getInt(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_REPLIES)));
         String imageReplyCount = String.valueOf(cursor.getInt(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_IMAGES)));
+        int locked = cursor.getInt(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_LOCKED));
+        int sticky = cursor.getInt(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_STICKY));
         String embed = cursor.getString(cursor.getColumnIndex(DbContract.CatalogEntry.COLUMN_CATALOG_EMBED));
 
         if (sub != null){
@@ -100,16 +106,28 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
         catalogViewHolder.replyCount.setText(replyCount);
         catalogViewHolder.imageReplyCount.setText(imageReplyCount);
 
+        if (locked == LOCKED) {
+            catalogViewHolder.lockIcon.setVisibility(View.VISIBLE);
+        } else {
+            catalogViewHolder.lockIcon.setVisibility(View.GONE);
+        }
+
+        if (sticky == STICKY) {
+            catalogViewHolder.stickyIcon.setVisibility(View.VISIBLE);
+        } else {
+            catalogViewHolder.stickyIcon.setVisibility(View.GONE);
+        }
+
         //Prevent's bad requests to the server
         if (tim != null){
                 imageUrl = ChanUrls.getThumbnailUrl(boardName, tim);
-                networkHelper.getImageNoCrossfade(catalogViewHolder.catalog_picture, imageUrl);
+                networkHelper.getImageNoCrossfade(catalogViewHolder.catalogPicture, imageUrl);
         } else if (embed != null){
             youtubeData = Util.parseYoutube(embed);
             imageUrl = "https://" + youtubeData[1];
-            networkHelper.getImageNoCrossfade(catalogViewHolder.catalog_picture, imageUrl);
+            networkHelper.getImageNoCrossfade(catalogViewHolder.catalogPicture, imageUrl);
         } else {
-            catalogViewHolder.catalog_picture.setImageDrawable(null);
+            catalogViewHolder.catalogPicture.setImageDrawable(null);
         }
 
         //HIDDEN TAG ON COM TEXT TO HACK THREAD NUMBER INTO VIEW
@@ -118,7 +136,7 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
 
     @Override
     public int getItemViewType(int position) {
-        return Util.getCatalogView(context);
+        return SettingsHelper.getCatalogView(context);
     }
 
     @Override
@@ -140,7 +158,9 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
         public TextView catalogComText;
         public TextView replyCount;
         public TextView imageReplyCount;
-        public ImageView catalog_picture;
+        public ImageView catalogPicture;
+        public ImageView lockIcon;
+        public ImageView stickyIcon;
 
         public CatalogViewHolder(View itemView) {
             super(itemView);
@@ -148,7 +168,9 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
             catalogComText = (TextView) itemView.findViewById(R.id.catalog_com_text);
             replyCount = (TextView) itemView.findViewById(R.id.catalog_reply_count);
             imageReplyCount = (TextView) itemView.findViewById(R.id.catalog_image_reply_count);
-            catalog_picture = (ImageView) itemView.findViewById(R.id.catalog_picture);
+            catalogPicture = (ImageView) itemView.findViewById(R.id.catalog_picture);
+            lockIcon = (ImageView) itemView.findViewById(R.id.catalog_lock_icon);
+            stickyIcon = (ImageView) itemView.findViewById(R.id.catalog_sticky_icon);
 
             itemView.setOnClickListener(this);
         }

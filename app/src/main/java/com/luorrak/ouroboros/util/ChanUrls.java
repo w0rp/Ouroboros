@@ -107,6 +107,15 @@ public class ChanUrls {
         return builder.toString();
     }
 
+    public static String getDeletePostUrl(){
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(SCHEME) //https://8ch.net/post.php
+                .authority(DOMAIN_NAME)
+                .appendPath(POST_ENDPOINT)
+                .build();
+        return builder.toString();
+    }
+
     public static String getThreadHtmlUrl(String boardName, String no){
         Uri.Builder builder = new Uri.Builder();
         builder.scheme(SCHEME) //http://8ch.net/test/res/7102.html

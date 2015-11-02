@@ -22,7 +22,10 @@ import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseFragment;
 import com.luorrak.ouroboros.settings.SettingsFragment;
 import com.luorrak.ouroboros.util.DragAndDropRecyclerView.WatchListTouchHelper;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
+
+import java.util.Random;
 
 /**
  * Ouroboros - An 8chan browser
@@ -52,10 +55,15 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Util.onActivityCreateSetTheme(this, Util.getTheme(this));
+        Util.onActivityCreateSetTheme(this, SettingsHelper.getTheme(this));
         super.onCreate(savedInstanceState);
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        if (SettingsHelper.getPostPassword(getApplicationContext()) == ""){
+            Random random = new Random();
+            SettingsHelper.setPostPassword(getApplicationContext(), Long.toHexString(random.nextLong()));
+        }
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         setContentView(R.layout.activity_catalog);
 

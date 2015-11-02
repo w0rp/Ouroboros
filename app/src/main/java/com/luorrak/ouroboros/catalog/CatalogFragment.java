@@ -34,6 +34,7 @@ import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 
@@ -86,10 +87,10 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         View view = inflater.inflate(R.layout.fragment_catalog, container, false);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.catalogList);
-        int catalogViewType = Util.getCatalogView(getActivity());
+        int catalogViewType = SettingsHelper.getCatalogView(getActivity());
 
         if (catalogViewType == Util.CATALOG_LAYOUT_GRID){
-            recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), Util.getCatalogColumns(getActivity())));
+            recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), SettingsHelper.getCatalogColumns(getActivity())));
         } else {
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         }
@@ -197,14 +198,14 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 break;
             }
             case R.id.action_layout_grid: {
-                Util.setCatalogView(getActivity(), Util.CATALOG_LAYOUT_GRID);
+                SettingsHelper.setCatalogView(getActivity(), Util.CATALOG_LAYOUT_GRID);
                 CatalogFragment catalogFragment = new CatalogFragment().newInstance(boardName);
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
                 break;
             }
             case R.id.action_layout_list: {
-                Util.setCatalogView(getActivity(), Util.CATALOG_LAYOUT_LIST);
+                SettingsHelper.setCatalogView(getActivity(), Util.CATALOG_LAYOUT_LIST);
                 CatalogFragment catalogFragment = new CatalogFragment().newInstance(boardName);
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
@@ -269,7 +270,9 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         } else {
                             progressBar.setVisibility(View.INVISIBLE);
                             swipeRefreshLayout.setRefreshing(false);
-                            Snackbar.make(getView(), "Error retrieving catalog", Snackbar.LENGTH_LONG).show();
+                            if (getActivity() != null){
+                                Snackbar.make(getView(), "Error retrieving catalog", Snackbar.LENGTH_LONG).show();
+                            }
                         }
 
                         catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());

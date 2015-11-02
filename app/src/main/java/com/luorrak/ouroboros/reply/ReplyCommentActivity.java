@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 /**
@@ -30,7 +31,7 @@ public class ReplyCommentActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Util.onActivityCreateSetTheme(this, Util.getTheme(this));
+        Util.onActivityCreateSetTheme(this, SettingsHelper.getTheme(this));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_comment_activity);
 
