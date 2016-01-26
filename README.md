@@ -8,7 +8,9 @@ Ouroboros is a work in progress app for 8ch.net. It is currently in it's alpha s
 * https://github.com/Luorrak/Ouroboros/releases
 
 ## Plans Moving Forward
-I plan to support whatever 8chan decides to do going forward. Now that we have a direction to move in and are no longer stuck in development limbo I will be pushing out some stability updates in the short term as well as trying to reimpliment the ability to view all posts instead of relying entirely on the crippled catalog.json. I was avoiding fixing a lot of things because Infinity Next was going to break all compatibility. If vichan gets fixed, I will support that. If 8chan migrates to Lynxchan I will update to support that. Both of these options have a much simpiler api than infinity next which makes it easy to code for. Unfortunately I have to rethink a few cool ideas I had planned once next gets released.
+Read this first for context: https://medium.com/@infinitechan/infinity-never-3d5f733af739
+
+I plan to support whatever 8chan decides to do going forward. Now that we have a direction to move in and are no longer stuck in development limbo I will be pushing out some stability updates in the short term as well as trying to re-implement the ability to view all posts instead of relying entirely on the crippled catalog.json. I was avoiding fixing a lot of things because Infinity Next was going to break all compatibility. If vichan gets fixed, I will support that. If 8chan migrates to Lynxchan I will update to support that. Both of these options have a much simpler api than infinity next which makes it easy to code for. Unfortunately I have to rethink a few cool ideas I had planned for Next.
 
 ## License
 * Ouroboros is licensed under GPLv3
