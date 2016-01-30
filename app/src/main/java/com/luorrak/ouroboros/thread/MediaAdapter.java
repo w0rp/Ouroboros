@@ -147,7 +147,9 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                                 return;
                             }
 
-                            generateSwatch(result.getBitmapInfo().bitmap, mediaViewHolder);
+                            if (result.getBitmapInfo().bitmap != null){
+                                generateSwatch(result.getBitmapInfo().bitmap, mediaViewHolder);
+                            }
 
                             Ion.with(result.getImageView())
                                     .crossfade(true)
@@ -211,18 +213,15 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     }
 
     private void generateSwatch(Bitmap bitmap, final MediaViewHolder mediaViewHolder) {
-        Palette.generateAsync(bitmap,
-                new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        Palette.Swatch vibrant =
-                                palette.getLightMutedSwatch();
-                        if (vibrant != null) {
-                            mediaViewHolder.mediaHolder.setBackgroundColor(
-                                    vibrant.getRgb());
-                        }
-                    }
-                });
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                Palette.Swatch swatch = palette.getMutedSwatch();
+                if (swatch != null) {
+                    mediaViewHolder.mediaHolder.setBackgroundColor(swatch.getRgb());
+                }
+            }
+        });
     }
 
     @Override
