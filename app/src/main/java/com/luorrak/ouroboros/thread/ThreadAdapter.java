@@ -154,23 +154,20 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                             .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                                 @Override
                                 public void onCompleted(Exception e, ImageViewBitmapInfo result) {
-                                    if (e != null || result.getBitmapInfo() == null) {
+                                    if (e != null || result.getBitmapInfo().bitmap == null) {
                                         return;
                                     }
 
                                     if (getItemViewType(cursor.getPosition()) != Util.THREAD_LAYOUT_HORIZONTAL){
-                                        Palette.generateAsync(result.getBitmapInfo().bitmap,
-                                                new Palette.PaletteAsyncListener() {
-                                                    @Override
-                                                    public void onGenerated(Palette palette) {
-                                                        Palette.Swatch vibrant =
-                                                                palette.getLightMutedSwatch();
-                                                        if (vibrant != null) {
-                                                            threadViewHolder.mediaHolder.setBackgroundColor(
-                                                                    vibrant.getRgb());
-                                                        }
-                                                    }
-                                                });
+                                        Palette.from(result.getBitmapInfo().bitmap).generate(new Palette.PaletteAsyncListener() {
+                                            @Override
+                                            public void onGenerated(Palette palette) {
+                                                Palette.Swatch swatch = palette.getMutedSwatch();
+                                                if (swatch != null){
+                                                    threadViewHolder.mediaHolder.setBackgroundColor(swatch.getRgb());
+                                                }
+                                            }
+                                        });
                                     }
                                 }
                             });
