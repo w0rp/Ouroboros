@@ -50,7 +50,7 @@
         android:id="@+id/action_menu_layout"
         android:orderInCategory="160"
         android:title="Choose Layout"
-        app:showAsAction="collapseActionView|ifRoom"
+        app:showAsAction="never"
         android:visible="false">
         <menu>
             <item
