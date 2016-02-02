@@ -156,7 +156,6 @@ public class CommentParser {
                     processedText = TextUtils.concat(processedText, "\n");
                 } else if (bodyLine.tagName().equals("pre")){
                     processedText = TextUtils.concat(processedText, parseCodeText(bodyLine));
-                    break;
                 }
 
             }
