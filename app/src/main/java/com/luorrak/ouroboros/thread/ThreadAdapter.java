@@ -209,11 +209,14 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
         //Does comment exist
         if (threadViewHolder.threadObject.com != null){
-            Spannable spannableCom = commentParser.parseCom(threadViewHolder.threadObject.com,
+            Spannable spannableCom = commentParser.parseCom(
+                    threadViewHolder.threadObject.com,
+                    CommentParser.THREAD_VIEW,
                     boardName,
-                    cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_RESTO)),
+                    threadViewHolder.threadObject.resto,
                     fragmentManager,
                     infiniteDbHelper
+
             );
             threadViewHolder.threadObject.parsedCom = spannableCom;
             threadViewHolder.threadCom.setVisibility(View.VISIBLE);
