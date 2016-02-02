@@ -4,17 +4,19 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 import android.view.View;
+import android.widget.Switch;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.thread.CardDialogFragment;
@@ -27,7 +29,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 
 import java.util.List;
 
@@ -49,9 +50,10 @@ import java.util.List;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//Adopted from Chanobol/Clover
+
 public class CommentParser {
-    private final String LOG_TAG = CommentParser.class.getSimpleName();
+    public final static int CATALOG_VIEW = 0;
+    public final static int THREAD_VIEW = 1;
 
     public Spannable parseId(String id){
         SpannableString coloredId = new SpannableString(id);
@@ -59,148 +61,184 @@ public class CommentParser {
         return coloredId;
     }
 
-    public Spannable parseCom(String rawCom, String currentBoard, String resto, FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper){
+    /* Example formatting
+        <p class="body-line ltr ">normal text</p>
+        <p class="body-line ltr "><span class="heading">Red Text</span></p>
+        <p class="body-line ltr quote">&gt;Green Text</p>
+        <p class="body-line ltr "><span class="spoiler">Spoiler Text</span></p>
+        <p class="body-line ltr "><em>Italic Text</em></p>
+        <p class="body-line ltr "><strong>Bold Text</strong></p>
+        <p class="body-line ltr "><u>Under Line</u></p>
+        <p class="body-line ltr "><s>Strike-through</s></p>
+        <p class="body-line ltr "><span class="aa">Escaped text</span></p>
+        <p class="body-line ltr ">
+            <code>
+                <pre class='prettyprint' style='display:inline-block'>codeblock</pre>
+            </code>
+        </p>
+    */
 
-        Document doc = Jsoup.parseBodyFragment(rawCom);
-        List<Node> comLineArray = doc.body().childNodes();
+    /*
+    JSoup making it this for some reason
+    <html>
+     <head></head>
+     <body>
+      <p class="body-line ltr ">normal text</p>
+      <p class="body-line ltr "><span class="heading">Red Text</span></p>
+      <p class="body-line ltr quote">&gt;Green Text</p>
+      <p class="body-line ltr "><span class="spoiler">Spoiler Text</span></p>
+      <p class="body-line ltr "><em>Italic Text</em></p>
+      <p class="body-line ltr "><strong>Bold Text</strong></p>
+      <p class="body-line ltr "><u>Under Line</u></p>
+      <p class="body-line ltr "><s>Strike-through</s></p>
+      <p class="body-line ltr "><span class="aa">Escaped text</span></p>
+      <p class="body-line ltr "><code></code></p>
+      <pre class="prettyprint" style="display:inline-block"><code>codeblock</code></pre>
+      <p></p>
+     </body>
+    </html>
+
+
+     <p class=\"body-line ltr \"><a onclick=\"highlightReply('22543', event);\" href=\"\/test\/res\/22543.html#22543\">&gt;&gt;22543<\/a><\/p>
+     <p class=\"body-line ltr \"><a href=\"\/irc\/res\/468.html#468\">&gt;&gt;&gt;\/irc\/468<\/a><\/p>
+     <p class=\"body-line ltr \"><a href=\"https:\/\/www.ixquick.com\/\" rel=\"nofollow\" target=\"_blank\">https:\/\/www.ixquick.com\/<\/a><\/p>
+     */
+
+    public Spannable parseCom(String rawCom, int viewState, String currentBoard, String resto, FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper){
         CharSequence processedText = new SpannableString("");
+        Document doc = Jsoup.parse(rawCom);
+        int parseLimit = 4;
+        int limit = 0;
 
-        int i = 1;
-        for (Node comLine : comLineArray){
-            //legacy stuff to avoid hard crashes
-            if (comLine instanceof TextNode){
-                //plain text
-                processedText = TextUtils.concat(processedText, "\nDEVELOPER REQUEST: This post was made before 8chan switched its comment format in April, 2015. If this post was made more recently then April, file a bug report with the developer of this app \n");
-                break;
-            } else {
-                Element lineElement = (Element) comLine;
-                if (lineElement.hasClass("empty")){
-                    processedText = TextUtils.concat(processedText, "\n");
-                }else if (lineElement.hasClass("quote")){
-                    CharSequence greenText = "";
-                    for (Node node : comLine.childNodes()){
-                        if (node instanceof TextNode){
-                            greenText = TextUtils.concat(greenText, ((TextNode) node).text());
-                            continue;
-                        }
-
-                        Element e = (Element) node;
-                        if (node.nodeName().equals("a")){
-                            greenText = TextUtils.concat(greenText, parseAnchor(e, currentBoard, resto, fragmentManager, infiniteDbHelper));
-                            continue;
-                        }
-                        greenText = TextUtils.concat(greenText, e.text());
-                    }
-                    greenText = parseQuote(greenText);
-                    greenText = TextUtils.concat(greenText, "\n");
-                    processedText = TextUtils.concat(processedText, greenText);
-                }else {
-                    for (Node node : comLine.childNodes()){
-                        CharSequence parsedNode = parseNode(node, currentBoard, resto, fragmentManager, infiniteDbHelper);
-                        processedText = TextUtils.concat(processedText, parsedNode);
-                    }
-                    if (i++ != comLineArray.size()){
-                        processedText = TextUtils.concat(processedText, "\n");
-                    } else {
-                        break;
-                    }
+        if (doc.select("p").size() == 0) {
+            return new SpannableString("LEGACY COMMENT SYSTEM!\n " + rawCom);
+        } else {
+            for (Element bodyLine : doc.body().children()){
+                //This speeds up swiping on catalogview without risking an error
+                if (viewState == CATALOG_VIEW && limit == parseLimit){
+                    break;
                 }
+                limit++;
+
+                if (bodyLine.className().equals("body-line ltr quote")){
+                    processedText = TextUtils.concat(processedText, parseGreenText(new SpannableString(bodyLine.text())));
+                    processedText = TextUtils.concat(processedText, "\n");
+                } else if (bodyLine.className().equals("body-line ltr")){
+                    if (bodyLine.children().size() == 0){
+                        //Normal Text
+                        processedText = TextUtils.concat(processedText, parseNormalText(new SpannableString(bodyLine.text())));
+                    } else {
+                        for (Element child : bodyLine.children()){
+                            switch(child.tagName()){
+                                default:
+                                    processedText = TextUtils.concat(processedText, parseNormalText(new SpannableString(child.text())));
+                                    break;
+                                case "span":
+                                    processedText = TextUtils.concat(processedText, parseSpanText(child));
+                                    break;
+                                case "em":
+                                    processedText = TextUtils.concat(processedText, parseItalicText(new SpannableString(child.text())));
+                                    break;
+                                case "strong":
+                                    processedText = TextUtils.concat(processedText, parseBoldText(new SpannableString(child.text())));
+                                    break;
+                                case "u":
+                                    processedText = TextUtils.concat(processedText, parseUnderlineText(new SpannableString(child.text())));
+                                    break;
+                                case "s":
+                                    processedText = TextUtils.concat(processedText, parseStrikethroughText(new SpannableString(child.text())));
+                                    break;
+                                case "a":
+                                    processedText = TextUtils.concat(processedText, parseAnchorText(child, currentBoard, resto, fragmentManager, infiniteDbHelper));
+                            }
+                        }
+                    }
+                    processedText = TextUtils.concat(processedText, "\n");
+                } else if (bodyLine.tagName().equals("pre")){
+                    processedText = TextUtils.concat(processedText, parseCodeText(bodyLine));
+                    break;
+                }
+
             }
-
-
         }
         return SpannableStringBuilder.valueOf(processedText);
     }
 
-    private CharSequence parseQuote(CharSequence node){
-        //Element greenTextElement = (Element) node;
-        SpannableString greenText = new SpannableString(node);
+    //nested switch statement
+    private CharSequence parseSpanText(Element child){
+        CharSequence spanText = new SpannableString("");
+        switch (child.className()){
+            case "heading":
+                spanText = parseHeadingText(new SpannableString(child.text()));
+                break;
+            case "spoiler":
+                spanText =  parseSpoilerText(new SpannableString(child.text()));
+                break;
+            case "aa":
+                spanText =  parseEscapedText(new SpannableString(child.text()));
+                break;
+        }
+        return spanText;
+    }
+
+
+    private CharSequence parseNormalText(SpannableString normalText){
+       return normalText;
+    }
+
+    private CharSequence parseGreenText(SpannableString greenText){
         greenText.setSpan(new ForegroundColorSpan(Color.parseColor("#789922")), 0, greenText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return greenText;
     }
 
-    private CharSequence parseNode(Node node, String currentBoard, String resto, FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper) {
-        if (node instanceof TextNode){
-            return Html.fromHtml(Html.fromHtml(node.toString()).toString());
-            //return node.toString();
-        }
-
-        switch (node.nodeName()){
-            case "p": {
-                Element p = (Element) node;
-                if (p.hasClass("empty")){
-                    return "\n";
-                }
-                /*
-                if (p.hasClass("quote")){
-                    Element quote = (Element) node;
-                    SpannableString greenText = new SpannableString(quote.text());
-                    greenText.setSpan(new ForegroundColorSpan(Color.parseColor("#789922")), 0, greenText.length(), 0);
-                    Log.d(LOG_TAG, "Green Text " + quote.toString() + "Node name " + node.nodeName());
-                    return greenText;
-                }*/
-            }
-            case "span": {
-                Element span = (Element) node;
-
-                String sclass = span.classNames().iterator().next();
-
-                switch (sclass){
-                    case "heading":{
-                        Element heading = (Element) node;
-                        SpannableString redText = new SpannableString(heading.text());
-                        redText.setSpan(new ForegroundColorSpan(Color.RED), 0, redText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        redText.setSpan(new StyleSpan(Typeface.BOLD), 0, redText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        return redText;
-                    }
-                    case "spoiler": {
-                        Element spoiler = (Element) node;
-                        SpannableString spoilerText = new SpannableString(spoiler.text());
-                        SpoilerSpan spoilerSpan = new SpoilerSpan();
-                        spoilerText.setSpan(spoilerSpan, 0, spoilerText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        return spoilerText;
-                    }
-                }
-            }
-            case "s":{
-                Element s = (Element) node;
-                SpannableString strikethrough = new SpannableString(s.text());
-                strikethrough.setSpan(new StrikethroughSpan(), 0, strikethrough.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                return strikethrough;
-            }
-            case "em":{
-                Element em = (Element) node;
-                SpannableString italic = new SpannableString(em.text());
-                italic.setSpan(new StyleSpan(Typeface.ITALIC), 0, italic.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                return italic;
-            }
-            case "strong":{
-                Element strong = (Element) node;
-                SpannableString bold = new SpannableString(strong.text());
-                bold.setSpan(new StyleSpan(Typeface.BOLD), 0, bold.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                return bold;
-            }
-            case "a":{
-                Element a = (Element) node;
-
-                //Links need to be parsed
-                return parseAnchor(a, currentBoard, resto, fragmentManager, infiniteDbHelper);
-            }
-            default: {
-                if (node instanceof Element){
-                    return ((Element) node).text();
-                }
-            }
-        }
-        return node.toString();
+    private CharSequence parseSpoilerText(SpannableString spoilerText){
+        SpoilerSpan spoilerSpan = new SpoilerSpan();
+        spoilerText.setSpan(spoilerSpan, 0, spoilerText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return spoilerText;
     }
 
-    private CharSequence parseAnchor(final Element anchor, final String currentBoard, String resto, final FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper){
+    private CharSequence parseItalicText(SpannableString italic){
+        italic.setSpan(new StyleSpan(Typeface.ITALIC), 0, italic.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return italic;
+    }
 
+    private CharSequence parseBoldText(SpannableString bold){
+        bold.setSpan(new StyleSpan(Typeface.BOLD), 0, bold.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return bold;
+    }
+
+    private CharSequence parseUnderlineText(SpannableString underline) {
+        underline.setSpan(new UnderlineSpan(), 0, underline.length(), 0);
+        return underline;
+    }
+
+    private CharSequence parseHeadingText(SpannableString heading){
+        heading.setSpan(new ForegroundColorSpan(Color.RED), 0, heading.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        heading.setSpan(new StyleSpan(Typeface.BOLD), 0, heading.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return heading;
+    }
+
+    private CharSequence parseStrikethroughText(SpannableString strikethrough){
+        strikethrough.setSpan(new StrikethroughSpan(), 0, strikethrough.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return strikethrough;
+    }
+
+    private CharSequence parseEscapedText(SpannableString escapedText){
+        return escapedText;
+    }
+
+    private CharSequence parseCodeText(Element codeElement){
+        Element preElement = codeElement.child(0);
+        SpannableString codeText = new SpannableString("\n" + preElement.text() + "\n");
+        codeText.setSpan(new BackgroundColorSpan(Color.LTGRAY), 0, codeText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return codeText;
+    }
+
+    private CharSequence parseAnchorText(final Element anchor, final String currentBoard, final String resto,  final FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper) {
         final String linkUrl = anchor.attr("href");
-        if (linkUrl.contains("http")){
+        SpannableString linkText = new SpannableString(anchor.text());
+        if (linkUrl.contains("http")) {
             //normal link
-            SpannableString normalLink = new SpannableString(anchor.text());
             ClickableSpan clickableNormalLink = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
@@ -208,13 +246,11 @@ public class CommentParser {
                     dialog.show(fragmentManager, "externallink");
                 }
             };
-            normalLink.setSpan(new ForegroundColorSpan(Color.parseColor("#0645AD")), 0, normalLink.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            normalLink.setSpan(clickableNormalLink, 0, normalLink.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            return normalLink;
-
-        } else if (linkUrl.contains("_g")){
+            linkText.setSpan(new ForegroundColorSpan(Color.parseColor("#0645AD")), 0, linkText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            linkText.setSpan(clickableNormalLink, 0, linkText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return linkText;
+        }  else if (linkUrl.contains("_g")){
             //normal link
-            SpannableString normalLink = new SpannableString(anchor.text());
             ClickableSpan clickableNormalLink = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
@@ -222,13 +258,12 @@ public class CommentParser {
                     dialog.show(fragmentManager, "externallink");
                 }
             };
-            normalLink.setSpan(new ForegroundColorSpan(Color.parseColor("#0645AD")), 0, normalLink.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            normalLink.setSpan(clickableNormalLink, 0, normalLink.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            return normalLink;
+            linkText.setSpan(new ForegroundColorSpan(Color.parseColor("#0645AD")), 0, linkText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            linkText.setSpan(clickableNormalLink, 0, linkText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return linkText;
         } else if (linkUrl.contains(resto)){
             //same thread
             String anchorText = infiniteDbHelper.isNoUserPost(currentBoard, linkUrl.split("#")[1]) ? anchor.text() + " (You)" : anchor.text();
-            SpannableString sameThread = new SpannableString(anchorText);
             ClickableSpan clickableSameThreadLink = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
@@ -240,13 +275,12 @@ public class CommentParser {
 
                 }
             };
-            sameThread.setSpan(clickableSameThreadLink, 0, sameThread.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            sameThread.setSpan(new ForegroundColorSpan(Color.parseColor("#FF6600")), 0, sameThread.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            return sameThread;
+            linkText.setSpan(clickableSameThreadLink, 0, linkText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            linkText.setSpan(new ForegroundColorSpan(Color.parseColor("#FF6600")), 0, linkText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return linkText;
 
         } else {
             //different thread
-            SpannableString differentThread = new SpannableString(anchor.text());
             ClickableSpan clickableDifferentThreadLink = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
@@ -254,10 +288,9 @@ public class CommentParser {
                     dialog.show(fragmentManager, "internallink");
                 }
             };
-            differentThread.setSpan(clickableDifferentThreadLink, 0, differentThread.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            differentThread.setSpan(new ForegroundColorSpan(Color.parseColor("#FF6600")), 0, differentThread.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            return differentThread;
+            linkText.setSpan(clickableDifferentThreadLink, 0, linkText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            linkText.setSpan(new ForegroundColorSpan(Color.parseColor("#FF6600")), 0, linkText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return linkText;
         }
     }
 }
-

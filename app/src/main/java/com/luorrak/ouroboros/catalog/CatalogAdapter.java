@@ -89,11 +89,12 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
             catalogViewHolder.catalogComText.setVisibility(View.VISIBLE);
             catalogViewHolder.catalogComText.setText(commentParser.parseCom(
                     com,
+                    CommentParser.CATALOG_VIEW,
                     "v",
-                    "-1", //dummy data as link is unclickable
+                    "-1",
                     null,
                     infiniteDbHelper
-            ));
+                    ));
         } else {
             catalogViewHolder.catalogComText.setVisibility(View.GONE);
         }

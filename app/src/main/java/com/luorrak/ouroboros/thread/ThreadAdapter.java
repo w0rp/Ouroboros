@@ -154,23 +154,20 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                             .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                                 @Override
                                 public void onCompleted(Exception e, ImageViewBitmapInfo result) {
-                                    if (e != null || result.getBitmapInfo() == null) {
+                                    if (e != null || result.getBitmapInfo().bitmap == null) {
                                         return;
                                     }
 
                                     if (getItemViewType(cursor.getPosition()) != Util.THREAD_LAYOUT_HORIZONTAL){
-                                        Palette.generateAsync(result.getBitmapInfo().bitmap,
-                                                new Palette.PaletteAsyncListener() {
-                                                    @Override
-                                                    public void onGenerated(Palette palette) {
-                                                        Palette.Swatch vibrant =
-                                                                palette.getLightMutedSwatch();
-                                                        if (vibrant != null) {
-                                                            threadViewHolder.mediaHolder.setBackgroundColor(
-                                                                    vibrant.getRgb());
-                                                        }
-                                                    }
-                                                });
+                                        Palette.from(result.getBitmapInfo().bitmap).generate(new Palette.PaletteAsyncListener() {
+                                            @Override
+                                            public void onGenerated(Palette palette) {
+                                                Palette.Swatch swatch = palette.getMutedSwatch();
+                                                if (swatch != null){
+                                                    threadViewHolder.mediaHolder.setBackgroundColor(swatch.getRgb());
+                                                }
+                                            }
+                                        });
                                     }
                                 }
                             });
@@ -209,11 +206,14 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
         //Does comment exist
         if (threadViewHolder.threadObject.com != null){
-            Spannable spannableCom = commentParser.parseCom(threadViewHolder.threadObject.com,
+            Spannable spannableCom = commentParser.parseCom(
+                    threadViewHolder.threadObject.com,
+                    CommentParser.THREAD_VIEW,
                     boardName,
-                    cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_RESTO)),
+                    threadViewHolder.threadObject.resto,
                     fragmentManager,
                     infiniteDbHelper
+
             );
             threadViewHolder.threadObject.parsedCom = spannableCom;
             threadViewHolder.threadCom.setVisibility(View.VISIBLE);
