@@ -161,6 +161,11 @@ public class CommentParser {
 
             }
         }
+
+        //trim trailing newline.
+        if (processedText.length() > 0 ){
+            processedText = processedText.subSequence(0, processedText.length() - 1);
+        }
         return SpannableStringBuilder.valueOf(processedText);
     }
 
