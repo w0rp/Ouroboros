@@ -230,7 +230,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         if (backStackCount > 0) {
             FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(backStackCount - 1);
             String str = backEntry.getName();
-            if (str == "threadDialog"){
+            if (str.equals("threadDialog")){
                 getActivity().onBackPressed();
                 return false;
             }
@@ -301,6 +301,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                 infiniteDbHelper.insertWatchlistEntry(String.valueOf(getActivity().getTitle()), boardName, resto, serializedMediaList, count);
                 Snackbar.make(getView(), "Thread Added To Watchlist", Snackbar.LENGTH_LONG).show();
                 ((ThreadActivity) getActivity()).updateWatchlist();
+                break;
             }
             case R.id.action_layout_vertical: {
                 SettingsHelper.setThreadView(getActivity(), Util.THREAD_LAYOUT_VERTICAL);
