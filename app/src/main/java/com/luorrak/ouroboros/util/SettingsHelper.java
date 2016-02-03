@@ -73,6 +73,11 @@ public class SettingsHelper {
         return defaultEmail;
     }
 
+    public static int getImageOptions(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return Integer.valueOf(sharedPreferences.getString("image_options", "1"));
+    }
+
     public static String getPostPassword(Context context){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String postPassword = sharedPreferences.getString("post_password", "");

@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -131,33 +132,42 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
 
         if (validExt.contains(media.ext)){
             String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
-            Ion.with(mediaViewHolder.mediaImage)
-                    .smartSize(true)
-                    .crossfade(true)
-                    .load(imageUrl)
-                    .withBitmapInfo()
-                    .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
-                        @Override
-                        public void onCompleted(Exception e, ImageViewBitmapInfo result) {
-                            if (e != null || result.getBitmapInfo() == null) {
-                                return;
+            if (SettingsHelper.getImageOptions(context) != 3){
+                Ion.with(mediaViewHolder.mediaImage)
+                        .smartSize(true)
+                        .crossfade(true)
+                        .load(imageUrl)
+                        .withBitmapInfo()
+                        .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
+                            @Override
+                            public void onCompleted(Exception e, ImageViewBitmapInfo result) {
+                                if (e != null || result.getBitmapInfo() == null || threadValue == Util.THREAD_LAYOUT_HORIZONTAL) {
+                                    return;
+                                }
+                                if (result.getBitmapInfo().bitmap != null){
+                                    generateSwatch(result.getBitmapInfo().bitmap, mediaViewHolder);
+                                }
+
+                                WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+                                if(wifiManager.isWifiEnabled() && SettingsHelper.getImageOptions(context) == 1){
+                                    Ion.with(result.getImageView())
+                                            .crossfade(true)
+                                            .smartSize(true)
+                                            .load(ChanUrls.getImageUrl(boardName, media.fileName, media.ext))
+                                            .withBitmapInfo();
+                                } else if (SettingsHelper.getImageOptions(context) == 0){
+                                    Ion.with(result.getImageView())
+                                            .crossfade(true)
+                                            .smartSize(true)
+                                            .load(ChanUrls.getImageUrl(boardName, media.fileName, media.ext))
+                                            .withBitmapInfo();
+                                }
+
+
                             }
 
-                            if (threadValue == Util.THREAD_LAYOUT_HORIZONTAL){
-                                return;
-                            }
-
-                            if (result.getBitmapInfo().bitmap != null){
-                                generateSwatch(result.getBitmapInfo().bitmap, mediaViewHolder);
-                            }
-
-                            Ion.with(result.getImageView())
-                                    .crossfade(true)
-                                    .smartSize(true)
-                                    .load(ChanUrls.getImageUrl(boardName, media.fileName, media.ext))
-                                    .withBitmapInfo();
-                        }
-                    });
+                        });
+            }
 
             mediaViewHolder.mediaImage.setOnClickListener(new View.OnClickListener() {
                 @Override

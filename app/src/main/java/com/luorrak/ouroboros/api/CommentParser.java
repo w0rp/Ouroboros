@@ -16,7 +16,6 @@ import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 import android.view.View;
-import android.widget.Switch;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.thread.CardDialogFragment;
@@ -29,8 +28,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
-
-import java.util.List;
+import org.jsoup.nodes.TextNode;
 
 /**
  * Ouroboros - An 8chan browser
@@ -128,30 +126,7 @@ public class CommentParser {
                         //Normal Text
                         processedText = TextUtils.concat(processedText, parseNormalText(new SpannableString(bodyLine.text())));
                     } else {
-                        for (Element child : bodyLine.children()){
-                            switch(child.tagName()){
-                                default:
-                                    processedText = TextUtils.concat(processedText, parseNormalText(new SpannableString(child.text())));
-                                    break;
-                                case "span":
-                                    processedText = TextUtils.concat(processedText, parseSpanText(child));
-                                    break;
-                                case "em":
-                                    processedText = TextUtils.concat(processedText, parseItalicText(new SpannableString(child.text())));
-                                    break;
-                                case "strong":
-                                    processedText = TextUtils.concat(processedText, parseBoldText(new SpannableString(child.text())));
-                                    break;
-                                case "u":
-                                    processedText = TextUtils.concat(processedText, parseUnderlineText(new SpannableString(child.text())));
-                                    break;
-                                case "s":
-                                    processedText = TextUtils.concat(processedText, parseStrikethroughText(new SpannableString(child.text())));
-                                    break;
-                                case "a":
-                                    processedText = TextUtils.concat(processedText, parseAnchorText(child, currentBoard, resto, fragmentManager, infiniteDbHelper));
-                            }
-                        }
+                        processedText = parseFormatting(bodyLine, processedText, currentBoard, resto, fragmentManager, infiniteDbHelper);
                     }
                     processedText = TextUtils.concat(processedText, "\n");
                 } else if (bodyLine.tagName().equals("pre")){
@@ -181,11 +156,47 @@ public class CommentParser {
             case "aa":
                 spanText =  parseEscapedText(new SpannableString(child.text()));
                 break;
+            case "tex":
+                spanText = parseTexText(new SpannableString(child.text()));
+                break;
         }
         return spanText;
     }
 
 
+    private CharSequence parseFormatting(Element bodyLine, CharSequence processedText, String currentBoard, String resto, FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper){
+        for (Node childNode : bodyLine.childNodes()){
+            if (childNode instanceof TextNode){
+                processedText = TextUtils.concat(processedText, parseNormalText(new SpannableString(((TextNode) childNode).text())));
+            } else if (childNode instanceof Element){
+                Element childElement = (Element) childNode;
+                switch(childElement.tagName()){
+                    default:
+                        processedText = TextUtils.concat(processedText, parseNormalText(new SpannableString(childElement.text())));
+                        break;
+                    case "span":
+                        CharSequence spanText = parseSpanText(childElement);
+                        processedText = TextUtils.concat(processedText, spanText);
+                        break;
+                    case "em":
+                        processedText = TextUtils.concat(processedText, parseItalicText(new SpannableString(childElement.text())));
+                        break;
+                    case "strong":
+                        processedText = TextUtils.concat(processedText, parseBoldText(new SpannableString(childElement.text())));
+                        break;
+                    case "u":
+                        processedText = TextUtils.concat(processedText, parseUnderlineText(new SpannableString(childElement.text())));
+                        break;
+                    case "s":
+                        processedText = TextUtils.concat(processedText, parseStrikethroughText(new SpannableString(childElement.text())));
+                        break;
+                    case "a":
+                        processedText = TextUtils.concat(processedText, parseAnchorText(childElement, currentBoard, resto, fragmentManager, infiniteDbHelper));
+                }
+            }
+        }
+        return processedText;
+    }
     private CharSequence parseNormalText(SpannableString normalText){
        return normalText;
     }
@@ -231,6 +242,10 @@ public class CommentParser {
         return escapedText;
     }
 
+    private CharSequence parseTexText(SpannableString escapedText){
+        return escapedText;
+    }
+
     private CharSequence parseCodeText(Element codeElement){
         Element preElement = codeElement.child(0);
         SpannableString codeText = new SpannableString("\n" + preElement.text() + "\n");
@@ -267,7 +282,11 @@ public class CommentParser {
             return linkText;
         } else if (linkUrl.contains(resto)){
             //same thread
-            String anchorText = infiniteDbHelper.isNoUserPost(currentBoard, linkUrl.split("#")[1]) ? anchor.text() + " (You)" : anchor.text();
+            if (infiniteDbHelper.isNoUserPost(currentBoard, linkUrl.split("#")[1])){
+                linkText = SpannableString.valueOf(TextUtils.concat(linkText, " (You)"));
+            } else if (linkUrl.split("#")[1].equals(resto)){
+                linkText = SpannableString.valueOf(TextUtils.concat(linkText, " (OP)"));
+            }
             ClickableSpan clickableSameThreadLink = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
