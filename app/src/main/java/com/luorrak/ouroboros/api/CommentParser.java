@@ -16,7 +16,6 @@ import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 import android.view.View;
-import android.widget.Switch;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.thread.CardDialogFragment;
@@ -28,9 +27,6 @@ import com.luorrak.ouroboros.util.SpoilerSpan;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-
-import java.util.List;
 
 /**
  * Ouroboros - An 8chan browser
@@ -181,6 +177,9 @@ public class CommentParser {
             case "aa":
                 spanText =  parseEscapedText(new SpannableString(child.text()));
                 break;
+            case "tex":
+                spanText = parseTexText(new SpannableString(child.text()));
+                break;
         }
         return spanText;
     }
@@ -231,6 +230,10 @@ public class CommentParser {
         return escapedText;
     }
 
+    private CharSequence parseTexText(SpannableString escapedText){
+        return escapedText;
+    }
+
     private CharSequence parseCodeText(Element codeElement){
         Element preElement = codeElement.child(0);
         SpannableString codeText = new SpannableString("\n" + preElement.text() + "\n");
@@ -267,7 +270,11 @@ public class CommentParser {
             return linkText;
         } else if (linkUrl.contains(resto)){
             //same thread
-            String anchorText = infiniteDbHelper.isNoUserPost(currentBoard, linkUrl.split("#")[1]) ? anchor.text() + " (You)" : anchor.text();
+            if (infiniteDbHelper.isNoUserPost(currentBoard, linkUrl.split("#")[1])){
+                linkText = SpannableString.valueOf(TextUtils.concat(linkText, " (You)"));
+            } else if (linkUrl.split("#")[1].equals(resto)){
+                linkText = SpannableString.valueOf(TextUtils.concat(linkText, " (OP)"));
+            }
             ClickableSpan clickableSameThreadLink = new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
