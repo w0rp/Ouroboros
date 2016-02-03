@@ -109,7 +109,7 @@ public class CommentParser {
         int limit = 0;
 
         if (doc.select("p").size() == 0) {
-            return new SpannableString("LEGACY COMMENT SYSTEM!\n " + rawCom);
+            return new SpannableString("LEGACY COMMENT SYSTEM!\n " + doc.body().text());
         } else {
             for (Element bodyLine : doc.body().children()){
                 //This speeds up swiping on catalogview without risking an error
