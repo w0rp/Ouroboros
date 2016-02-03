@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
@@ -83,7 +84,6 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         this.boardName = boardName;
         this.context = context;
         this.infiniteDbHelper = new InfiniteDbHelper(context);
-        mediaAdapterHashMap = new HashMap<Integer, MediaAdapter>();
     }
 
     @Override
@@ -111,6 +111,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         }
 
         if(threadViewHolder.threadObject.sub != null){
+            threadViewHolder.threadObject.sub = Html.fromHtml(threadViewHolder.threadObject.sub).toString();
             threadViewHolder.threadSub.setText(threadViewHolder.threadObject.sub);
             threadViewHolder.threadSub.setVisibility(View.VISIBLE);
         }
@@ -189,24 +190,17 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
         if (!threadViewHolder.threadObject.replyCount.equals("0")){
             threadViewHolder.threadReplies.setVisibility(View.VISIBLE);
-            threadViewHolder.threadReplies.setText(threadViewHolder.threadObject.replyCount + " Replies");
+            threadViewHolder.threadObject.replyCount = threadViewHolder.threadObject.replyCount + " Replies";
+            threadViewHolder.threadReplies.setText(threadViewHolder.threadObject.replyCount);
         }
 
-        // Create an adapter if none exists
         threadViewHolder.threadMediaItemRecycler.setAdapter(new MediaAdapter(mediaArrayList, boardName, threadViewHolder.threadObject.resto, context));
-        /*
-        if (!mediaAdapterHashMap.containsKey(cursor.getPosition())) {
-            mediaAdapterHashMap.put(cursor.getPosition(), new MediaAdapter(mediaArrayList, boardName, threadViewHolder.threadObject.resto, context));
-        }
-        threadViewHolder.threadMediaItemRecycler.setAdapter(mediaAdapterHashMap.get(cursor.getPosition()));
-        */
-
 
         // END MediaView ///////////////////////////////////////////////////////////////////////////
 
         //Does comment exist
         if (threadViewHolder.threadObject.com != null){
-            Spannable spannableCom = commentParser.parseCom(
+            threadViewHolder.threadObject.parsedCom = commentParser.parseCom(
                     threadViewHolder.threadObject.com,
                     CommentParser.THREAD_VIEW,
                     boardName,
@@ -215,7 +209,6 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                     infiniteDbHelper
 
             );
-            threadViewHolder.threadObject.parsedCom = spannableCom;
             threadViewHolder.threadCom.setVisibility(View.VISIBLE);
             threadViewHolder.threadCom.setText(threadViewHolder.threadObject.parsedCom);
         }
