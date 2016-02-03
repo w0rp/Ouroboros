@@ -220,7 +220,7 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     public void updateWatchlist(){
-        Snackbar.make(findViewById(android.R.id.content), "Foobar", Snackbar.LENGTH_LONG);
         watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
+        int a = 2;
     }
 }
