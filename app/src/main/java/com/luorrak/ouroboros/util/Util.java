@@ -91,8 +91,7 @@ public class Util {
             objectOutput.writeObject(object);
             objectOutput.close();
 
-            byte[] serializedObject = outputStream.toByteArray();
-            return serializedObject;
+            return outputStream.toByteArray();
         } catch (IOException e) {
             return null;
         }

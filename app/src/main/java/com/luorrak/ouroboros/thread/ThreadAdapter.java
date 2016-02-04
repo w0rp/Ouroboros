@@ -74,16 +74,13 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
     private String boardName;
     private Context context;
     private InfiniteDbHelper infiniteDbHelper;
-    private int viewWidth;
-    private HashMap<Integer, MediaAdapter> mediaAdapterHashMap;
 
-
-    public ThreadAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName, Context context) {
+    public ThreadAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName, Context context, InfiniteDbHelper infiniteDbHelper) {
         super(cursor);
         this.fragmentManager = fragmentManager;
         this.boardName = boardName;
         this.context = context;
-        this.infiniteDbHelper = new InfiniteDbHelper(context);
+        this.infiniteDbHelper = infiniteDbHelper;
     }
 
     @Override

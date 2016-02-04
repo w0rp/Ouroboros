@@ -90,7 +90,7 @@ public class ThreadActivity extends AppCompatActivity {
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         watchList.setLayoutManager(layoutManager);
 
-        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), getApplicationContext(), drawerLayout);
+        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), drawerLayout, infiniteDbHelper);
         watchList.setAdapter(watchListAdapter);
 
         ItemTouchHelper.Callback callback = new WatchListTouchHelper(watchListAdapter);
@@ -163,6 +163,7 @@ public class ThreadActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case Util.REQUEST_STORAGE_PERMISSION: {
+                //https://stackoverflow.com/questions/35124794/android-studio-remove-security-exception-warning
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -173,6 +174,7 @@ public class ThreadActivity extends AppCompatActivity {
                     // functionality that depends on this permission.
                     Snackbar.make(getCurrentFocus(), "Requires Permission", Snackbar.LENGTH_LONG).show();
                 }
+                break;
             }
 
             // other 'case' lines to check for other
@@ -193,7 +195,7 @@ public class ThreadActivity extends AppCompatActivity {
 
         //clear dialog fragments
         fragmentManager.popBackStack("threadDialog", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        if (threadNo != "0"){
+        if (threadNo.equals("0")){
             ThreadFragment threadFragment = new ThreadFragment().newInstance(threadNo, boardName);
             fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
                     .addToBackStack("thread")
@@ -221,6 +223,5 @@ public class ThreadActivity extends AppCompatActivity {
 
     public void updateWatchlist(){
         watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
-        int a = 2;
     }
 }

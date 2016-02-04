@@ -31,21 +31,19 @@ import java.util.ArrayList;
 public class JsonParser {
     private final String LOG_TAG = JsonParser.class.getSimpleName();
 
-    //JSON CATALOG NODE NAMES
-    private static final String CATALOG_NO = "no";
-    private static final String CATALOG_FILENAME = "filename";
-    private static final String CATALOG_TIM = "tim"; //Image thumbnail location
-    private static final String CATALOG_EXT = "ext"; //image filename extension .jpg .png etc
-    private static final String CATALOG_SUB = "sub"; //Title
-    private static final String CATALOG_COM = "com"; //Comment
-    private static final String CATALOG_REPLIES = "replies"; //reply count
-    private static final String CATALOG_IMAGE = "images"; //image reply count
-    private static final String CATALOG_OMITTED_IMAGES = "omitted_images"; //image reply count
-    private static final String CATALOG_STICKY = "sticky";
-    private static final String CATALOG_LOCKED = "locked";
+    private final String CATALOG_NO = "no";
+    private final String CATALOG_FILENAME = "filename";
+    private final String CATALOG_TIM = "tim"; //Image thumbnail location
+    private final String CATALOG_EXT = "ext"; //image filename extension .jpg .png etc
+    private final String CATALOG_SUB = "sub"; //Title
+    private final String CATALOG_COM = "com"; //Comment
+    private final String CATALOG_REPLIES = "replies"; //reply count
+    private final String CATALOG_IMAGE = "images"; //image reply count
+    private final String CATALOG_OMITTED_IMAGES = "omitted_images"; //image reply count
+    private final String CATALOG_STICKY = "sticky";
+    private final String CATALOG_LOCKED = "locked";
     private final String CATALOG_EMBED = "embed";
 
-    //break the catalog into seperate pages elsewhere and submit them here. Might be able to just submit the object over for less complexity
     public String getCatalogNo(JsonObject catalogThreadJson){
         return catalogThreadJson.get(CATALOG_NO).getAsString();
     }

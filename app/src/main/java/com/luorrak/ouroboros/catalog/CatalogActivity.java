@@ -60,7 +60,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        if (SettingsHelper.getPostPassword(getApplicationContext()) == ""){
+        if (SettingsHelper.getPostPassword(getApplicationContext()).equals("")){
             Random random = new Random();
             SettingsHelper.setPostPassword(getApplicationContext(), Long.toHexString(random.nextLong()));
         }
@@ -94,7 +94,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         watchList.setLayoutManager(layoutManager);
 
-        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), getApplicationContext(), drawerLayout);
+        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), drawerLayout, infiniteDbHelper);
         watchList.setAdapter(watchListAdapter);
 
         ItemTouchHelper.Callback callback = new WatchListTouchHelper(watchListAdapter);

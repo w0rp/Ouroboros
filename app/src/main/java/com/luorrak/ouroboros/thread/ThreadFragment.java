@@ -132,7 +132,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         if (boardName != null){
             handler = new Handler();
             startStatusCheck();
-            threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getFragmentManager(), boardName, getActivity());
+            threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getFragmentManager(), boardName, getActivity(), infiniteDbHelper);
             threadAdapter.setHasStableIds(true);
             threadAdapter.hasStableIds();
             recyclerView.setAdapter(threadAdapter);
@@ -312,7 +312,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
             }
             case R.id.action_layout_horizontal: {
                 SettingsHelper.setThreadView(getActivity(), Util.THREAD_LAYOUT_HORIZONTAL);
-                ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);;
+                ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.placeholder_card, threadFragment).commit();
                 break;

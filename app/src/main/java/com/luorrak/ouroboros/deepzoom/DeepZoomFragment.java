@@ -238,7 +238,7 @@ public class DeepZoomFragment extends Fragment{
                     // functionality that depends on this permission.
                     Snackbar.make(getView(), "Requires Permission", Snackbar.LENGTH_LONG).show();
                 }
-                return;
+                break;
             }
 
             // other 'case' lines to check for other

@@ -71,8 +71,6 @@ import java.util.List;
 
 
 public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> {
-    final int VERTICAL = 0;
-    final int HORIZONTAL = 1;
     private String boardName;
     private String resto;
     private ArrayList<Media> mediaItems;

@@ -45,13 +45,11 @@ import java.util.ArrayList;
 public class WatchListAdapter extends CursorRecyclerAdapter implements TouchHelperInterface{
     private InfiniteDbHelper infiniteDbHelper;
     private DrawerLayout drawerLayout;
-    private Context context;
 
-    public WatchListAdapter(Cursor cursor, Context context, DrawerLayout drawerLayout) {
+    public WatchListAdapter(Cursor cursor, DrawerLayout drawerLayout, InfiniteDbHelper infiniteDbHelper) {
         super(cursor);
         this.drawerLayout = drawerLayout;
-        this.context = context;
-        infiniteDbHelper = new InfiniteDbHelper(context);
+        this.infiniteDbHelper = infiniteDbHelper;
     }
 
     @Override
@@ -129,6 +127,5 @@ public class WatchListAdapter extends CursorRecyclerAdapter implements TouchHelp
         public String board;
         public String no;
         public byte[] serializedMediaList;
-        public String order;
     }
 }

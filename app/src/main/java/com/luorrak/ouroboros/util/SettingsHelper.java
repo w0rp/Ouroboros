@@ -63,14 +63,12 @@ public class SettingsHelper {
 
     public static String getDefaultName(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String defaultName = sharedPreferences.getString("default_name", "");
-        return defaultName;
+        return sharedPreferences.getString("default_name", "");
     }
 
     public static String getDefaultEmail(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String defaultEmail = sharedPreferences.getString("default_email", "");
-        return defaultEmail;
+        return sharedPreferences.getString("default_email", "");
     }
 
     public static int getImageOptions(Context context) {
@@ -80,8 +78,7 @@ public class SettingsHelper {
 
     public static String getPostPassword(Context context){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String postPassword = sharedPreferences.getString("post_password", "");
-        return postPassword;
+        return sharedPreferences.getString("post_password", "");
     }
 
     public static void setPostPassword(Context context, String postPassword){
