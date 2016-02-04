@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +81,7 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
 
         if (sub != null){
             catalogViewHolder.catalogSubText.setVisibility(View.VISIBLE);
+            sub = Html.fromHtml(sub).toString();
             catalogViewHolder.catalogSubText.setText(sub);
         } else {
             catalogViewHolder.catalogSubText.setVisibility(View.GONE);
