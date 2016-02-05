@@ -100,7 +100,7 @@ public class DeepZoomFragment extends Fragment{
         setHasOptionsMenu(true);
         final LinearLayout deepzoomContainer = (LinearLayout) rootView.findViewById(R.id.deepzoom_container);
         photoView = (PhotoView) rootView.findViewById(R.id.deepzoom_photoview);
-        photoView.setMaximumScale(16);
+        photoView.setMaximumScale(24);
         mediaPlayButton = (ImageView) rootView.findViewById(R.id.deepzoom_media_play_button);
         mediaPlayButton.setVisibility(View.GONE);
 
@@ -108,7 +108,6 @@ public class DeepZoomFragment extends Fragment{
         progressBar.setVisibility(View.VISIBLE);
 
         Ion.with(photoView)
-                .deepZoom()
                 .load(ChanUrls.getThumbnailUrl(boardName, mediaItem.fileName))
                 .withBitmapInfo()
                 .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
@@ -138,7 +137,7 @@ public class DeepZoomFragment extends Fragment{
 
                         Ion.with(photoView)
                                 .crossfade(true)
-                                .smartSize(true)
+                                .deepZoom()
                                 .load(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext))
                                 .withBitmapInfo();
                     }
