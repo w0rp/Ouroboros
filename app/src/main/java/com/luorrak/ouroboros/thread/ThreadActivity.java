@@ -23,7 +23,6 @@ import android.widget.ProgressBar;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogActivity;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.catalog.WatchListAdapter;
 import com.luorrak.ouroboros.util.DragAndDropRecyclerView.WatchListTouchHelper;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
@@ -70,8 +69,8 @@ public class ThreadActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        String resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
-        String boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
+        String resto = getIntent().getStringExtra(Util.INTENT_THREAD_NO);
+        String boardName = getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
 
         if (savedInstanceState != null){
             threadFragment = (ThreadFragment) getFragmentManager().getFragment(savedInstanceState, "threadFragment");
@@ -202,7 +201,7 @@ public class ThreadActivity extends AppCompatActivity {
                     .commit();
         } else {
             Intent intent = new Intent(this, CatalogActivity.class);
-            intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+            intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
             startActivity(intent);
 
         }

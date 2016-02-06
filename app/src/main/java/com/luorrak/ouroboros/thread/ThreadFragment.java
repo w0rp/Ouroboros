@@ -29,13 +29,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
-import android.widget.ProgressBar;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.gallery.GalleryFragment;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
@@ -254,8 +252,8 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
             case R.id.action_reply:{
                 Intent intent =  new Intent(getActivity(), ReplyCommentActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(CatalogAdapter.THREAD_NO, resto);
-                intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+                intent.putExtra(Util.INTENT_THREAD_NO, resto);
+                intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
                 getActivity().startActivity(intent);
                 break;
             }

@@ -111,8 +111,8 @@ public class WatchListAdapter extends CursorRecyclerAdapter implements TouchHelp
                     drawerLayout.closeDrawer(Gravity.RIGHT);
                     Context context = v.getContext();
                     Intent intent = new Intent(context, ThreadActivity.class);
-                    intent.putExtra(CatalogAdapter.THREAD_NO, watchlistObject.no);
-                    intent.putExtra(CatalogAdapter.BOARD_NAME, watchlistObject.board);
+                    intent.putExtra(Util.INTENT_THREAD_NO, watchlistObject.no);
+                    intent.putExtra(Util.INTENT_BOARD_NAME, watchlistObject.board);
                     context.startActivity(intent);
                     break;
                 }

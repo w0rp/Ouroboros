@@ -39,7 +39,6 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.Media;
@@ -170,9 +169,9 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, DeepZoomActivity.class);
-                    intent.putExtra(CatalogAdapter.TIM, media.fileName);
-                    intent.putExtra(CatalogAdapter.THREAD_NO, resto);
-                    intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+                    intent.putExtra(Util.TIM, media.fileName);
+                    intent.putExtra(Util.INTENT_THREAD_NO, resto);
+                    intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
                     context.startActivity(intent);
                 }
             });

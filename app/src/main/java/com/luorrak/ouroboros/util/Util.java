@@ -40,6 +40,11 @@ import java.io.ObjectOutputStream;
  */
 public class Util {
     public static final int REQUEST_STORAGE_PERMISSION = 55;
+    public final static String INTENT_THREAD_NO = "com.luorrak.ouroboros.THREADNO";
+    public final static String INTENT_BOARD_NAME = "com.luorrak.ouroboros.BOARDNAME";
+    public final static String INTENT_REPLY_NO = "com.luorrak.ouroboros.REPLYNO";
+    public final static String TIM = "com.luorrak.ouroboros.TIM";
+    public final static String EXT = "com.luorrak.ouroboros.EXT";
 
     private static final int THEME_DEFAULT = 0;
     private static final int THEME_DARK = 1;

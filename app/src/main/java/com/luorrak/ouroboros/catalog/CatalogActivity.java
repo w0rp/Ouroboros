@@ -68,7 +68,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         setContentView(R.layout.activity_catalog);
 
         if (savedInstanceState == null){
-            board = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
+            board = getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
             if (board == null){
                 BoardListFragment boardListFragment = new BoardListFragment();
                 android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();

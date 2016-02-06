@@ -179,8 +179,8 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 String resto = "0";
                 Intent intent =  new Intent(getActivity(), ReplyCommentActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(CatalogAdapter.THREAD_NO, resto);
-                intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+                intent.putExtra(Util.INTENT_THREAD_NO, resto);
+                intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
                 getActivity().startActivity(intent);
                 break;
             }

@@ -12,7 +12,6 @@ import android.view.MenuItem;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Media;
@@ -61,9 +60,9 @@ public class DeepZoomActivity extends AppCompatActivity{
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        fileName = getIntent().getStringExtra(CatalogAdapter.TIM);
-        resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
-        boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
+        fileName = getIntent().getStringExtra(Util.TIM);
+        resto = getIntent().getStringExtra(Util.INTENT_THREAD_NO);
+        boardName = getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
 
         newMediaListInstance(infiniteDbHelper, resto);
         int selectedMediaItem = findMediaItemIndex(fileName);

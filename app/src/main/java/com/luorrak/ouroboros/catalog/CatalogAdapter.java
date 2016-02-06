@@ -42,11 +42,6 @@ import com.luorrak.ouroboros.util.Util;
  */
 public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable {
     private final String LOG_TAG = CatalogAdapter.class.getSimpleName();
-    public final static String THREAD_NO = "com.luorrak.ouroboros.THREADNO";
-    public final static String BOARD_NAME = "com.luorrak.ouroboros.BOARDNAME";
-    public final static String REPLY_NO = "com.luorrak.ouroboros.REPLYNO";
-    public final static String TIM = "com.luorrak.ouroboros.TIM";
-    public final static String EXT = "com.luorrak.ouroboros.EXT";
 
     private final int LOCKED = 1;
     private final int STICKY = 1;
@@ -183,8 +178,8 @@ public class CatalogAdapter extends CursorRecyclerAdapter implements Filterable 
             Context context = v.getContext();
             Intent intent = new Intent(context, ThreadActivity.class);
             String threadNo = (String) catalogComText.getTag();
-            intent.putExtra(THREAD_NO, threadNo);
-            intent.putExtra(BOARD_NAME, boardName);
+            intent.putExtra(Util.INTENT_THREAD_NO, threadNo);
+            intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
             context.startActivity(intent);
         }
     }

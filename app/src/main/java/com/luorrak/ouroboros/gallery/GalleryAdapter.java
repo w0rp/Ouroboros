@@ -9,12 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.Media;
 import com.luorrak.ouroboros.util.NetworkHelper;
+import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +41,6 @@ import java.util.List;
 
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
-    private NetworkHelper networkHelper = new NetworkHelper();
     private String boardName;
     private String resto;
     private ArrayList<Media> mediaItems;
@@ -63,53 +63,51 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     public void onBindViewHolder(GalleryViewHolder holder, int position) {
         final GalleryViewHolder galleryViewHolder = holder;
         final Media media = mediaItems.get(position);
-        galleryViewHolder.playButton.setVisibility(View.GONE);
+        resetView(galleryViewHolder);
+
+        Ion.with(galleryViewHolder.galleryImage)
+                .load(ChanUrls.getThumbnailUrl(boardName, media.fileName))
+                .withBitmapInfo();
 
         if (validExt.contains(media.ext)){
-            String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
-            networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
-
             galleryViewHolder.galleryImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context, DeepZoomActivity.class);
-                    intent.putExtra(CatalogAdapter.TIM, media.fileName);
-                    intent.putExtra(CatalogAdapter.THREAD_NO, resto);
-                    intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
-                    context.startActivity(intent);
+                    launchDeepZoomIntent(media.fileName);
                 }
             });
-        } else {
-            if (media.ext.equals(".webm")){
-                String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
-                networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
-                galleryViewHolder.playButton.setVisibility(View.VISIBLE);
-
-                galleryViewHolder.playButton.setOnClickListener(new View.OnClickListener() {
+        } else if (media.ext.equals(".webm") || media.ext.equals(".mp4")){
+            galleryViewHolder.playButton.setVisibility(View.VISIBLE);
+            galleryViewHolder.playButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, media.fileName, media.ext));
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setDataAndType(uri, "video/webm");
-                        galleryViewHolder.itemView.getContext().startActivity(intent);
+                        launchVideoIntent(galleryViewHolder, boardName, media.fileName, media.ext);
                     }
                 });
-            } else if (media.ext.equals(".mp4")) {
-                String imageUrl = ChanUrls.getThumbnailUrl(boardName, media.fileName);
-                networkHelper.getImageNoCrossfade(galleryViewHolder.galleryImage, imageUrl);
-                galleryViewHolder.playButton.setVisibility(View.VISIBLE);
-
-                galleryViewHolder.playButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, media.fileName, media.ext));
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setDataAndType(uri, "video/mp4");
-                        galleryViewHolder.itemView.getContext().startActivity(intent);
-                    }
-                });
-            }
         }
+    }
+
+    private void resetView(GalleryViewHolder galleryViewHolder){
+        galleryViewHolder.playButton.setVisibility(View.GONE);
+        galleryViewHolder.galleryImage.setOnClickListener(null);
+        galleryViewHolder.playButton.setOnClickListener(null);
+    }
+
+    private void launchDeepZoomIntent(String fileName){
+        Intent intent = new Intent(context, DeepZoomActivity.class);
+        intent.putExtra(Util.TIM, fileName);
+        intent.putExtra(Util.INTENT_THREAD_NO, resto);
+        intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
+        context.startActivity(intent);
+    }
+
+    private void launchVideoIntent(GalleryViewHolder galleryViewHolder, String boardName, String fileName, String ext){
+        Uri uri = Uri.parse(ChanUrls.getImageUrl(boardName, fileName, ext));
+        String type = ext.equals(".webm") ? "video/webm" : "video/mp4";
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(uri, type);
+        context.startActivity(intent);
     }
 
     @Override

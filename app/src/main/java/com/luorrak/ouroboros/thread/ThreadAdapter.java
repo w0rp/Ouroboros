@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -34,19 +33,16 @@ import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.CommentParser;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.Media;
-import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 /**
@@ -387,9 +383,9 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                     Log.d(LOG_TAG, "Reply button pressed " + threadObject.no);
                     Intent intent =  new Intent(context, ReplyCommentActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra(CatalogAdapter.THREAD_NO, threadObject.resto);
-                    intent.putExtra(CatalogAdapter.REPLY_NO, threadObject.no);
-                    intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+                    intent.putExtra(Util.INTENT_THREAD_NO, threadObject.resto);
+                    intent.putExtra(Util.INTENT_REPLY_NO, threadObject.no);
+                    intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
                     context.startActivity(intent);
                     break;
                 }
