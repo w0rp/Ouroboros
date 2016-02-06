@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
 
+
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -77,6 +78,9 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     private Parcelable savedLayoutState ;
     private boolean isStatusCheckIsRunning;
     private Handler handler;
+
+    private String oldJsonString;
+    private int pollingInterval;
 
     //Get thread number from link somehow
     public ThreadFragment newInstance(String resto, String boardName){
@@ -129,6 +133,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
         if (boardName != null){
             handler = new Handler();
+            pollingInterval = 10000;
             startStatusCheck();
             threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getFragmentManager(), boardName, getActivity(), infiniteDbHelper);
             threadAdapter.setHasStableIds(true);
@@ -342,8 +347,14 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                     @Override
                     public void onCompleted(Exception e, JsonObject jsonObject) {
                         if (e == null) {
-                            networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadAdapter);
-                            //new InsertThreadIntoDatabase().execute(jsonObject);
+                            if (jsonObject.toString().equals(oldJsonString)){
+                                pollingInterval = pollingInterval + pollingInterval/2;
+                                ((ThreadActivity) getActivity()).setProgressBarStatus(false);
+                            } else {
+                                restartStatusCheck();
+                                oldJsonString = jsonObject.toString();
+                                networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadAdapter);
+                            }
                         } else {
                             ((ThreadActivity) getActivity()).setProgressBarStatus(false);
                             Snackbar.make(getView(), "Error retrieving thread", Snackbar.LENGTH_LONG).show();
@@ -383,7 +394,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         @Override
         public void run() {
             getThread(resto, boardName);
-            handler.postDelayed(statusCheck, 30000);
+            handler.postDelayed(statusCheck, pollingInterval);
         }
     };
 
@@ -397,5 +408,11 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     private void stopStatusCheck() {
         isStatusCheckIsRunning = false;
         handler.removeCallbacks(statusCheck);
+    }
+
+    private void restartStatusCheck(){
+        stopStatusCheck();
+        pollingInterval = 10000;
+        startStatusCheck();
     }
 }
