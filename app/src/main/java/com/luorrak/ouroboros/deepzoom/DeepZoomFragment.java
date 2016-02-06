@@ -116,20 +116,9 @@ public class DeepZoomFragment extends Fragment{
                         if (e != null) {
                             return;
                         }
-
                         progressBar.setVisibility(View.INVISIBLE);
 
-                        if (result.getBitmapInfo() != null){
-                            Palette.from(result.getBitmapInfo().bitmap).generate(new Palette.PaletteAsyncListener() {
-                                @Override
-                                public void onGenerated(Palette palette) {
-                                    Palette.Swatch swatch = palette.getMutedSwatch();
-                                    if (swatch != null) {
-                                        deepzoomContainer.setBackgroundColor(swatch.getRgb());
-                                    }
-                                }
-                            });
-                        }
+                        Util.setSwatch(deepzoomContainer, result);
 
                         if (mediaItem.ext.equals(".webm") || mediaItem.ext.equals(".mp4")) {
                             return;

@@ -142,9 +142,8 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                                 if (e != null || result.getBitmapInfo() == null || threadValue == Util.THREAD_LAYOUT_HORIZONTAL) {
                                     return;
                                 }
-                                if (result.getBitmapInfo().bitmap != null){
-                                    generateSwatch(result.getBitmapInfo().bitmap, mediaViewHolder);
-                                }
+                                Util.setSwatch(mediaViewHolder.mediaHolder, result);
+
 
                                 WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                                 if(wifiManager.isWifiEnabled() && SettingsHelper.getImageOptions(context) == 1){
@@ -191,7 +190,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                                 return;
                             }
 
-                            generateSwatch(result.getBitmapInfo().bitmap, mediaViewHolder);
+                            Util.setSwatch(mediaViewHolder.mediaHolder, result);
                         }
                     });
             mediaViewHolder.playButton.setVisibility(View.VISIBLE);

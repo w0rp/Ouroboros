@@ -157,15 +157,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                                     }
 
                                     if (getItemViewType(cursor.getPosition()) != Util.THREAD_LAYOUT_HORIZONTAL){
-                                        Palette.from(result.getBitmapInfo().bitmap).generate(new Palette.PaletteAsyncListener() {
-                                            @Override
-                                            public void onGenerated(Palette palette) {
-                                                Palette.Swatch swatch = palette.getMutedSwatch();
-                                                if (swatch != null){
-                                                    threadViewHolder.mediaHolder.setBackgroundColor(swatch.getRgb());
-                                                }
-                                            }
-                                        });
+                                        Util.setSwatch(threadViewHolder.mediaHolder, result);
                                     }
                                 }
                             });

@@ -5,7 +5,10 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.graphics.Palette;
+import android.view.View;
 
+import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.luorrak.ouroboros.R;
 
 import org.jsoup.Jsoup;
@@ -115,5 +118,19 @@ public class Util {
         ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("ComText", text);
         clipboardManager.setPrimaryClip(clipData);
+    }
+
+    public static void setSwatch(final View view, ImageViewBitmapInfo result){
+        if (result.getBitmapInfo() != null){
+            Palette.from(result.getBitmapInfo().bitmap).generate(new Palette.PaletteAsyncListener() {
+                @Override
+                public void onGenerated(Palette palette) {
+                    Palette.Swatch swatch = palette.getMutedSwatch();
+                    if (swatch != null) {
+                        view.setBackgroundColor(swatch.getRgb());
+                    }
+                }
+            });
+        }
     }
 }
