@@ -1,6 +1,7 @@
 package com.luorrak.ouroboros.catalog;
 
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
@@ -18,7 +19,9 @@ import android.widget.ProgressBar;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.ReplyChecker.ReplyCheckerFragment;
 import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseFragment;
+import com.luorrak.ouroboros.services.ReplyCheckerService;
 import com.luorrak.ouroboros.settings.SettingsFragment;
 import com.luorrak.ouroboros.util.DragAndDropRecyclerView.WatchListTouchHelper;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
@@ -52,6 +55,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
     private InfiniteDbHelper infiniteDbHelper;
     private RecyclerView watchList;
     private WatchListAdapter watchListAdapter;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +64,12 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        if (SettingsHelper.getPostPassword(getApplicationContext()).equals("")){
-            Random random = new Random();
-            SettingsHelper.setPostPassword(getApplicationContext(), Long.toHexString(random.nextLong()));
-        }
+        initPostPassword();
+
+        Util.startReplyCheckerService(getApplicationContext());
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         setContentView(R.layout.activity_catalog);
+        bindViews();
 
         if (savedInstanceState == null){
             board = getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
@@ -80,20 +84,37 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
             }
         }
 
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
+        setupWatchlist();
+
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.setDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+    }
+
+    private void bindViews(){
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         watchList = (RecyclerView) findViewById(R.id.watch_list);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+    }
+    private void initPostPassword(){
+        if (SettingsHelper.getPostPassword(getApplicationContext()).equals("")){
+            Random random = new Random();
+            SettingsHelper.setPostPassword(getApplicationContext(), Long.toHexString(random.nextLong()));
+        }
+    }
+
+    private void setupWatchlist(){
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         watchList.setLayoutManager(layoutManager);
-
         watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), drawerLayout, infiniteDbHelper);
         watchList.setAdapter(watchListAdapter);
 
@@ -101,9 +122,6 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(watchList);
 
-        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
-        drawerLayout.setDrawerListener(drawerToggle);
-        drawerToggle.syncState();
     }
 
     @Override
@@ -137,6 +155,13 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
                 OpenSourceLicenseFragment openSourceLicenseFragment = new OpenSourceLicenseFragment();
                 android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, openSourceLicenseFragment).commit();
+                progressBar.setVisibility(View.INVISIBLE);
+                break;
+            }
+            case R.id.drawer_item_replies: {
+                ReplyCheckerFragment replyCheckerFragment = new ReplyCheckerFragment();
+                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, replyCheckerFragment).commit();
                 progressBar.setVisibility(View.INVISIBLE);
                 break;
             }

@@ -35,9 +35,11 @@ import com.luorrak.ouroboros.util.DbContract.WatchlistEntry;
 public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     private final String LOG_TAG = InfiniteDbHelper.class.getSimpleName();
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "cache.db";
     private SQLiteDatabase db = getWritableDatabase();
+    public static final int trueFlag = 1;
+    public static final int falseFlag = 0;
 
     // Constructor /////////////////////////////////////////////////////////////////////////////////
 
@@ -363,11 +365,16 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     }
     // User Posts Functions ////////////////////////////////////////////////////////////////////////
 
-    public void insertUserPostEntry(String board, String no){
+    public void insertUserPostEntry(String board, String no, String resto, String subject, String comment){
 
         ContentValues values = new ContentValues();
         values.put(UserPosts.COLUMN_BOARDS, board);
         values.put(UserPosts.COLUMN_NO, no);
+        values.put(UserPosts.COLUMN_RESTO, resto);
+        values.put(UserPosts.COLUMN_SUBJECT, subject);
+        values.put(UserPosts.COLUMN_COMMENT, comment);
+        values.put(UserPosts.COLUMN_NUMBER_OF_REPLIES, 0);
+        values.put(UserPosts.COLUMN_NEW_REPLY_FLAG, falseFlag);
 
         try {
             db.insertOrThrow(
@@ -386,6 +393,49 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 UserPosts.TABLE_NAME, //Table name
                 UserPosts.COLUMN_BOARDS + "=? AND " + UserPosts.COLUMN_NO + "=?", //where clause
                 new String[] {boardName, no}) > 0; // selection
+    }
+
+    public void updateUserPostReplyCount(int newReplyCount, int newReplyFlag, String rowID){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(UserPosts.COLUMN_NUMBER_OF_REPLIES, newReplyCount);
+        contentValues.put(UserPosts.COLUMN_NEW_REPLY_FLAG, newReplyFlag);
+        db.update(UserPosts.TABLE_NAME,
+                contentValues, //values
+                UserPosts._ID + "= ? and " + UserPosts.COLUMN_NEW_REPLY_FLAG + "=?", //where
+                new String[]{rowID, String.valueOf(falseFlag)} //where args
+        );
+    }
+    
+    public Cursor getUserPostsCursor(){
+
+        Cursor cursor = db.query(
+                UserPosts.TABLE_NAME,
+                null,
+                null, //selection
+                null, //selection args
+                null, //group by
+                null, //having
+                UserPosts.COLUMN_RESTO + " ASC" //orderby
+        );
+
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getFlaggedUserPostsCursor(){
+
+        Cursor cursor = db.query(
+                UserPosts.TABLE_NAME,
+                null,
+                UserPosts.COLUMN_NEW_REPLY_FLAG + " =?", //selection
+                new String[] {String.valueOf(trueFlag)}, //selection args
+                null, //group by
+                null, //having
+                UserPosts._ID + " DESC" //orderby
+        );
+
+        cursor.moveToFirst();
+        return cursor;
     }
 
     // Watchlist Functions /////////////////////////////////////////////////////////////////////////
@@ -555,7 +605,12 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 UserPosts._ID + " INTEGER PRIMARY KEY, " +
 
                 UserPosts.COLUMN_BOARDS + " TEXT NOT NULL, " +
-                UserPosts.COLUMN_NO + " TEXT NOT NULL);";
+                UserPosts.COLUMN_NO + " TEXT NOT NULL, " +
+                UserPosts.COLUMN_RESTO + " TEXT NOT NULL, " +
+                UserPosts.COLUMN_SUBJECT + " TEXT NOT NULL, " +
+                UserPosts.COLUMN_COMMENT + " TEXT NOT NULL, " +
+                UserPosts.COLUMN_NUMBER_OF_REPLIES + " INTEGER NOT NULL, " +
+                UserPosts.COLUMN_NEW_REPLY_FLAG + " INTEGER NOT NULL);";
 
         final String SQL_CREATE_WATCHLIST_TABLE = "CREATE TABLE IF NOT EXISTS " + WatchlistEntry.TABLE_NAME + " (" +
                 WatchlistEntry._ID + " INTEGER PRIMARY KEY, " +
@@ -583,6 +638,11 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         db.execSQL("DROP TABLE IF EXISTS " + ThreadEntry.TABLE_NAME);
         if (oldVersion < 4){
             db.execSQL("DROP TABLE IF EXISTS " + BoardEntry.TABLE_NAME);
+        }
+        if (oldVersion < 5){
+            db.execSQL("DROP TABLE IF EXISTS " + CatalogEntry.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + ThreadEntry.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + UserPosts.TABLE_NAME);
         }
 
         onCreate(db);

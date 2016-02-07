@@ -1,8 +1,11 @@
 package com.luorrak.ouroboros.util;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.graphics.Palette;
@@ -10,6 +13,8 @@ import android.view.View;
 
 import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.services.AlarmReceiver;
+import com.luorrak.ouroboros.services.ReplyCheckerService;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -137,5 +142,17 @@ public class Util {
                 }
             });
         }
+    }
+
+    public static void startReplyCheckerService(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra("startReplyCheckerService", true);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 60000, 60000, alarmIntent);
+    }
+
+    public static void stopReplyCheckerService(Context context){
+        //// TODO: 2/6/16  
     }
 }

@@ -184,6 +184,16 @@ public class DbContract {
         public static final String COLUMN_BOARDS = "board_name";
 
         public static final String COLUMN_NO = "user_post_no";
+
+        public static final String COLUMN_RESTO = "user_post_resto";
+
+        public static final String COLUMN_SUBJECT = "user_post_subject";
+
+        public static final String COLUMN_COMMENT = "user_post_comment";
+
+        public static final String COLUMN_NUMBER_OF_REPLIES = "user_post_number_of_replies";
+
+        public static final String COLUMN_NEW_REPLY_FLAG = "new_reply_flag";
     }
 
     public static final class WatchlistEntry implements BaseColumns{
