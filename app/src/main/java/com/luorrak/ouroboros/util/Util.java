@@ -148,11 +148,17 @@ public class Util {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("startReplyCheckerService", true);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 5738295, intent, 0);
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 60000, 60000, alarmIntent);
     }
 
     public static void stopReplyCheckerService(Context context){
-        //// TODO: 2/6/16  
+        //// TODO: 2/6/16  Intent intentstop = new Intent(this, Areceiver.class);
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        PendingIntent senderstop = PendingIntent.getBroadcast(context,
+                5738295, intent, 0);
+        AlarmManager alarmManagerstop = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        alarmManagerstop.cancel(senderstop);
     }
 }

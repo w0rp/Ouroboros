@@ -1,10 +1,14 @@
 package com.luorrak.ouroboros.ReplyChecker;
 
 import android.database.Cursor;
+import android.graphics.Typeface;
+import android.support.design.widget.Snackbar;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.luorrak.ouroboros.R;
@@ -38,13 +42,29 @@ public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
     public void onBindViewHolderCursor(RecyclerView.ViewHolder holder, Cursor cursor) {
         ReplyCheckerViewHolder replyCheckerViewHolder = (ReplyCheckerViewHolder) holder;
         createReplyCheckerObject(replyCheckerViewHolder, cursor);
+        setViewVisibility(replyCheckerViewHolder);
+
+        String threadTitle = "/" + replyCheckerViewHolder.replyCheckerObject.boardName + "/" +
+                replyCheckerViewHolder.replyCheckerObject.resto;
+
+        replyCheckerViewHolder.rcThreadName.setText(threadTitle);
         replyCheckerViewHolder.rcSubjectText.setText(replyCheckerViewHolder.replyCheckerObject.subject);
         replyCheckerViewHolder.rcCommentText.setText(replyCheckerViewHolder.replyCheckerObject.comment);
-        replyCheckerViewHolder.rcReplyCountText.setText(replyCheckerViewHolder.replyCheckerObject.replyCount);
+        replyCheckerViewHolder.rcReplyCountText.setText(replyCheckerViewHolder.replyCheckerObject.replyCount + " Replies");
     }
 
+    private void setViewVisibility(ReplyCheckerViewHolder replyCheckerViewHolder){
+        if (replyCheckerViewHolder.replyCheckerObject.subject.equals("")){
+            replyCheckerViewHolder.rcSubjectText.setVisibility(View.GONE);
+        }
+        if (replyCheckerViewHolder.replyCheckerObject.comment.equals("")){
+            replyCheckerViewHolder.rcCommentText.setVisibility(View.GONE);
+        }
+    }
 
     private void createReplyCheckerObject(ReplyCheckerViewHolder replyCheckerViewHolder, Cursor cursor){
+        replyCheckerViewHolder.replyCheckerObject.boardName = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_BOARDS));
+        replyCheckerViewHolder.replyCheckerObject.resto = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_RESTO));
         replyCheckerViewHolder.replyCheckerObject.subject = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_SUBJECT));
         replyCheckerViewHolder.replyCheckerObject.comment = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_COMMENT));
         replyCheckerViewHolder.replyCheckerObject.replyCount = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_NUMBER_OF_REPLIES));
@@ -55,22 +75,57 @@ public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
     }
 
     class ReplyCheckerObject {
-        public String subject;
-        public String comment;
-        public String replyCount;
+        public String boardName = "";
+        public String resto = "";
+        public String subject = "";
+        public String comment = "";
+        public String replyCount = "";
     }
 
-    private class ReplyCheckerViewHolder extends RecyclerView.ViewHolder {
+    private class ReplyCheckerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public CardView rcCard;
+        public TextView rcThreadName;
         public TextView rcSubjectText;
         public TextView rcCommentText;
         public TextView rcReplyCountText;
+        public Button rcMarkAsReadButton;
         public ReplyCheckerObject replyCheckerObject;
+
         public ReplyCheckerViewHolder(View itemView) {
             super(itemView);
+            rcCard = (CardView) itemView.findViewById(R.id.reply_checker_card);
+            rcThreadName = (TextView) itemView.findViewById(R.id.reply_checker_thread_name);
             rcSubjectText = (TextView) itemView.findViewById(R.id.reply_checker_sub_text);
             rcCommentText = (TextView) itemView.findViewById(R.id.reply_checker_com_text);
             rcReplyCountText = (TextView) itemView.findViewById(R.id.reply_checker_reply_count);
+            rcMarkAsReadButton = (Button) itemView.findViewById(R.id.reply_checker_mark_as_read_button);
             replyCheckerObject = new ReplyCheckerObject();
+
+            rcReplyCountText.setTypeface(rcReplyCountText.getTypeface(), Typeface.BOLD);
+
+            rcMarkAsReadButton.setOnClickListener(this);
+
+            rcCard.setOnClickListener(this);
+            rcThreadName.setOnClickListener(this);
+            rcSubjectText.setOnClickListener(this);
+            rcCommentText.setOnClickListener(this);
+            rcReplyCountText.setOnClickListener(this);
+
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()){
+                case R.id.reply_checker_mark_as_read_button:{
+                    Snackbar.make(v, "Thread Marked As Read", Snackbar.LENGTH_LONG).show();
+                    break;
+                }
+                default:{
+                    // TODO: 2/8/16 Open thread in new intent and mark as read
+                    Snackbar.make(v, "Anything else clicked", Snackbar.LENGTH_LONG).show();
+                    break;
+                }
+            }
         }
     }
 }

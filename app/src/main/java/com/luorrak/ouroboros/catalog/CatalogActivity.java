@@ -66,6 +66,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         initPostPassword();
 
+        Util.stopReplyCheckerService(getApplicationContext());
         Util.startReplyCheckerService(getApplicationContext());
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         setContentView(R.layout.activity_catalog);

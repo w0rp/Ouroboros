@@ -2,10 +2,12 @@ package com.luorrak.ouroboros.ReplyChecker;
 
 import android.app.Fragment;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,11 +44,14 @@ public class ReplyCheckerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_reply_checker, container, false);
         InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.reply_checker_recyclerview);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         Cursor userPostsCursor = infiniteDbHelper.getFlaggedUserPostsCursor();
-        ReplyCheckerAdapter replyCheckerAdapter = new ReplyCheckerAdapter(userPostsCursor);
-        recyclerView.setAdapter(replyCheckerAdapter);
+        Log.d("Stuff", DatabaseUtils.dumpCurrentRowToString(userPostsCursor));
+        if((userPostsCursor != null) && (userPostsCursor .getCount() > 0)){
+            recyclerView = (RecyclerView) view.findViewById(R.id.reply_checker_recyclerview);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            ReplyCheckerAdapter replyCheckerAdapter = new ReplyCheckerAdapter(userPostsCursor);
+            recyclerView.setAdapter(replyCheckerAdapter);
+        }
         return view;
     }
 }
