@@ -1,5 +1,6 @@
 package com.luorrak.ouroboros.ReplyChecker;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.support.design.widget.Snackbar;
@@ -12,8 +13,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.thread.ThreadActivity;
+import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
 import com.luorrak.ouroboros.util.DbContract;
+import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.Util;
 
 /**
  * Ouroboros - An 8chan browser
@@ -34,8 +39,10 @@ import com.luorrak.ouroboros.util.DbContract;
  */
 public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
 
-    public ReplyCheckerAdapter(Cursor cursor) {
+    InfiniteDbHelper infiniteDbHelper;
+    public ReplyCheckerAdapter(Cursor cursor, InfiniteDbHelper infiniteDbHelper) {
         super(cursor);
+        this.infiniteDbHelper = infiniteDbHelper;
     }
 
     @Override
@@ -63,11 +70,14 @@ public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
     }
 
     private void createReplyCheckerObject(ReplyCheckerViewHolder replyCheckerViewHolder, Cursor cursor){
-        replyCheckerViewHolder.replyCheckerObject.boardName = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_BOARDS));
-        replyCheckerViewHolder.replyCheckerObject.resto = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_RESTO));
-        replyCheckerViewHolder.replyCheckerObject.subject = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_SUBJECT));
-        replyCheckerViewHolder.replyCheckerObject.comment = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_COMMENT));
-        replyCheckerViewHolder.replyCheckerObject.replyCount = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_NUMBER_OF_REPLIES));
+        if((cursor != null) && (cursor.getCount() > 0)){
+            replyCheckerViewHolder.replyCheckerObject.id = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts._ID));
+            replyCheckerViewHolder.replyCheckerObject.boardName = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_BOARDS));
+            replyCheckerViewHolder.replyCheckerObject.resto = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_RESTO));
+            replyCheckerViewHolder.replyCheckerObject.subject = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_SUBJECT));
+            replyCheckerViewHolder.replyCheckerObject.comment = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_COMMENT));
+            replyCheckerViewHolder.replyCheckerObject.replyCount = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_NUMBER_OF_REPLIES));
+        }
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -75,6 +85,7 @@ public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
     }
 
     class ReplyCheckerObject {
+        public String id = "";
         public String boardName = "";
         public String resto = "";
         public String subject = "";
@@ -118,11 +129,16 @@ public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
             switch (v.getId()){
                 case R.id.reply_checker_mark_as_read_button:{
                     Snackbar.make(v, "Thread Marked As Read", Snackbar.LENGTH_LONG).show();
+                    infiniteDbHelper.removeUserPostFlag(replyCheckerObject.id);
+                    changeCursor(infiniteDbHelper.getFlaggedUserPostsCursor());
                     break;
                 }
                 default:{
                     // TODO: 2/8/16 Open thread in new intent and mark as read
-                    Snackbar.make(v, "Anything else clicked", Snackbar.LENGTH_LONG).show();
+                    Intent intent = new Intent(v.getContext(), ThreadActivity.class);
+                    intent.putExtra(Util.INTENT_THREAD_NO, replyCheckerObject.resto);
+                    intent.putExtra(Util.INTENT_BOARD_NAME, replyCheckerObject.boardName);
+                    v.getContext().startActivity(intent);
                     break;
                 }
             }

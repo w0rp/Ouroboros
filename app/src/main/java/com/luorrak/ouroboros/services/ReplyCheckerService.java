@@ -2,8 +2,10 @@ package com.luorrak.ouroboros.services;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -13,9 +15,11 @@ import com.google.gson.JsonObject;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.JsonParser;
+import com.luorrak.ouroboros.catalog.CatalogActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.DbContract;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.Util;
 
 import java.util.concurrent.ExecutionException;
 
@@ -56,6 +60,7 @@ public class ReplyCheckerService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         Cursor userPostsCursor = infiniteDbHelper.getUserPostsCursor();
+        Log.d("ReplyService", DatabaseUtils.dumpCursorToString(userPostsCursor));
         Cursor repliesCursor;
         String userPostBoardName;
         String userPostResto;
@@ -64,7 +69,8 @@ public class ReplyCheckerService extends IntentService {
         int replyCount = 0;
 
         String oldResto = "";
-        while (userPostsCursor.moveToNext()) {
+        do {
+            String userPostRowId = String.valueOf(userPostsCursor.getInt(userPostsCursor.getColumnIndex(DbContract.UserPosts._ID)));
             userPostBoardName = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_BOARDS));
             userPostResto = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_RESTO));
             userPostNo = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_NO));
@@ -73,29 +79,28 @@ public class ReplyCheckerService extends IntentService {
             //No change in thread.
             // TODO: 2/7/16 resto 0 new thread
             if (!userPostResto.equals(oldResto)){
-                getThreadJson(userPostBoardName, userPostResto, infiniteDbHelper);
+                getThreadJson(userPostBoardName, userPostResto, infiniteDbHelper, userPostRowId);
+                oldResto = userPostResto;
             }
-
-            repliesCursor = infiniteDbHelper.getReplies(userPostNo);
+            repliesCursor = infiniteDbHelper.getRCReplies(userPostNo);
             int threadReplyCount = repliesCursor.getCount();
             repliesCursor.close();
 
             if (threadReplyCount > userReplyCount) {
                 replyCount++;
-                String userPostRowId = String.valueOf(userPostsCursor.getInt(userPostsCursor.getColumnIndex(DbContract.UserPosts._ID)));
-                //// TODO: 2/6/16 remove flag in review activity
-                infiniteDbHelper.updateUserPostReplyCount(threadReplyCount, InfiniteDbHelper.trueFlag, userPostRowId);
+                infiniteDbHelper.updateUserPostReplyCount(threadReplyCount, userPostRowId);
+                infiniteDbHelper.addUserPostFlag(userPostRowId);
             }
-        }
+        }while (userPostsCursor.moveToNext());
         userPostsCursor.close();
-        infiniteDbHelper.deleteThreadCache();
+        infiniteDbHelper.deleteRCCache();
 
         if (replyCount > 0){
             createNotification(String.valueOf(replyCount));
         }
     }
 
-    private void getThreadJson(final String userPostBoardName, String userPostResto, final InfiniteDbHelper infiniteDbHelper) {
+    private void getThreadJson(final String userPostBoardName, String userPostResto, final InfiniteDbHelper infiniteDbHelper, String userPostRowId) {
         JsonObject jsonObject = null;
         try {
             jsonObject = Ion.with(getApplicationContext())
@@ -103,21 +108,21 @@ public class ReplyCheckerService extends IntentService {
                     .setLogging("ReplyService", Log.DEBUG)
                     .asJsonObject().get();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            infiniteDbHelper.deleteUserPostsEntry(userPostRowId);
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            infiniteDbHelper.deleteUserPostsEntry(userPostRowId);
         }
         if (jsonObject != null){
-            insertThreadIntoDatabase(jsonObject, userPostBoardName, infiniteDbHelper);
+            insertRCIntoDatabase(jsonObject, userPostBoardName, infiniteDbHelper);
         }
     }
 
-    private void insertThreadIntoDatabase(JsonObject jsonObject, String userPostBoardName, InfiniteDbHelper infiniteDbHelper) {
+    private void insertRCIntoDatabase(JsonObject jsonObject, String userPostBoardName, InfiniteDbHelper infiniteDbHelper) {
         JsonParser jsonParser = new JsonParser();
         JsonArray posts = jsonObject.getAsJsonArray("posts");
         for (JsonElement postElement : posts) {
             JsonObject post = postElement.getAsJsonObject();
-            infiniteDbHelper.insertThreadEntry(
+            infiniteDbHelper.insertRCEntry(
                     userPostBoardName,
                     jsonParser.getThreadResto(post),
                     jsonParser.getThreadNo(post),
@@ -138,10 +143,21 @@ public class ReplyCheckerService extends IntentService {
     private void createNotification(String replyCount) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(replyCount + " Simple Notification")
-                .setContentText("This is a normal notification.");
+                .setColor(getApplicationContext().getResources().getColor(R.color.md_green_500))
+                .setContentTitle(replyCount + " New Post Replied To")
+                .setContentText("Click here to go see");
 
-        //Intent resultIntent = new Intent(this, )
+        Intent resultIntent = new Intent(this, CatalogActivity.class);
+        resultIntent.putExtra(Util.INTENT_REPLY_CHECKER, true);
+
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        this,
+                        0,
+                        resultIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        notificationBuilder.setContentIntent(resultPendingIntent);
         notificationManager.notify(1438, notificationBuilder.build());
     }
 }

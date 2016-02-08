@@ -48,6 +48,7 @@ public class Util {
     public final static String INTENT_THREAD_NO = "com.luorrak.ouroboros.THREADNO";
     public final static String INTENT_BOARD_NAME = "com.luorrak.ouroboros.BOARDNAME";
     public final static String INTENT_REPLY_NO = "com.luorrak.ouroboros.REPLYNO";
+    public final static String INTENT_REPLY_CHECKER = "com.luorrak.ouroboros.REPLYNO";
     public final static String TIM = "com.luorrak.ouroboros.TIM";
     public final static String EXT = "com.luorrak.ouroboros.EXT";
 
@@ -149,14 +150,14 @@ public class Util {
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("startReplyCheckerService", true);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 5738295, intent, 0);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 60000, 60000, alarmIntent);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, alarmIntent);
     }
 
     public static void stopReplyCheckerService(Context context){
         //// TODO: 2/6/16  Intent intentstop = new Intent(this, Areceiver.class);
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent senderstop = PendingIntent.getBroadcast(context,
-                5738295, intent, 0);
+                5738295, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManagerstop = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         alarmManagerstop.cancel(senderstop);

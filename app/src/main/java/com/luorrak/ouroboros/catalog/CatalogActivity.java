@@ -50,6 +50,7 @@ import java.util.Random;
 
 public class CatalogActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private String board;
+    private boolean replyCheckerIntent;
     private DrawerLayout drawerLayout;
     private ProgressBar progressBar;
     private InfiniteDbHelper infiniteDbHelper;
@@ -66,25 +67,27 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         initPostPassword();
 
-        Util.stopReplyCheckerService(getApplicationContext());
-        Util.startReplyCheckerService(getApplicationContext());
+        //Util.stopReplyCheckerService(getApplicationContext());
+      Util.startReplyCheckerService(getApplicationContext());
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         setContentView(R.layout.activity_catalog);
         bindViews();
 
-        if (savedInstanceState == null){
-            board = getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
-            if (board == null){
-                BoardListFragment boardListFragment = new BoardListFragment();
-                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
-            } else {
-                CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
-                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
-            }
+        board = getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
+        replyCheckerIntent = getIntent().getBooleanExtra(Util.INTENT_REPLY_CHECKER, false);
+        if (board != null){
+            CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
+            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
+        } else if (replyCheckerIntent) {
+            ReplyCheckerFragment replyCheckerFragment = new ReplyCheckerFragment();
+            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.activity_catalog_fragment_container, replyCheckerFragment).commit();
+        } else {
+            BoardListFragment boardListFragment = new BoardListFragment();
+            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
         }
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);

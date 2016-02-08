@@ -177,6 +177,92 @@ public class DbContract {
         public static final String COLUMN_THREAD_MEDIA_FILES = "media_files";
     }
 
+    public static final class ReplyCheck implements BaseColumns{
+
+        public static final String TABLE_NAME = "thread";
+
+        /*
+        foreign key from table boards
+        Type: String
+         */
+        public static final String COLUMN_BOARD_NAME = "board_name";
+        /*
+        OP post people are replying to
+        Type: String
+         */
+        public static final String COLUMN_THREAD_RESTO = "resto";
+        /*
+        post number
+        Type: String
+         */
+        public static final String COLUMN_THREAD_NO = "no";
+        /*
+        original filename
+        WARNING: can be null
+        Type: String
+         */
+        public static final String COLUMN_THREAD_FILENAME = "filename";
+
+        public static final String COLUMN_THREAD_IMAGE_HEIGHT = "image_01_height";
+
+        public static final String COLUMN_THREAD_IMAGE_WIDTH = "image_01_width";
+        /*
+        Post Subtitle
+        WARNING: should only appear on OP else return null
+        Type: String
+         */
+        public static final String COLUMN_THREAD_SUB = "sub";
+        /*
+        post comment
+        WARNING: will be filled with html special characters
+        Type: String
+         */
+        public static final String COLUMN_THREAD_COM = "com";
+        /*
+        post email
+        WARNING: Can have any type of text
+        Type: String
+        */
+        public static final String COLUMN_THREAD_EMAIL = "email";
+        /*
+        Name of poster
+        WARNING: can be null
+        Type: String
+         */
+        public static final String COLUMN_THREAD_NAME = "name";
+        /*
+        trip of poster
+        WARNING: can be null
+        Type: String
+         */
+        public static final String COLUMN_THREAD_TRIP = "trip";
+        /*
+        What time the post was submitted
+        Type: String
+         */
+        public static final String COLUMN_THREAD_TIME = "time";
+        /*
+        last time the post was modified
+        Type: String
+         */
+        public static final String COLUMN_THREAD_LAST_MODIFIED = "last_modified";
+        /*
+        poster id
+        WARNING: may be null
+        Type: String
+         */
+        public static final String COLUMN_THREAD_ID = "id";
+
+        public static final String COLUMN_THREAD_EMBED = "embed";
+
+        /*
+        Serialized Arraylist of Media Items
+        WARNING: may be null
+        Type: BLOB
+        */
+        public static final String COLUMN_THREAD_MEDIA_FILES = "media_files";
+    }
+
     public static final class UserPosts implements BaseColumns{
         public static final String TABLE_NAME = "userposts";
 
