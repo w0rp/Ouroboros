@@ -155,11 +155,17 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                             .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                                 @Override
                                 public void onCompleted(Exception e, ImageViewBitmapInfo result) {
-                                    if (e != null || result.getBitmapInfo().bitmap == null) {
+                                    if (e != null) {
+                                        return;
+                                    }
+                                    if (result.getException() != null){
+                                        return;
+                                    }
+                                    if (result.getBitmapInfo().bitmap == null){
                                         return;
                                     }
 
-                                    if (getItemViewType(cursor.getPosition()) != Util.THREAD_LAYOUT_HORIZONTAL){
+                                    if (getItemViewType(cursor.getPosition()) != Util.THREAD_LAYOUT_HORIZONTAL ){
                                         Palette.from(result.getBitmapInfo().bitmap).generate(new Palette.PaletteAsyncListener() {
                                             @Override
                                             public void onGenerated(Palette palette) {
