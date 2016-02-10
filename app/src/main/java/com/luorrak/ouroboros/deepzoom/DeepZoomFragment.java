@@ -117,8 +117,9 @@ public class DeepZoomFragment extends Fragment{
                             return;
                         }
                         progressBar.setVisibility(View.INVISIBLE);
-
-                        Util.setSwatch(deepzoomContainer, result);
+                        if (result.getException() == null){
+                            Util.setSwatch(deepzoomContainer, result);
+                        }
 
                         if (mediaItem.ext.equals(".webm") || mediaItem.ext.equals(".mp4")) {
                             return;
