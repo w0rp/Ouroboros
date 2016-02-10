@@ -129,8 +129,10 @@ public class ThreadActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        if (threadFragment.isAdded()){
+            getFragmentManager().putFragment(outState, "threadFragment", threadFragment);
+        }
 
-        getFragmentManager().putFragment(outState, "threadFragment", threadFragment);
     }
 
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////
