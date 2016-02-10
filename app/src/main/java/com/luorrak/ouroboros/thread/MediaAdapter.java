@@ -39,7 +39,6 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.Media;
@@ -71,8 +70,6 @@ import java.util.List;
 
 
 public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> {
-    final int VERTICAL = 0;
-    final int HORIZONTAL = 1;
     private String boardName;
     private String resto;
     private ArrayList<Media> mediaItems;
@@ -144,9 +141,8 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                                 if (e != null || result.getBitmapInfo() == null || threadValue == Util.THREAD_LAYOUT_HORIZONTAL) {
                                     return;
                                 }
-                                if (result.getBitmapInfo().bitmap != null){
-                                    generateSwatch(result.getBitmapInfo().bitmap, mediaViewHolder);
-                                }
+                                Util.setSwatch(mediaViewHolder.mediaHolder, result);
+
 
                                 WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                                 if(wifiManager.isWifiEnabled() && SettingsHelper.getImageOptions(context) == 1){
@@ -173,9 +169,9 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, DeepZoomActivity.class);
-                    intent.putExtra(CatalogAdapter.TIM, media.fileName);
-                    intent.putExtra(CatalogAdapter.THREAD_NO, resto);
-                    intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+                    intent.putExtra(Util.TIM, media.fileName);
+                    intent.putExtra(Util.INTENT_THREAD_NO, resto);
+                    intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
                     context.startActivity(intent);
                 }
             });
@@ -193,7 +189,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                                 return;
                             }
 
-                            generateSwatch(result.getBitmapInfo().bitmap, mediaViewHolder);
+                            Util.setSwatch(mediaViewHolder.mediaHolder, result);
                         }
                     });
             mediaViewHolder.playButton.setVisibility(View.VISIBLE);

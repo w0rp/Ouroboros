@@ -29,13 +29,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
-import android.widget.ProgressBar;
+
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.gallery.GalleryFragment;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
@@ -76,16 +75,26 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     private ThreadNetworkFragment networkFragment;
     private String resto;
     private String boardName;
+    private int threadPosition;
+    private boolean firstRequest;
     private Parcelable savedLayoutState ;
     private boolean isStatusCheckIsRunning;
     private Handler handler;
 
+    private String oldJsonString;
+    private int pollingInterval;
+
     //Get thread number from link somehow
     public ThreadFragment newInstance(String resto, String boardName){
+        return newInstance(resto, boardName, 0);
+    }
+
+    public ThreadFragment newInstance(String resto, String boardName, int threadPosition){
         ThreadFragment threadFragment = new ThreadFragment();
         Bundle args = new Bundle();
         args.putString("resto", resto);
         args.putString("boardName", boardName);
+        args.putInt("threadPosition", threadPosition);
         threadFragment.setArguments(args);
         return threadFragment;
     }
@@ -99,6 +108,9 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
             savedLayoutState = savedInstanceState.getParcelable("savedLayout");
             resto = savedInstanceState.getString("resto");
             boardName = getArguments().getString("boardName");
+            firstRequest = getArguments().getBoolean("firstRequest");
+        } else {
+            firstRequest = true;
         }
     }
 
@@ -122,6 +134,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         if (getArguments() != null) {
             resto = getArguments().getString("resto");
             boardName = getArguments().getString("boardName");
+            threadPosition = getArguments().getInt("threadPosition");
         }
 
         if (networkFragment == null) {
@@ -131,11 +144,13 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
         if (boardName != null){
             handler = new Handler();
+            pollingInterval = 10000;
             startStatusCheck();
-            threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getFragmentManager(), boardName, getActivity());
+            threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getFragmentManager(), boardName, getActivity(), infiniteDbHelper);
             threadAdapter.setHasStableIds(true);
             threadAdapter.hasStableIds();
             recyclerView.setAdapter(threadAdapter);
+            recyclerView.scrollToPosition(threadPosition);
         }
 
         return view;
@@ -163,6 +178,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         outState.putParcelable("savedLayout", savedLayoutState);
         outState.putString("boardName", boardName);
         outState.putString("resto", resto);
+        outState.putBoolean("firstRequest", firstRequest);
     }
 
     // Options Menu ////////////////////////////////////////////////////////////////////////////////
@@ -247,15 +263,14 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                 break;
             }
             case R.id.action_scroll_bottom:{
-                Log.d(LOG_TAG, "getItemCount " + threadAdapter.getItemCount());
                 recyclerView.scrollToPosition(threadAdapter.getItemCount() - 1);
                 break;
             }
             case R.id.action_reply:{
                 Intent intent =  new Intent(getActivity(), ReplyCommentActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(CatalogAdapter.THREAD_NO, resto);
-                intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+                intent.putExtra(Util.INTENT_THREAD_NO, resto);
+                intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
                 getActivity().startActivity(intent);
                 break;
             }
@@ -312,7 +327,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
             }
             case R.id.action_layout_horizontal: {
                 SettingsHelper.setThreadView(getActivity(), Util.THREAD_LAYOUT_HORIZONTAL);
-                ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);;
+                ThreadFragment threadFragment = new ThreadFragment().newInstance(resto, boardName);
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.placeholder_card, threadFragment).commit();
                 break;
@@ -333,8 +348,6 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         ((ThreadActivity) getActivity()).setProgressBarStatus(true);
         final String threadJsonUrl = ChanUrls.getThreadUrl(boardName, threadNumber);
 
-        Log.d(LOG_TAG, "thread json url "+ threadJsonUrl);
-
         Ion.with(context)
                 .load(threadJsonUrl)
                 .setLogging(LOG_TAG, Log.DEBUG)
@@ -344,12 +357,19 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                     @Override
                     public void onCompleted(Exception e, JsonObject jsonObject) {
                         if (e == null) {
-                            networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadAdapter);
-                            //new InsertThreadIntoDatabase().execute(jsonObject);
+                            if (jsonObject.toString().equals(oldJsonString)){
+                                pollingInterval = pollingInterval + pollingInterval/2;
+                                ((ThreadActivity) getActivity()).setProgressBarStatus(false);
+                            } else {
+                                restartStatusCheck();
+                                oldJsonString = jsonObject.toString();
+                                networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadPosition, firstRequest, recyclerView, threadAdapter);
+                            }
                         } else {
                             ((ThreadActivity) getActivity()).setProgressBarStatus(false);
                             Snackbar.make(getView(), "Error retrieving thread", Snackbar.LENGTH_LONG).show();
                         }
+                        firstRequest = false;
                     }
                 });
     }
@@ -385,7 +405,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         @Override
         public void run() {
             getThread(resto, boardName);
-            handler.postDelayed(statusCheck, 30000);
+            handler.postDelayed(statusCheck, pollingInterval);
         }
     };
 
@@ -399,5 +419,11 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     private void stopStatusCheck() {
         isStatusCheckIsRunning = false;
         handler.removeCallbacks(statusCheck);
+    }
+
+    private void restartStatusCheck(){
+        stopStatusCheck();
+        pollingInterval = 10000;
+        startStatusCheck();
     }
 }

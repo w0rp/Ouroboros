@@ -53,7 +53,7 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BoardListFragment extends android.app.Fragment implements OnStartDragListener {
+public class BoardListFragment extends Fragment implements OnStartDragListener {
     private NavigationBoardListAdapter boardListAdapter;
     private ItemTouchHelper touchHelper;
 
@@ -72,7 +72,7 @@ public class BoardListFragment extends android.app.Fragment implements OnStartDr
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.board_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        boardListAdapter = new NavigationBoardListAdapter(boardListCursor, getFragmentManager(), getActivity(), infiniteDbHelper, view, this);
+        boardListAdapter = new NavigationBoardListAdapter(boardListCursor, getActivity(), infiniteDbHelper, this);
 
         ItemTouchHelper.Callback callback = new BoardListTouchHelper(boardListAdapter);
         touchHelper = new ItemTouchHelper(callback);

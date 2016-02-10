@@ -14,6 +14,9 @@
         <item name="board_reorder_icon">@drawable/ic_reorder_black_18dp</item>
         <item name="catalog_lock_icon">@drawable/ic_lock_black_24dp</item>
         <item name="catalog_sticky_icon">@drawable/ic_turned_in_black_24dp</item>
+        <item name="reply_checker_read_icon">@drawable/ic_mail_black_24dp</item>
+
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
 
         <item name="divider_color">@color/md_purple_100</item>
         <item name="reply_button">@color/md_purple_500</item>
@@ -30,6 +33,9 @@
         <item name="board_reorder_icon">@drawable/ic_reorder_white_18dp</item>
         <item name="catalog_lock_icon">@drawable/ic_lock_white_24dp</item>
         <item name="catalog_sticky_icon">@drawable/ic_turned_in_white_24dp</item>
+        <item name="reply_checker_read_icon">@drawable/ic_mail_white_24dp</item>
+
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
 
         <item name="divider_color">@color/md_teal_100</item>
         <item name="reply_button">@color/md_teal_500</item>

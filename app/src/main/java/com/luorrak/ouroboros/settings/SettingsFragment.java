@@ -2,10 +2,13 @@ package com.luorrak.ouroboros.settings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
+
 import android.preference.PreferenceManager;
+import android.support.v7.preference.PreferenceFragmentCompat;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.util.SettingsHelper;
+import com.luorrak.ouroboros.util.Util;
 
 /**
  * Ouroboros - An 8chan browser
@@ -25,16 +28,15 @@ import com.luorrak.ouroboros.R;
  * along
  */
 
-public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public SettingsFragment(){
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getActivity().setTitle("Settings");
+    public void onCreatePreferences(Bundle bundle, String s) {
         addPreferencesFromResource(R.xml.preferences);
+        getActivity().setTitle("Settings");
         PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -46,6 +48,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     getActivity().recreate();
                 }
                 break;
+            }
+            case "pref_reply_checker": {
+                if (SettingsHelper.getReplyCheckerStatus(getActivity())){
+                    Util.startReplyCheckerService(getActivity());
+                } else {
+                    Util.stopReplyCheckerService(getActivity());
+                }
             }
         }
     }

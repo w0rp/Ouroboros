@@ -26,8 +26,6 @@ import com.luorrak.ouroboros.R;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class ExternalNavigationWarningFragment extends DialogFragment {
-    public final static boolean EXTERNAL = true;
-    public final static boolean INTERNAL = false;
 
     public static ExternalNavigationWarningFragment newInstance(String url) {
         ExternalNavigationWarningFragment frag = new ExternalNavigationWarningFragment();

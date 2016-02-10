@@ -57,7 +57,7 @@ public class CardDialogFragment extends Fragment {
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.postList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        ThreadAdapter threadAdapter = new ThreadAdapter(cursor, getFragmentManager(), boardName, getActivity());
+        ThreadAdapter threadAdapter = new ThreadAdapter(cursor, getFragmentManager(), boardName, getActivity(), infiniteDbHelper);
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(threadAdapter);

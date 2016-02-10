@@ -1,12 +1,20 @@
 package com.luorrak.ouroboros.util;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.graphics.Palette;
+import android.view.View;
 
+import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.services.AlarmReceiver;
+import com.luorrak.ouroboros.services.ReplyCheckerService;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -37,6 +45,13 @@ import java.io.ObjectOutputStream;
  */
 public class Util {
     public static final int REQUEST_STORAGE_PERMISSION = 55;
+    public final static String INTENT_THREAD_NO = "com.luorrak.ouroboros.THREADNO";
+    public final static String INTENT_BOARD_NAME = "com.luorrak.ouroboros.BOARDNAME";
+    public final static String INTENT_THREAD_POSITION = "com.luorrak.ouroboros.THREADPOSITION";
+    public final static String INTENT_REPLY_NO = "com.luorrak.ouroboros.REPLYNO";
+    public final static String INTENT_REPLY_CHECKER = "com.luorrak.ouroboros.REPLYNO";
+    public final static String TIM = "com.luorrak.ouroboros.TIM";
+    public final static String EXT = "com.luorrak.ouroboros.EXT";
 
     private static final int THEME_DEFAULT = 0;
     private static final int THEME_DARK = 1;
@@ -47,6 +62,7 @@ public class Util {
     public static final int CATALOG_LAYOUT_LIST = 0;
     public static final int CATALOG_LAYOUT_GRID= 1;
 
+    public static final int REPLY_CHECKER_INTENT_ID = 5738295;
 
     public static String[] parseYoutube(String embed) {
         String[] youtubeData = new String[2];
@@ -91,8 +107,7 @@ public class Util {
             objectOutput.writeObject(object);
             objectOutput.close();
 
-            byte[] serializedObject = outputStream.toByteArray();
-            return serializedObject;
+            return outputStream.toByteArray();
         } catch (IOException e) {
             return null;
         }
@@ -116,5 +131,36 @@ public class Util {
         ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("ComText", text);
         clipboardManager.setPrimaryClip(clipData);
+    }
+
+    public static void setSwatch(final View view, ImageViewBitmapInfo result){
+        if (result.getBitmapInfo() != null){
+            Palette.from(result.getBitmapInfo().bitmap).generate(new Palette.PaletteAsyncListener() {
+                @Override
+                public void onGenerated(Palette palette) {
+                    Palette.Swatch swatch = palette.getMutedSwatch();
+                    if (swatch != null) {
+                        view.setBackgroundColor(swatch.getRgb());
+                    }
+                }
+            });
+        }
+    }
+
+    public static void startReplyCheckerService(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra("startReplyCheckerService", true);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, REPLY_CHECKER_INTENT_ID, intent, 0);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 15*60*1000, 15*60*1000, alarmIntent);
+    }
+
+    public static void stopReplyCheckerService(Context context){
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        PendingIntent senderstop = PendingIntent.getBroadcast(context,
+                REPLY_CHECKER_INTENT_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManagerstop = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        alarmManagerstop.cancel(senderstop);
     }
 }

@@ -14,6 +14,7 @@ import com.luorrak.ouroboros.util.DbContract.CatalogEntry;
 import com.luorrak.ouroboros.util.DbContract.ThreadEntry;
 import com.luorrak.ouroboros.util.DbContract.UserPosts;
 import com.luorrak.ouroboros.util.DbContract.WatchlistEntry;
+import com.luorrak.ouroboros.util.DbContract.ReplyCheck;
 
 /**
  * Ouroboros - An 8chan browser
@@ -35,9 +36,11 @@ import com.luorrak.ouroboros.util.DbContract.WatchlistEntry;
 public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     private final String LOG_TAG = InfiniteDbHelper.class.getSimpleName();
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "cache.db";
     private SQLiteDatabase db = getWritableDatabase();
+    public static final int trueFlag = 1;
+    public static final int falseFlag = 0;
 
     // Constructor /////////////////////////////////////////////////////////////////////////////////
 
@@ -124,7 +127,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     public boolean insertThreadEntry(String board, String resto, String no, String sub, String com,
                                      String email, String name, String trip, String time, String last_modified,
-                                     String id, String embed, byte[] mediaFiles){
+                                     String id, String embed, byte[] mediaFiles, int position){
         ContentValues values = new ContentValues();
         values.put(ThreadEntry.COLUMN_BOARD_NAME, board);
         values.put(ThreadEntry.COLUMN_THREAD_RESTO, resto);
@@ -139,6 +142,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         values.put(ThreadEntry.COLUMN_THREAD_ID, id);
         values.put(ThreadEntry.COLUMN_THREAD_EMBED, embed);
         values.put(ThreadEntry.COLUMN_THREAD_MEDIA_FILES, mediaFiles);
+        values.put(ThreadEntry.COLUMN_POSITION, position);
 
         try {
             db.insertOrThrow(
@@ -232,6 +236,90 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         if (cursor != null){
             cursor.moveToFirst();
         }
+        return cursor;
+    }
+
+    // Reply Check /////////////////////////////////////////////////////////////////////////////////
+    //Just a mirror of Thread to prevent deletion when browsing
+
+    public boolean insertRCEntry(String board, String resto, String no, String sub, String com,
+                                     String email, String name, String trip, String time, String last_modified,
+                                     String id, String embed, byte[] mediaFiles, int position){
+        ContentValues values = new ContentValues();
+        values.put(ReplyCheck.COLUMN_BOARD_NAME, board);
+        values.put(ReplyCheck.COLUMN_THREAD_RESTO, resto);
+        values.put(ReplyCheck.COLUMN_THREAD_NO, no);
+        values.put(ReplyCheck.COLUMN_THREAD_SUB, sub);
+        values.put(ReplyCheck.COLUMN_THREAD_COM, com);
+        values.put(ReplyCheck.COLUMN_THREAD_EMAIL, email);
+        values.put(ReplyCheck.COLUMN_THREAD_NAME, name);
+        values.put(ReplyCheck.COLUMN_THREAD_TRIP, trip);
+        values.put(ReplyCheck.COLUMN_THREAD_TIME, time);
+        values.put(ReplyCheck.COLUMN_THREAD_LAST_MODIFIED, last_modified);
+        values.put(ReplyCheck.COLUMN_THREAD_ID, id);
+        values.put(ReplyCheck.COLUMN_THREAD_EMBED, embed);
+        values.put(ReplyCheck.COLUMN_THREAD_MEDIA_FILES, mediaFiles);
+        values.put(ReplyCheck.COLUMN_REPLY_CHECK_POSITION, position);
+
+        try {
+            db.insertOrThrow(
+                    ReplyCheck.TABLE_NAME,
+                    null,
+                    values
+            );
+            return true;
+        } catch (SQLException e){
+            Log.e(LOG_TAG, "Error Inserting row into " + ReplyCheck.TABLE_NAME +
+                    " NO: " + no);
+            return false;
+        }
+    }
+
+    public Cursor getRCCursor(String resto){
+        Cursor cursor = db.query(
+                ReplyCheck.TABLE_NAME, //table name
+                null, //columns to search
+                ReplyCheck.COLUMN_THREAD_RESTO + "=?", //where clause
+                new String[] {resto}, //where arguements
+                null, //Group by
+                null, //having
+                null //orderby
+        );
+
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public void deleteRCCache(){
+        //Delete all rows in table
+        db.delete(ReplyCheck.TABLE_NAME, null, null);
+    }
+
+    public Cursor getRCPost(String userPostBoardName, String userPostResto, String userPostNo){
+        Cursor cursor = db.query(
+                ReplyCheck.TABLE_NAME, //table name
+                null, //columns to search
+                ReplyCheck.COLUMN_BOARD_NAME + "=? AND " + ReplyCheck.COLUMN_THREAD_RESTO + "=? AND " + ReplyCheck.COLUMN_THREAD_NO + "=?", //where clause
+                new String[] {userPostBoardName, userPostResto, userPostNo}, //where arguements
+                null, //Group by
+                null, //having
+                null //orderby
+        );
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getRCReplies(String postNo) {
+        Cursor cursor = db.query(
+                ReplyCheck.TABLE_NAME, //table name
+                null, //columns to search
+                ReplyCheck.COLUMN_THREAD_COM + " LIKE ?", //where clause
+                new String[] {"%onclick=\"highlightReply('" + postNo + "%"}, //where arguements
+                null, //Group by
+                null, //having
+                null //orderby
+        );
+        cursor.moveToFirst();
         return cursor;
     }
 
@@ -358,16 +446,23 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         db.delete(
                 BoardEntry.TABLE_NAME,
                 BoardEntry.BOARD_ORDER + " =?",
-                new String[] {String.valueOf(boardListCount)}
+                new String[]{String.valueOf(boardListCount)}
         );
     }
     // User Posts Functions ////////////////////////////////////////////////////////////////////////
 
-    public void insertUserPostEntry(String board, String no){
+    public void insertUserPostEntry(String board, String no, String resto, String subject, String comment){
 
         ContentValues values = new ContentValues();
         values.put(UserPosts.COLUMN_BOARDS, board);
         values.put(UserPosts.COLUMN_NO, no);
+        values.put(UserPosts.COLUMN_RESTO, resto);
+        values.put(UserPosts.COLUMN_SUBJECT, subject);
+        values.put(UserPosts.COLUMN_COMMENT, comment);
+        values.put(UserPosts.COLUMN_NUMBER_OF_REPLIES, 0);
+        values.put(UserPosts.COLUMN_NEW_REPLY_FLAG, falseFlag);
+        values.put(UserPosts.COLUMN_ERROR_COUNT, 0);
+        values.put(UserPosts.COLUMN_POSITION, 0);
 
         try {
             db.insertOrThrow(
@@ -380,12 +475,104 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         }
     }
 
+    public void deleteUserPostsEntry(String rowId){
+        db.delete(UserPosts.TABLE_NAME,
+                UserPosts._ID + "=?",
+                new String[]{rowId});
+    }
+
     public boolean isNoUserPost(String boardName, String no) {
        return DatabaseUtils.queryNumEntries(
                 db, //Database
                 UserPosts.TABLE_NAME, //Table name
                 UserPosts.COLUMN_BOARDS + "=? AND " + UserPosts.COLUMN_NO + "=?", //where clause
                 new String[] {boardName, no}) > 0; // selection
+    }
+
+    public void updateUserPostReplyCount(String rowID, int newReplyCount){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(UserPosts.COLUMN_NUMBER_OF_REPLIES, newReplyCount);
+        db.update(UserPosts.TABLE_NAME,
+                contentValues, //values
+                UserPosts._ID + "= ?", //where
+                new String[]{rowID} //where args
+        );
+    }
+
+    public void updateUserPostPosition(String rowID, int position){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(UserPosts.COLUMN_POSITION, position);
+
+        db.update(UserPosts.TABLE_NAME,
+                contentValues, //values
+                UserPosts._ID + "= ?", //where
+                new String[]{rowID} //where args
+        );
+    }
+
+    public void addUserPostFlag(String rowID){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(UserPosts.COLUMN_NEW_REPLY_FLAG, trueFlag);
+
+        db.update(UserPosts.TABLE_NAME,
+                contentValues, //values
+                UserPosts._ID + "= ?", //where
+                new String[]{rowID} //where args
+        );
+    }
+
+    public void removeUserPostFlag(String rowID){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(UserPosts.COLUMN_NEW_REPLY_FLAG, falseFlag);
+
+        db.update(UserPosts.TABLE_NAME,
+                contentValues, //values
+                UserPosts._ID + "= ?", //where
+                new String[]{rowID} //where args
+        );
+    }
+
+    public void updateUserPostErrorCount(String rowID, int errorCount){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(UserPosts.COLUMN_ERROR_COUNT, errorCount);
+
+        db.update(UserPosts.TABLE_NAME,
+                contentValues, //values
+                UserPosts._ID + "= ?", //where
+                new String[]{rowID} //where args
+        );
+    }
+
+    public Cursor getUserPostsCursor(){
+
+        Cursor cursor = db.query(
+                UserPosts.TABLE_NAME,
+                null,
+                null, //selection
+                null, //selection args
+                null, //group by
+                null, //having
+                UserPosts.COLUMN_RESTO + " ASC" //orderby
+        );
+
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getFlaggedUserPostsCursor(){
+
+        Cursor cursor = db.query(
+                UserPosts.TABLE_NAME,
+                null,
+                UserPosts.COLUMN_NEW_REPLY_FLAG + " =?", //selection
+                new String[] {String.valueOf(trueFlag)}, //selection args
+                null, //group by
+                null, //having
+                UserPosts._ID + " DESC" //orderby
+        );
+
+        cursor.moveToFirst();
+        return cursor;
     }
 
     // Watchlist Functions /////////////////////////////////////////////////////////////////////////
@@ -546,16 +733,49 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 ThreadEntry.COLUMN_THREAD_IMAGE_HEIGHT + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_IMAGE_WIDTH + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_MEDIA_FILES + " BLOB, " +
+                ThreadEntry.COLUMN_POSITION + " INTEGER, " +
 
                 //I think this should auto overwrite dup posts if they ever come up
                 " UNIQUE (" + ThreadEntry.COLUMN_THREAD_NO + ", " + ThreadEntry.COLUMN_BOARD_NAME +
+                ") ON CONFLICT IGNORE);";
+
+        final String SQL_CREATE_REPLY_CHECK_TABLE = "CREATE TABLE " + ReplyCheck.TABLE_NAME + " (" +
+                ReplyCheck._ID + " INTEGER PRIMARY KEY, " +
+
+                //Foreign Key for board name
+                ReplyCheck.COLUMN_BOARD_NAME + " INTEGER NOT NULL, " +
+                ReplyCheck.COLUMN_THREAD_RESTO + " TEXT NOT NULL, " +
+                ReplyCheck.COLUMN_THREAD_NO + " TEXT NOT NULL, " +
+                ReplyCheck.COLUMN_THREAD_SUB + " TEXT, " +
+                ReplyCheck.COLUMN_THREAD_COM + " TEXT, " +
+                ReplyCheck.COLUMN_THREAD_EMAIL + " TEXT, " +
+                ReplyCheck.COLUMN_THREAD_NAME + " TEXT, " +
+                ReplyCheck.COLUMN_THREAD_TRIP + " TEXT, " +
+                ReplyCheck.COLUMN_THREAD_TIME + " TEXT NOT NULL, " +
+                ReplyCheck.COLUMN_THREAD_LAST_MODIFIED + " TEXT, " +
+                ReplyCheck.COLUMN_THREAD_ID + " TEXT, " +
+                ReplyCheck.COLUMN_THREAD_EMBED + " TEXT, " +
+                ReplyCheck.COLUMN_THREAD_IMAGE_HEIGHT + " TEXT, " +
+                ReplyCheck.COLUMN_THREAD_IMAGE_WIDTH + " TEXT, " +
+                ReplyCheck.COLUMN_THREAD_MEDIA_FILES + " BLOB, " +
+                ReplyCheck.COLUMN_REPLY_CHECK_POSITION + " INTEGER, " +
+
+                //I think this should auto overwrite dup posts if they ever come up
+                " UNIQUE (" + ReplyCheck.COLUMN_THREAD_NO + ", " + ReplyCheck.COLUMN_BOARD_NAME +
                 ") ON CONFLICT IGNORE);";
 
         final String SQL_CREATE_USER_POSTS_TABLE = "CREATE TABLE IF NOT EXISTS " + UserPosts.TABLE_NAME + " (" +
                 UserPosts._ID + " INTEGER PRIMARY KEY, " +
 
                 UserPosts.COLUMN_BOARDS + " TEXT NOT NULL, " +
-                UserPosts.COLUMN_NO + " TEXT NOT NULL);";
+                UserPosts.COLUMN_NO + " TEXT NOT NULL, " +
+                UserPosts.COLUMN_RESTO + " TEXT NOT NULL, " +
+                UserPosts.COLUMN_SUBJECT + " TEXT NOT NULL, " +
+                UserPosts.COLUMN_COMMENT + " TEXT NOT NULL, " +
+                UserPosts.COLUMN_NUMBER_OF_REPLIES + " INTEGER NOT NULL, " +
+                UserPosts.COLUMN_NEW_REPLY_FLAG + " INTEGER NOT NULL, " +
+                UserPosts.COLUMN_ERROR_COUNT + " INTEGER NOT NULL, "  +
+                UserPosts.COLUMN_POSITION + " INTEGER NOT NULL);";
 
         final String SQL_CREATE_WATCHLIST_TABLE = "CREATE TABLE IF NOT EXISTS " + WatchlistEntry.TABLE_NAME + " (" +
                 WatchlistEntry._ID + " INTEGER PRIMARY KEY, " +
@@ -573,6 +793,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         db.execSQL(SQL_CREATE_BOARD_TABLE);
         db.execSQL(SQL_CREATE_CATALOG_TABLE);
         db.execSQL(SQL_CREATE_THREAD_TABLE);
+        db.execSQL(SQL_CREATE_REPLY_CHECK_TABLE);
         db.execSQL(SQL_CREATE_USER_POSTS_TABLE);
         db.execSQL(SQL_CREATE_WATCHLIST_TABLE);
     }
@@ -581,8 +802,14 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + CatalogEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ThreadEntry.TABLE_NAME);
+
         if (oldVersion < 4){
             db.execSQL("DROP TABLE IF EXISTS " + BoardEntry.TABLE_NAME);
+        }
+        if (oldVersion < 5) {
+            db.execSQL("DROP TABLE IF EXISTS " + CatalogEntry.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + ThreadEntry.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + UserPosts.TABLE_NAME);
         }
 
         onCreate(db);

@@ -1,7 +1,5 @@
 package com.luorrak.ouroboros.catalog;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,6 +8,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -179,8 +179,8 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 String resto = "0";
                 Intent intent =  new Intent(getActivity(), ReplyCommentActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(CatalogAdapter.THREAD_NO, resto);
-                intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+                intent.putExtra(Util.INTENT_THREAD_NO, resto);
+                intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
                 getActivity().startActivity(intent);
                 break;
             }

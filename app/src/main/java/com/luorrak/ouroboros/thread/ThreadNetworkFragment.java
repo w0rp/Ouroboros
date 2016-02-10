@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -38,8 +39,8 @@ public class ThreadNetworkFragment extends Fragment {
     private Activity activity;
     private InsertThreadIntoDatabaseTask insertThreadIntoDatabaseTask;
 
-    public void beginTask(JsonObject jsonObject, InfiniteDbHelper infiniteDbHelper, String boardName, String resto, ThreadAdapter threadAdapter){
-        insertThreadIntoDatabaseTask = new InsertThreadIntoDatabaseTask(activity, infiniteDbHelper, boardName, resto, threadAdapter);
+    public void beginTask(JsonObject jsonObject, InfiniteDbHelper infiniteDbHelper, String boardName, String resto, int threadPosition, boolean firstRequest, RecyclerView recyclerView, ThreadAdapter threadAdapter){
+        insertThreadIntoDatabaseTask = new InsertThreadIntoDatabaseTask(activity, infiniteDbHelper, boardName, resto, threadPosition, firstRequest, recyclerView, threadAdapter);
         insertThreadIntoDatabaseTask.execute(jsonObject);
     }
 
@@ -85,13 +86,19 @@ public class ThreadNetworkFragment extends Fragment {
         private String boardName;
         private String resto;
         private ThreadAdapter threadAdapter;
+        private RecyclerView recyclerView;
+        private int threadPosition;
+        private boolean firstRequest;
 
-        public InsertThreadIntoDatabaseTask(Activity activity, InfiniteDbHelper infiniteDbHelper, String boardName, String resto, ThreadAdapter threadAdapter) {
+        public InsertThreadIntoDatabaseTask(Activity activity, InfiniteDbHelper infiniteDbHelper, String boardName, String resto, int threadPosition, boolean firstRequest, RecyclerView recyclerView, ThreadAdapter threadAdapter) {
             onAttach(activity);
             this.infiniteDbHelper = infiniteDbHelper;
             this.boardName = boardName;
             this.resto = resto;
             this.threadAdapter = threadAdapter;
+            this.recyclerView = recyclerView;
+            this.threadPosition = threadPosition;
+            this.firstRequest = firstRequest;
         }
 
         public void onDetach(){
@@ -106,6 +113,7 @@ public class ThreadNetworkFragment extends Fragment {
         protected Void doInBackground(JsonObject... params) {
             JsonParser jsonParser = new JsonParser();
             JsonArray posts = params[0].getAsJsonArray("posts");
+            int position = 0;
             for (JsonElement postElement : posts) {
                 if (isCancelled()) break;
                 JsonObject post = postElement.getAsJsonObject();
@@ -123,8 +131,10 @@ public class ThreadNetworkFragment extends Fragment {
                         jsonParser.getThreadLastModified(post),
                         jsonParser.getThreadId(post),
                         jsonParser.getThreadEmbed(post),
-                        jsonParser.getMediaFiles(post)
+                        jsonParser.getMediaFiles(post),
+                        position
                 );
+                position++;
             }
             return null;
         }
@@ -141,6 +151,10 @@ public class ThreadNetworkFragment extends Fragment {
                 progressBar.setVisibility(View.INVISIBLE);
             }
             threadAdapter.changeCursor(infiniteDbHelper.getThreadCursor(resto));
+
+            if (firstRequest){
+                recyclerView.scrollToPosition(threadPosition);
+            }
         }
     }
 }

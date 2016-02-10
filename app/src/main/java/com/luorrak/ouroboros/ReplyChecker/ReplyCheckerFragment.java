@@ -1,15 +1,18 @@
-package com.luorrak.ouroboros.miscellaneous;
+package com.luorrak.ouroboros.ReplyChecker;
 
-import android.content.res.AssetManager;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 
-import com.luorrak.ouroboros.util.SettingsHelper;
-import com.luorrak.ouroboros.util.Util;
+import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.util.InfiniteDbHelper;
 
 /**
  * Ouroboros - An 8chan browser
@@ -28,19 +31,24 @@ import com.luorrak.ouroboros.util.Util;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class OpenSourceLicenseFragment extends Fragment {
 
+public class ReplyCheckerFragment extends Fragment {
+
+    RecyclerView recyclerView;
+
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Util.onActivityCreateSetTheme(getActivity(), SettingsHelper.getTheme(getActivity()));
         super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.fragment_reply_checker, container, false);
+        InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());
 
-        getActivity().setTitle("License");
-        WebView webView = new WebView(getActivity());
-        AssetManager am = getActivity().getAssets();
-        webView.loadUrl("file:///android_asset/license.html");
-
-        return webView;
+        getActivity().setTitle("Replies");
+        Cursor userPostsCursor = infiniteDbHelper.getFlaggedUserPostsCursor();
+        recyclerView = (RecyclerView) view.findViewById(R.id.reply_checker_recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        ReplyCheckerAdapter replyCheckerAdapter = new ReplyCheckerAdapter(userPostsCursor, infiniteDbHelper);
+        recyclerView.setAdapter(replyCheckerAdapter);
+        return view;
     }
-
 }

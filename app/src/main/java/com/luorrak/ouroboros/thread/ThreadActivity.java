@@ -23,7 +23,6 @@ import android.widget.ProgressBar;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.catalog.CatalogActivity;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.catalog.WatchListAdapter;
 import com.luorrak.ouroboros.util.DragAndDropRecyclerView.WatchListTouchHelper;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
@@ -70,13 +69,14 @@ public class ThreadActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        String resto = getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
-        String boardName = getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
+        String resto = getIntent().getStringExtra(Util.INTENT_THREAD_NO);
+        String boardName = getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
+        int threadPosition = getIntent().getIntExtra(Util.INTENT_THREAD_POSITION, 0);
 
         if (savedInstanceState != null){
             threadFragment = (ThreadFragment) getFragmentManager().getFragment(savedInstanceState, "threadFragment");
         } else {
-            threadFragment = new ThreadFragment().newInstance(resto, boardName);
+            threadFragment = new ThreadFragment().newInstance(resto, boardName, threadPosition);
         }
 
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -90,7 +90,7 @@ public class ThreadActivity extends AppCompatActivity {
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         watchList.setLayoutManager(layoutManager);
 
-        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), getApplicationContext(), drawerLayout);
+        watchListAdapter = new WatchListAdapter(infiniteDbHelper.getWatchlistCursor(), drawerLayout, infiniteDbHelper);
         watchList.setAdapter(watchListAdapter);
 
         ItemTouchHelper.Callback callback = new WatchListTouchHelper(watchListAdapter);
@@ -130,8 +130,10 @@ public class ThreadActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        if (threadFragment.isAdded()){
+            getFragmentManager().putFragment(outState, "threadFragment", threadFragment);
+        }
 
-        getFragmentManager().putFragment(outState, "threadFragment", threadFragment);
     }
 
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////
@@ -163,6 +165,7 @@ public class ThreadActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case Util.REQUEST_STORAGE_PERMISSION: {
+                //https://stackoverflow.com/questions/35124794/android-studio-remove-security-exception-warning
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -173,6 +176,7 @@ public class ThreadActivity extends AppCompatActivity {
                     // functionality that depends on this permission.
                     Snackbar.make(getCurrentFocus(), "Requires Permission", Snackbar.LENGTH_LONG).show();
                 }
+                break;
             }
 
             // other 'case' lines to check for other
@@ -193,14 +197,14 @@ public class ThreadActivity extends AppCompatActivity {
 
         //clear dialog fragments
         fragmentManager.popBackStack("threadDialog", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        if (threadNo != "0"){
+        if (!threadNo.equals("0")){
             ThreadFragment threadFragment = new ThreadFragment().newInstance(threadNo, boardName);
             fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
                     .addToBackStack("thread")
                     .commit();
         } else {
             Intent intent = new Intent(this, CatalogActivity.class);
-            intent.putExtra(CatalogAdapter.BOARD_NAME, boardName);
+            intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
             startActivity(intent);
 
         }
@@ -221,6 +225,5 @@ public class ThreadActivity extends AppCompatActivity {
 
     public void updateWatchlist(){
         watchListAdapter.changeCursor(infiniteDbHelper.getWatchlistCursor());
-        int a = 2;
     }
 }

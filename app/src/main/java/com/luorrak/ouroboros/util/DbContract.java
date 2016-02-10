@@ -175,6 +175,96 @@ public class DbContract {
         Type: BLOB
         */
         public static final String COLUMN_THREAD_MEDIA_FILES = "media_files";
+
+        public static final String COLUMN_POSITION = "position";
+    }
+
+    public static final class ReplyCheck implements BaseColumns{
+
+        public static final String TABLE_NAME = "reply_check_cache";
+
+        /*
+        foreign key from table boards
+        Type: String
+         */
+        public static final String COLUMN_BOARD_NAME = "board_name";
+        /*
+        OP post people are replying to
+        Type: String
+         */
+        public static final String COLUMN_THREAD_RESTO = "resto";
+        /*
+        post number
+        Type: String
+         */
+        public static final String COLUMN_THREAD_NO = "no";
+        /*
+        original filename
+        WARNING: can be null
+        Type: String
+         */
+        public static final String COLUMN_THREAD_FILENAME = "filename";
+
+        public static final String COLUMN_THREAD_IMAGE_HEIGHT = "image_01_height";
+
+        public static final String COLUMN_THREAD_IMAGE_WIDTH = "image_01_width";
+        /*
+        Post Subtitle
+        WARNING: should only appear on OP else return null
+        Type: String
+         */
+        public static final String COLUMN_THREAD_SUB = "sub";
+        /*
+        post comment
+        WARNING: will be filled with html special characters
+        Type: String
+         */
+        public static final String COLUMN_THREAD_COM = "com";
+        /*
+        post email
+        WARNING: Can have any type of text
+        Type: String
+        */
+        public static final String COLUMN_THREAD_EMAIL = "email";
+        /*
+        Name of poster
+        WARNING: can be null
+        Type: String
+         */
+        public static final String COLUMN_THREAD_NAME = "name";
+        /*
+        trip of poster
+        WARNING: can be null
+        Type: String
+         */
+        public static final String COLUMN_THREAD_TRIP = "trip";
+        /*
+        What time the post was submitted
+        Type: String
+         */
+        public static final String COLUMN_THREAD_TIME = "time";
+        /*
+        last time the post was modified
+        Type: String
+         */
+        public static final String COLUMN_THREAD_LAST_MODIFIED = "last_modified";
+        /*
+        poster id
+        WARNING: may be null
+        Type: String
+         */
+        public static final String COLUMN_THREAD_ID = "id";
+
+        public static final String COLUMN_THREAD_EMBED = "embed";
+
+        /*
+        Serialized Arraylist of Media Items
+        WARNING: may be null
+        Type: BLOB
+        */
+        public static final String COLUMN_THREAD_MEDIA_FILES = "media_files";
+
+        public static final String COLUMN_REPLY_CHECK_POSITION = "position";
     }
 
     public static final class UserPosts implements BaseColumns{
@@ -184,6 +274,20 @@ public class DbContract {
         public static final String COLUMN_BOARDS = "board_name";
 
         public static final String COLUMN_NO = "user_post_no";
+
+        public static final String COLUMN_RESTO = "user_post_resto";
+
+        public static final String COLUMN_SUBJECT = "user_post_subject";
+
+        public static final String COLUMN_COMMENT = "user_post_comment";
+
+        public static final String COLUMN_NUMBER_OF_REPLIES = "user_post_number_of_replies";
+
+        public static final String COLUMN_NEW_REPLY_FLAG = "new_reply_flag";
+
+        public static final String COLUMN_ERROR_COUNT = "error_count";
+
+        public static final String COLUMN_POSITION = "position";
     }
 
     public static final class WatchlistEntry implements BaseColumns{

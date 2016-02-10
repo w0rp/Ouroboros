@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -23,9 +24,6 @@
         <activity
             android:name=".thread.ThreadActivity"
             android:label="Thread">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".catalog.CatalogActivity" />
         </activity>
         <activity
             android:name=".deepzoom.DeepZoomActivity"
@@ -41,5 +39,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".thread.ThreadActivity" />
         </activity>
+        <service android:name=".services.ReplyCheckerService"
+            android:exported="false"/>
+        <receiver android:name=".services.AlarmReceiver"/>
     </application>
 </manifest>

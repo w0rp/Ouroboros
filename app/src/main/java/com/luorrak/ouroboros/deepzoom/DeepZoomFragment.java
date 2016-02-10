@@ -100,7 +100,7 @@ public class DeepZoomFragment extends Fragment{
         setHasOptionsMenu(true);
         final LinearLayout deepzoomContainer = (LinearLayout) rootView.findViewById(R.id.deepzoom_container);
         photoView = (PhotoView) rootView.findViewById(R.id.deepzoom_photoview);
-        photoView.setMaximumScale(16);
+        photoView.setMaximumScale(24);
         mediaPlayButton = (ImageView) rootView.findViewById(R.id.deepzoom_media_play_button);
         mediaPlayButton.setVisibility(View.GONE);
 
@@ -108,7 +108,6 @@ public class DeepZoomFragment extends Fragment{
         progressBar.setVisibility(View.VISIBLE);
 
         Ion.with(photoView)
-                .deepZoom()
                 .load(ChanUrls.getThumbnailUrl(boardName, mediaItem.fileName))
                 .withBitmapInfo()
                 .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
@@ -117,20 +116,9 @@ public class DeepZoomFragment extends Fragment{
                         if (e != null) {
                             return;
                         }
-
                         progressBar.setVisibility(View.INVISIBLE);
 
-                        if (result.getBitmapInfo() != null){
-                            Palette.from(result.getBitmapInfo().bitmap).generate(new Palette.PaletteAsyncListener() {
-                                @Override
-                                public void onGenerated(Palette palette) {
-                                    Palette.Swatch swatch = palette.getMutedSwatch();
-                                    if (swatch != null) {
-                                        deepzoomContainer.setBackgroundColor(swatch.getRgb());
-                                    }
-                                }
-                            });
-                        }
+                        Util.setSwatch(deepzoomContainer, result);
 
                         if (mediaItem.ext.equals(".webm") || mediaItem.ext.equals(".mp4")) {
                             return;
@@ -138,7 +126,7 @@ public class DeepZoomFragment extends Fragment{
 
                         Ion.with(photoView)
                                 .crossfade(true)
-                                .smartSize(true)
+                                .deepZoom()
                                 .load(ChanUrls.getImageUrl(boardName, mediaItem.fileName, mediaItem.ext))
                                 .withBitmapInfo();
                     }
@@ -238,7 +226,7 @@ public class DeepZoomFragment extends Fragment{
                     // functionality that depends on this permission.
                     Snackbar.make(getView(), "Requires Permission", Snackbar.LENGTH_LONG).show();
                 }
-                return;
+                break;
             }
 
             // other 'case' lines to check for other

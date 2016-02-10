@@ -58,7 +58,7 @@ public class NetworkHelper {
     private boolean needDNSBLCaptcha = false;
     private boolean genericCaptcha = false;
     private Reply reply;
-    public void postReply(final Context context, Reply reply, final SharedPreferences sharedPreferences,
+    public void postReply(final Context context, final Reply reply, final SharedPreferences sharedPreferences,
                           final JsonParser jsonParser, final InfiniteDbHelper infiniteDbHelper, final View view){
         this.reply = reply;
         String postUrl = ChanUrls.getReplyUrl();
@@ -158,7 +158,7 @@ public class NetworkHelper {
                             boardName = jsonParser.getSubmittedBoardName(jsonObjectResponse.getResult());
                             userPostNo = jsonParser.getUserPostNo(jsonObjectResponse.getResult());
 
-                            infiniteDbHelper.insertUserPostEntry(boardName, userPostNo);
+                            infiniteDbHelper.insertUserPostEntry(boardName, userPostNo, reply.resto, reply.subject, reply.comment);
 
                             sharedPreferences.edit().remove(SaveReplyText.nameEditTextKey)
                                     .remove(SaveReplyText.emailEditTextKey)

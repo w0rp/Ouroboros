@@ -36,7 +36,6 @@ import android.widget.TextView;
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.JsonParser;
-import com.luorrak.ouroboros.catalog.CatalogAdapter;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
 import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.Reply;
@@ -45,7 +44,6 @@ import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Ouroboros - An 8chan browser
@@ -98,9 +96,9 @@ public class ReplyCommentFragment extends Fragment {
         }
         reply.fileName = new ArrayList<String>();
 
-        resto = getActivity().getIntent().getStringExtra(CatalogAdapter.THREAD_NO);
-        boardName = getActivity().getIntent().getStringExtra(CatalogAdapter.BOARD_NAME);
-        replyNo = getActivity().getIntent().getStringExtra(CatalogAdapter.REPLY_NO);
+        resto = getActivity().getIntent().getStringExtra(Util.INTENT_THREAD_NO);
+        boardName = getActivity().getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
+        replyNo = getActivity().getIntent().getStringExtra(Util.INTENT_REPLY_NO);
 
         EditText nameText = (EditText) view.findViewById(R.id.post_comment_editText_name);
         EditText emailText = (EditText) view.findViewById(R.id.post_comment_editText_email);
@@ -224,7 +222,7 @@ public class ReplyCommentFragment extends Fragment {
                     // functionality that depends on this permission.
                     Snackbar.make(getView(), "Requires Permission", Snackbar.LENGTH_LONG).show();
                 }
-                return;
+                break;
             }
 
             // other 'case' lines to check for other

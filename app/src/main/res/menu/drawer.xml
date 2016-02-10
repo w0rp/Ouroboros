@@ -6,6 +6,10 @@
             android:icon="@drawable/ic_list_black_24dp"
             android:title="Boards"/>
         <item
+            android:id="@+id/drawer_item_replies"
+            android:icon="@drawable/ic_mail_black_24dp"
+            android:title="Replies" />
+        <item
             android:id="@+id/drawer_item_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="Settings"/>

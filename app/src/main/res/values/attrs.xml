@@ -11,4 +11,5 @@
     <attr name="board_reorder_icon" format="reference"/>
     <attr name="catalog_lock_icon" format="reference" />
     <attr name="catalog_sticky_icon" format="reference" />
+    <attr name="reply_checker_read_icon" format="reference"/>
 </resources>
