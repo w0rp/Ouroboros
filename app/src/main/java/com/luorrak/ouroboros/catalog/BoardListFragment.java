@@ -53,7 +53,7 @@ import com.luorrak.ouroboros.util.InfiniteDbHelper;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BoardListFragment extends android.app.Fragment implements OnStartDragListener {
+public class BoardListFragment extends Fragment implements OnStartDragListener {
     private NavigationBoardListAdapter boardListAdapter;
     private ItemTouchHelper touchHelper;
 

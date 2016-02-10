@@ -54,4 +54,11 @@
             android:inputType="text"
             android:defaultValue=""/>
         </PreferenceCategory>
+    <PreferenceCategory android:title="Miscellaneous">
+        <CheckBoxPreference
+            android:key="pref_reply_checker"
+            android:title="Reply Checker Enabled"
+            android:summary="Enable/Disable Periodic Checks for new replies"
+            android:defaultValue="true" />
+    </PreferenceCategory>
 </PreferenceScreen>

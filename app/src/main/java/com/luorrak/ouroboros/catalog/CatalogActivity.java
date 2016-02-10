@@ -1,6 +1,7 @@
 package com.luorrak.ouroboros.catalog;
 
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,6 +22,7 @@ import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.ReplyChecker.ReplyCheckerFragment;
 import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseFragment;
+import com.luorrak.ouroboros.services.AlarmReceiver;
 import com.luorrak.ouroboros.services.ReplyCheckerService;
 import com.luorrak.ouroboros.settings.SettingsFragment;
 import com.luorrak.ouroboros.util.DragAndDropRecyclerView.WatchListTouchHelper;
@@ -66,9 +68,8 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         initPostPassword();
+        initReplyChecker();
 
-        //Util.stopReplyCheckerService(getApplicationContext());
-      Util.startReplyCheckerService(getApplicationContext());
         infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         setContentView(R.layout.activity_catalog);
         bindViews();
@@ -77,15 +78,15 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         replyCheckerIntent = getIntent().getBooleanExtra(Util.INTENT_REPLY_CHECKER, false);
         if (board != null){
             CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
-            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
         } else if (replyCheckerIntent) {
             ReplyCheckerFragment replyCheckerFragment = new ReplyCheckerFragment();
-            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.activity_catalog_fragment_container, replyCheckerFragment).commit();
         } else {
             BoardListFragment boardListFragment = new BoardListFragment();
-            android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
         }
 
@@ -116,6 +117,14 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         }
     }
 
+    private void initReplyChecker(){
+        if (SettingsHelper.getReplyCheckerStatus(getApplicationContext())){
+            Util.startReplyCheckerService(getApplicationContext());
+        } else {
+            Util.stopReplyCheckerService(getApplicationContext());
+        }
+    }
+
     private void setupWatchlist(){
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         watchList.setLayoutManager(layoutManager);
@@ -143,28 +152,28 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
         switch (menuItem.getItemId()){
             case R.id.drawer_item_boards:{
                 BoardListFragment boardListFragment = new BoardListFragment();
-                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
                 progressBar.setVisibility(View.INVISIBLE);
                 break;
             }
             case R.id.drawer_item_settings: {
                 SettingsFragment settingsFragment = new SettingsFragment();
-                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, settingsFragment).commit();
                 progressBar.setVisibility(View.INVISIBLE);
                 break;
             }
             case R.id.drawer_item_licences: {
                 OpenSourceLicenseFragment openSourceLicenseFragment = new OpenSourceLicenseFragment();
-                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, openSourceLicenseFragment).commit();
                 progressBar.setVisibility(View.INVISIBLE);
                 break;
             }
             case R.id.drawer_item_replies: {
                 ReplyCheckerFragment replyCheckerFragment = new ReplyCheckerFragment();
-                android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, replyCheckerFragment).commit();
                 progressBar.setVisibility(View.INVISIBLE);
                 break;
@@ -191,7 +200,7 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
     public void launchBoardFragment(String board){
         this.board = board; //The real reason for this method being here
         CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
     }
 }

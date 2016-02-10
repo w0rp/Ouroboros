@@ -87,4 +87,9 @@ public class SettingsHelper {
         editor.putString("post_password", postPassword);
         editor.apply();
     }
+
+    public static boolean getReplyCheckerStatus(Context context){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean("pref_reply_checker", true);
+    }
 }

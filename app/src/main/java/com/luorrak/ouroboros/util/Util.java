@@ -61,6 +61,7 @@ public class Util {
     public static final int CATALOG_LAYOUT_LIST = 0;
     public static final int CATALOG_LAYOUT_GRID= 1;
 
+    public static final int REPLY_CHECKER_INTENT_ID = 5738295;
 
     public static String[] parseYoutube(String embed) {
         String[] youtubeData = new String[2];
@@ -149,7 +150,7 @@ public class Util {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("startReplyCheckerService", true);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 5738295, intent, 0);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, REPLY_CHECKER_INTENT_ID, intent, 0);
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 60*1000, 60*1000, alarmIntent);
     }
 
@@ -157,7 +158,7 @@ public class Util {
         //// TODO: 2/6/16  Intent intentstop = new Intent(this, Areceiver.class);
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent senderstop = PendingIntent.getBroadcast(context,
-                5738295, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                REPLY_CHECKER_INTENT_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManagerstop = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         alarmManagerstop.cancel(senderstop);
