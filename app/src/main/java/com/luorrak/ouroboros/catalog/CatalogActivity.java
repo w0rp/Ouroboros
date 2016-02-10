@@ -76,18 +76,20 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
 
         board = getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
         replyCheckerIntent = getIntent().getBooleanExtra(Util.INTENT_REPLY_CHECKER, false);
-        if (board != null){
-            CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
-            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
-        } else if (replyCheckerIntent) {
-            ReplyCheckerFragment replyCheckerFragment = new ReplyCheckerFragment();
-            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.activity_catalog_fragment_container, replyCheckerFragment).commit();
-        } else {
-            BoardListFragment boardListFragment = new BoardListFragment();
-            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
+        if (savedInstanceState == null) {
+            if (board != null){
+                CatalogFragment catalogFragment = new CatalogFragment().newInstance(board);
+                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, catalogFragment).commit();
+            } else if (replyCheckerIntent) {
+                ReplyCheckerFragment replyCheckerFragment = new ReplyCheckerFragment();
+                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, replyCheckerFragment).commit();
+            } else {
+                BoardListFragment boardListFragment = new BoardListFragment();
+                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
+            }
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);

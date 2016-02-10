@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.luorrak.ouroboros.R;
@@ -99,7 +100,7 @@ public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
         public TextView rcSubjectText;
         public TextView rcCommentText;
         public TextView rcReplyCountText;
-        public Button rcMarkAsReadButton;
+        public ImageButton rcMarkAsReadButton;
         public ReplyCheckerObject replyCheckerObject;
 
         public ReplyCheckerViewHolder(View itemView) {
@@ -109,9 +110,10 @@ public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
             rcSubjectText = (TextView) itemView.findViewById(R.id.reply_checker_sub_text);
             rcCommentText = (TextView) itemView.findViewById(R.id.reply_checker_com_text);
             rcReplyCountText = (TextView) itemView.findViewById(R.id.reply_checker_reply_count);
-            rcMarkAsReadButton = (Button) itemView.findViewById(R.id.reply_checker_mark_as_read_button);
+            rcMarkAsReadButton = (ImageButton) itemView.findViewById(R.id.reply_checker_mark_as_read_button);
             replyCheckerObject = new ReplyCheckerObject();
 
+            rcThreadName.setTypeface(rcThreadName.getTypeface(), Typeface.BOLD);
             rcReplyCountText.setTypeface(rcReplyCountText.getTypeface(), Typeface.BOLD);
 
             rcMarkAsReadButton.setOnClickListener(this);

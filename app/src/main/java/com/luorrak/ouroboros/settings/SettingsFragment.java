@@ -7,6 +7,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.util.SettingsHelper;
+import com.luorrak.ouroboros.util.Util;
 
 /**
  * Ouroboros - An 8chan browser
@@ -46,6 +48,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     getActivity().recreate();
                 }
                 break;
+            }
+            case "pref_reply_checker": {
+                if (SettingsHelper.getReplyCheckerStatus(getActivity())){
+                    Util.startReplyCheckerService(getActivity());
+                } else {
+                    Util.stopReplyCheckerService(getActivity());
+                }
             }
         }
     }

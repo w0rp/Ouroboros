@@ -3,8 +3,8 @@
     android:id="@+id/catalog_swipe_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="8dp"
-    android:paddingRight="8dp"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp"
     android:background="?attr/window_background"
     tools:context=".CatalogFragment">
 

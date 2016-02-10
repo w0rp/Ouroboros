@@ -43,13 +43,13 @@
                 android:maxLines="6"
                 android:text="COMMENT"/>
         </LinearLayout>
-        <Button
+        <ImageButton
             android:id="@+id/reply_checker_mark_as_read_button"
             android:layout_width="75dp"
             android:layout_height="24dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:text="X"
+            android:src="?attr/reply_checker_read_icon"
             android:textSize="16sp"
             android:background="?android:attr/selectableItemBackground"/>
         <View
@@ -60,14 +60,14 @@
             android:layout_marginTop="2dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:background="#972397" />
+            android:background="?attr/divider_color" />
         <TextView
             android:id="@+id/reply_checker_reply_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/reply_checker_divider"
             android:layout_alignParentRight="true"
-            android:paddingRight="8dp"
+            android:padding="8dp"
             android:text="1000 Replies"
             android:textSize="16sp" />
     </RelativeLayout>
