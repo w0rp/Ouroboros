@@ -66,41 +66,45 @@ public class ReplyCheckerService extends IntentService {
         String userPostResto;
         String userPostNo;
         int userReplyCount;
+        int userPostErrorCount;
         int replyCount = 0;
 
         String oldResto = "";
-        do {
-            String userPostRowId = String.valueOf(userPostsCursor.getInt(userPostsCursor.getColumnIndex(DbContract.UserPosts._ID)));
-            userPostBoardName = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_BOARDS));
-            userPostResto = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_RESTO));
-            userPostNo = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_NO));
-            userReplyCount = userPostsCursor.getInt(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_NUMBER_OF_REPLIES));
+        if((userPostsCursor != null) && (userPostsCursor.getCount() > 0)){
+            do {
+                String userPostRowId = String.valueOf(userPostsCursor.getInt(userPostsCursor.getColumnIndex(DbContract.UserPosts._ID)));
+                userPostBoardName = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_BOARDS));
+                userPostResto = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_RESTO));
+                userPostNo = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_NO));
+                userReplyCount = userPostsCursor.getInt(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_NUMBER_OF_REPLIES));
+                userPostErrorCount = userPostsCursor.getInt(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_ERROR_COUNT));
 
-            //No change in thread.
-            // TODO: 2/7/16 resto 0 new thread
-            if (!userPostResto.equals(oldResto)){
-                getThreadJson(userPostBoardName, userPostResto, infiniteDbHelper, userPostRowId);
-                oldResto = userPostResto;
+                //No change in thread.
+                // TODO: 2/7/16 resto 0 new thread
+                if (!userPostResto.equals(oldResto)){
+                    getThreadJson(userPostBoardName, userPostResto, infiniteDbHelper, userPostRowId, userPostErrorCount);
+                    oldResto = userPostResto;
+                }
+                repliesCursor = infiniteDbHelper.getRCReplies(userPostNo);
+                int threadReplyCount = repliesCursor.getCount();
+                repliesCursor.close();
+
+                if (threadReplyCount > userReplyCount) {
+                    replyCount++;
+                    infiniteDbHelper.updateUserPostReplyCount(threadReplyCount, userPostRowId);
+                    infiniteDbHelper.addUserPostFlag(userPostRowId);
+                }
+            }while (userPostsCursor.moveToNext());
+            userPostsCursor.close();
+            infiniteDbHelper.deleteRCCache();
+
+            if (replyCount > 0){
+                createNotification(String.valueOf(replyCount));
             }
-            repliesCursor = infiniteDbHelper.getRCReplies(userPostNo);
-            int threadReplyCount = repliesCursor.getCount();
-            repliesCursor.close();
-
-            if (threadReplyCount > userReplyCount) {
-                replyCount++;
-                infiniteDbHelper.updateUserPostReplyCount(threadReplyCount, userPostRowId);
-                infiniteDbHelper.addUserPostFlag(userPostRowId);
-            }
-        }while (userPostsCursor.moveToNext());
-        userPostsCursor.close();
-        infiniteDbHelper.deleteRCCache();
-
-        if (replyCount > 0){
-            createNotification(String.valueOf(replyCount));
         }
     }
 
-    private void getThreadJson(final String userPostBoardName, String userPostResto, final InfiniteDbHelper infiniteDbHelper, String userPostRowId) {
+    private void getThreadJson(final String userPostBoardName, String userPostResto, final InfiniteDbHelper infiniteDbHelper, String userPostRowId, int userPostErrorCount) {
         JsonObject jsonObject = null;
         try {
             jsonObject = Ion.with(getApplicationContext())
@@ -108,12 +112,23 @@ public class ReplyCheckerService extends IntentService {
                     .setLogging("ReplyService", Log.DEBUG)
                     .asJsonObject().get();
         } catch (InterruptedException e) {
-            infiniteDbHelper.deleteUserPostsEntry(userPostRowId);
+            userPostPrune(infiniteDbHelper, userPostRowId, userPostErrorCount);
         } catch (ExecutionException e) {
-            infiniteDbHelper.deleteUserPostsEntry(userPostRowId);
+            userPostPrune(infiniteDbHelper, userPostRowId, userPostErrorCount);
         }
         if (jsonObject != null){
             insertRCIntoDatabase(jsonObject, userPostBoardName, infiniteDbHelper);
+            infiniteDbHelper.updateUserPostErrorCount(userPostRowId, 0);
+        } else {
+            userPostPrune(infiniteDbHelper, userPostRowId, userPostErrorCount);
+        }
+    }
+
+    private void userPostPrune(InfiniteDbHelper infiniteDbHelper, String userPostRowId, int userPostErrorCount){
+        if(userPostErrorCount == 2){
+            infiniteDbHelper.deleteUserPostsEntry(userPostRowId);
+        } else {
+            infiniteDbHelper.updateUserPostErrorCount(userPostRowId, userPostErrorCount + 1);
         }
     }
 
@@ -142,7 +157,7 @@ public class ReplyCheckerService extends IntentService {
 
     private void createNotification(String replyCount) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext())
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.white_ouroboros)
                 .setColor(getApplicationContext().getResources().getColor(R.color.md_green_500))
                 .setContentTitle(replyCount + " New Post Replied To")
                 .setContentText("Click here to go see");

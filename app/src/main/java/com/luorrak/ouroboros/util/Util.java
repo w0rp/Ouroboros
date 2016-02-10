@@ -150,7 +150,7 @@ public class Util {
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("startReplyCheckerService", true);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 5738295, intent, 0);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, alarmIntent);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 60*1000, 60*1000, alarmIntent);
     }
 
     public static void stopReplyCheckerService(Context context){

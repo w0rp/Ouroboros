@@ -179,7 +179,7 @@ public class DbContract {
 
     public static final class ReplyCheck implements BaseColumns{
 
-        public static final String TABLE_NAME = "thread";
+        public static final String TABLE_NAME = "reply_check_cache";
 
         /*
         foreign key from table boards
@@ -280,6 +280,8 @@ public class DbContract {
         public static final String COLUMN_NUMBER_OF_REPLIES = "user_post_number_of_replies";
 
         public static final String COLUMN_NEW_REPLY_FLAG = "new_reply_flag";
+
+        public static final String COLUMN_ERROR_COUNT = "error_count";
     }
 
     public static final class WatchlistEntry implements BaseColumns{

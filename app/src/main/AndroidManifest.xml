@@ -24,9 +24,6 @@
         <activity
             android:name=".thread.ThreadActivity"
             android:label="Thread">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".catalog.CatalogActivity" />
         </activity>
         <activity
             android:name=".deepzoom.DeepZoomActivity"
