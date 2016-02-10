@@ -145,7 +145,6 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         if (boardName != null){
             handler = new Handler();
             pollingInterval = 10000;
-            startStatusCheck();
             threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getFragmentManager(), boardName, getActivity(), infiniteDbHelper);
             threadAdapter.setHasStableIds(true);
             threadAdapter.hasStableIds();
@@ -154,6 +153,12 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         }
 
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        startStatusCheck();
     }
 
     // Life Cycle //////////////////////////////////////////////////////////////////////////////////
@@ -357,8 +362,8 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                     @Override
                     public void onCompleted(Exception e, JsonObject jsonObject) {
                         if (e == null) {
-                            if (jsonObject.toString().equals(oldJsonString)){
-                                pollingInterval = pollingInterval + pollingInterval/2;
+                            if (jsonObject.toString().equals(oldJsonString)) {
+                                pollingInterval = pollingInterval + pollingInterval / 2;
                                 ((ThreadActivity) getActivity()).setProgressBarStatus(false);
                             } else {
                                 restartStatusCheck();
