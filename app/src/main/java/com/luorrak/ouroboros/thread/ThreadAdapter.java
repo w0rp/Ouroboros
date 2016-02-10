@@ -148,7 +148,11 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                             .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                                 @Override
                                 public void onCompleted(Exception e, ImageViewBitmapInfo result) {
-                                    if (e != null || result.getBitmapInfo().bitmap == null) {
+                                    if (e != null || result.getException() != null){
+                                        return;
+                                    }
+                                    
+                                    if (result.getBitmapInfo().bitmap == null){
                                         return;
                                     }
 
