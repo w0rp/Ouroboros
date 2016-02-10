@@ -138,7 +138,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                         .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                             @Override
                             public void onCompleted(Exception e, ImageViewBitmapInfo result) {
-                                if (e != null || result.getBitmapInfo() == null || threadValue == Util.THREAD_LAYOUT_HORIZONTAL) {
+                                if (e != null || result.getException() == null || result.getBitmapInfo() == null || threadValue == Util.THREAD_LAYOUT_HORIZONTAL) {
                                     return;
                                 }
                                 Util.setSwatch(mediaViewHolder.mediaHolder, result);
