@@ -109,7 +109,7 @@ public class ReplyCheckerService extends IntentService {
             infiniteDbHelper.deleteRCCache();
 
             if (replyCount > 0){
-                createNotification(String.valueOf(replyCount));
+                createNotification(replyCount);
             }
         }
     }
@@ -168,11 +168,12 @@ public class ReplyCheckerService extends IntentService {
         }
     }
 
-    private void createNotification(String replyCount) {
+    private void createNotification(int replyCount) {
+        String title = (replyCount > 1) ? replyCount + " Posts Replied To" : replyCount + " Post Replied To";
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.mipmap.white_ouroboros)
                 .setColor(getApplicationContext().getResources().getColor(R.color.md_green_500))
-                .setContentTitle(replyCount + " New Post Replied To")
+                .setContentTitle(title)
                 .setContentText("Click here to go see");
 
         Intent resultIntent = new Intent(this, CatalogActivity.class);
