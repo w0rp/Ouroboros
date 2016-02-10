@@ -369,6 +369,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                             ((ThreadActivity) getActivity()).setProgressBarStatus(false);
                             Snackbar.make(getView(), "Error retrieving thread", Snackbar.LENGTH_LONG).show();
                         }
+                        firstRequest = false;
                     }
                 });
     }
