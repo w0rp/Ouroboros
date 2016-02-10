@@ -71,11 +71,12 @@ public class ThreadActivity extends AppCompatActivity {
 
         String resto = getIntent().getStringExtra(Util.INTENT_THREAD_NO);
         String boardName = getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
+        int threadPosition = getIntent().getIntExtra(Util.INTENT_THREAD_POSITION, 0);
 
         if (savedInstanceState != null){
             threadFragment = (ThreadFragment) getFragmentManager().getFragment(savedInstanceState, "threadFragment");
         } else {
-            threadFragment = new ThreadFragment().newInstance(resto, boardName);
+            threadFragment = new ThreadFragment().newInstance(resto, boardName, threadPosition);
         }
 
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();

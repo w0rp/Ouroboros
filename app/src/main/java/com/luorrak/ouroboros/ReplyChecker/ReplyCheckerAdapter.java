@@ -78,6 +78,7 @@ public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
             replyCheckerViewHolder.replyCheckerObject.subject = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_SUBJECT));
             replyCheckerViewHolder.replyCheckerObject.comment = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_COMMENT));
             replyCheckerViewHolder.replyCheckerObject.replyCount = cursor.getString(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_NUMBER_OF_REPLIES));
+            replyCheckerViewHolder.replyCheckerObject.position = cursor.getInt(cursor.getColumnIndex(DbContract.UserPosts.COLUMN_POSITION));
         }
     }
     @Override
@@ -92,6 +93,7 @@ public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
         public String subject = "";
         public String comment = "";
         public String replyCount = "";
+        public int position = 0;
     }
 
     private class ReplyCheckerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -140,6 +142,7 @@ public class ReplyCheckerAdapter extends CursorRecyclerAdapter{
                     Intent intent = new Intent(v.getContext(), ThreadActivity.class);
                     intent.putExtra(Util.INTENT_THREAD_NO, replyCheckerObject.resto);
                     intent.putExtra(Util.INTENT_BOARD_NAME, replyCheckerObject.boardName);
+                    intent.putExtra(Util.INTENT_THREAD_POSITION, replyCheckerObject.position);
                     v.getContext().startActivity(intent);
                     break;
                 }

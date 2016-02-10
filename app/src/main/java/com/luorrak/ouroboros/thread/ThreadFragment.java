@@ -75,6 +75,8 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     private ThreadNetworkFragment networkFragment;
     private String resto;
     private String boardName;
+    private int threadPosition;
+    private boolean firstRequest;
     private Parcelable savedLayoutState ;
     private boolean isStatusCheckIsRunning;
     private Handler handler;
@@ -84,10 +86,15 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
     //Get thread number from link somehow
     public ThreadFragment newInstance(String resto, String boardName){
+        return newInstance(resto, boardName, 0);
+    }
+
+    public ThreadFragment newInstance(String resto, String boardName, int threadPosition){
         ThreadFragment threadFragment = new ThreadFragment();
         Bundle args = new Bundle();
         args.putString("resto", resto);
         args.putString("boardName", boardName);
+        args.putInt("threadPosition", threadPosition);
         threadFragment.setArguments(args);
         return threadFragment;
     }
@@ -101,6 +108,9 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
             savedLayoutState = savedInstanceState.getParcelable("savedLayout");
             resto = savedInstanceState.getString("resto");
             boardName = getArguments().getString("boardName");
+            firstRequest = getArguments().getBoolean("firstRequest");
+        } else {
+            firstRequest = true;
         }
     }
 
@@ -124,6 +134,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         if (getArguments() != null) {
             resto = getArguments().getString("resto");
             boardName = getArguments().getString("boardName");
+            threadPosition = getArguments().getInt("threadPosition");
         }
 
         if (networkFragment == null) {
@@ -139,6 +150,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
             threadAdapter.setHasStableIds(true);
             threadAdapter.hasStableIds();
             recyclerView.setAdapter(threadAdapter);
+            recyclerView.scrollToPosition(threadPosition);
         }
 
         return view;
@@ -166,6 +178,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         outState.putParcelable("savedLayout", savedLayoutState);
         outState.putString("boardName", boardName);
         outState.putString("resto", resto);
+        outState.putBoolean("firstRequest", firstRequest);
     }
 
     // Options Menu ////////////////////////////////////////////////////////////////////////////////
@@ -250,7 +263,6 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                 break;
             }
             case R.id.action_scroll_bottom:{
-                Log.d(LOG_TAG, "getItemCount " + threadAdapter.getItemCount());
                 recyclerView.scrollToPosition(threadAdapter.getItemCount() - 1);
                 break;
             }
@@ -336,8 +348,6 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         ((ThreadActivity) getActivity()).setProgressBarStatus(true);
         final String threadJsonUrl = ChanUrls.getThreadUrl(boardName, threadNumber);
 
-        Log.d(LOG_TAG, "thread json url "+ threadJsonUrl);
-
         Ion.with(context)
                 .load(threadJsonUrl)
                 .setLogging(LOG_TAG, Log.DEBUG)
@@ -353,7 +363,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                             } else {
                                 restartStatusCheck();
                                 oldJsonString = jsonObject.toString();
-                                networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadAdapter);
+                                networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadPosition, firstRequest, recyclerView, threadAdapter);
                             }
                         } else {
                             ((ThreadActivity) getActivity()).setProgressBarStatus(false);

@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -60,7 +59,6 @@ public class ReplyCheckerService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getApplicationContext());
         Cursor userPostsCursor = infiniteDbHelper.getUserPostsCursor();
-        Log.d("ReplyService", DatabaseUtils.dumpCursorToString(userPostsCursor));
         Cursor repliesCursor;
         String userPostBoardName;
         String userPostResto;
@@ -68,10 +66,14 @@ public class ReplyCheckerService extends IntentService {
         int userReplyCount;
         int userPostErrorCount;
         int replyCount = 0;
+        int threadReplyCount;
+        int position;
 
         String oldResto = "";
         if((userPostsCursor != null) && (userPostsCursor.getCount() > 0)){
             do {
+                threadReplyCount = 0;
+                position = 0;
                 String userPostRowId = String.valueOf(userPostsCursor.getInt(userPostsCursor.getColumnIndex(DbContract.UserPosts._ID)));
                 userPostBoardName = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_BOARDS));
                 userPostResto = userPostsCursor.getString(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_RESTO));
@@ -79,21 +81,29 @@ public class ReplyCheckerService extends IntentService {
                 userReplyCount = userPostsCursor.getInt(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_NUMBER_OF_REPLIES));
                 userPostErrorCount = userPostsCursor.getInt(userPostsCursor.getColumnIndex(DbContract.UserPosts.COLUMN_ERROR_COUNT));
 
-                //No change in thread.
-                // TODO: 2/7/16 resto 0 new thread
                 if (!userPostResto.equals(oldResto)){
                     getThreadJson(userPostBoardName, userPostResto, infiniteDbHelper, userPostRowId, userPostErrorCount);
                     oldResto = userPostResto;
                 }
-                repliesCursor = infiniteDbHelper.getRCReplies(userPostNo);
-                int threadReplyCount = repliesCursor.getCount();
-                repliesCursor.close();
+
+                Cursor rcCursor = infiniteDbHelper.getRCPost(userPostBoardName, userPostResto, userPostNo);
+                if((rcCursor != null) && (rcCursor.getCount() > 0)){
+                    repliesCursor = infiniteDbHelper.getRCReplies(userPostNo);
+                    threadReplyCount = repliesCursor.getCount();
+                    repliesCursor.close();
+
+                    position = rcCursor.getInt(rcCursor.getColumnIndex(DbContract.UserPosts.COLUMN_POSITION));
+                }
+                rcCursor.close();
+
 
                 if (threadReplyCount > userReplyCount) {
                     replyCount++;
-                    infiniteDbHelper.updateUserPostReplyCount(threadReplyCount, userPostRowId);
+                    infiniteDbHelper.updateUserPostReplyCount(userPostRowId, threadReplyCount);
+                    infiniteDbHelper.updateUserPostPosition(userPostRowId, position);
                     infiniteDbHelper.addUserPostFlag(userPostRowId);
                 }
+
             }while (userPostsCursor.moveToNext());
             userPostsCursor.close();
             infiniteDbHelper.deleteRCCache();
@@ -135,6 +145,7 @@ public class ReplyCheckerService extends IntentService {
     private void insertRCIntoDatabase(JsonObject jsonObject, String userPostBoardName, InfiniteDbHelper infiniteDbHelper) {
         JsonParser jsonParser = new JsonParser();
         JsonArray posts = jsonObject.getAsJsonArray("posts");
+        int position = 0;
         for (JsonElement postElement : posts) {
             JsonObject post = postElement.getAsJsonObject();
             infiniteDbHelper.insertRCEntry(
@@ -150,8 +161,10 @@ public class ReplyCheckerService extends IntentService {
                     jsonParser.getThreadLastModified(post),
                     jsonParser.getThreadId(post),
                     jsonParser.getThreadEmbed(post),
-                    jsonParser.getMediaFiles(post)
+                    jsonParser.getMediaFiles(post),
+                    position
             );
+            position++;
         }
     }
 

@@ -127,7 +127,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     public boolean insertThreadEntry(String board, String resto, String no, String sub, String com,
                                      String email, String name, String trip, String time, String last_modified,
-                                     String id, String embed, byte[] mediaFiles){
+                                     String id, String embed, byte[] mediaFiles, int position){
         ContentValues values = new ContentValues();
         values.put(ThreadEntry.COLUMN_BOARD_NAME, board);
         values.put(ThreadEntry.COLUMN_THREAD_RESTO, resto);
@@ -142,6 +142,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         values.put(ThreadEntry.COLUMN_THREAD_ID, id);
         values.put(ThreadEntry.COLUMN_THREAD_EMBED, embed);
         values.put(ThreadEntry.COLUMN_THREAD_MEDIA_FILES, mediaFiles);
+        values.put(ThreadEntry.COLUMN_POSITION, position);
 
         try {
             db.insertOrThrow(
@@ -243,7 +244,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     public boolean insertRCEntry(String board, String resto, String no, String sub, String com,
                                      String email, String name, String trip, String time, String last_modified,
-                                     String id, String embed, byte[] mediaFiles){
+                                     String id, String embed, byte[] mediaFiles, int position){
         ContentValues values = new ContentValues();
         values.put(ReplyCheck.COLUMN_BOARD_NAME, board);
         values.put(ReplyCheck.COLUMN_THREAD_RESTO, resto);
@@ -258,6 +259,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         values.put(ReplyCheck.COLUMN_THREAD_ID, id);
         values.put(ReplyCheck.COLUMN_THREAD_EMBED, embed);
         values.put(ReplyCheck.COLUMN_THREAD_MEDIA_FILES, mediaFiles);
+        values.put(ReplyCheck.COLUMN_REPLY_CHECK_POSITION, position);
 
         try {
             db.insertOrThrow(
@@ -293,16 +295,17 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         db.delete(ReplyCheck.TABLE_NAME, null, null);
     }
 
-    public Cursor getRCPost(String postNo){
+    public Cursor getRCPost(String userPostBoardName, String userPostResto, String userPostNo){
         Cursor cursor = db.query(
                 ReplyCheck.TABLE_NAME, //table name
                 null, //columns to search
-                "no=?", //where clause
-                new String[] {postNo}, //where arguements
+                ReplyCheck.COLUMN_BOARD_NAME + "=? AND " + ReplyCheck.COLUMN_THREAD_RESTO + "=? AND " + ReplyCheck.COLUMN_THREAD_NO + "=?", //where clause
+                new String[] {userPostBoardName, userPostResto, userPostNo}, //where arguements
                 null, //Group by
                 null, //having
                 null //orderby
         );
+        cursor.moveToFirst();
         return cursor;
     }
 
@@ -459,6 +462,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         values.put(UserPosts.COLUMN_NUMBER_OF_REPLIES, 0);
         values.put(UserPosts.COLUMN_NEW_REPLY_FLAG, falseFlag);
         values.put(UserPosts.COLUMN_ERROR_COUNT, 0);
+        values.put(UserPosts.COLUMN_POSITION, 0);
 
         try {
             db.insertOrThrow(
@@ -485,9 +489,20 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 new String[] {boardName, no}) > 0; // selection
     }
 
-    public void updateUserPostReplyCount(int newReplyCount, String rowID){
+    public void updateUserPostReplyCount(String rowID, int newReplyCount){
         ContentValues contentValues = new ContentValues();
         contentValues.put(UserPosts.COLUMN_NUMBER_OF_REPLIES, newReplyCount);
+        db.update(UserPosts.TABLE_NAME,
+                contentValues, //values
+                UserPosts._ID + "= ?", //where
+                new String[]{rowID} //where args
+        );
+    }
+
+    public void updateUserPostPosition(String rowID, int position){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(UserPosts.COLUMN_POSITION, position);
+
         db.update(UserPosts.TABLE_NAME,
                 contentValues, //values
                 UserPosts._ID + "= ?", //where
@@ -718,6 +733,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 ThreadEntry.COLUMN_THREAD_IMAGE_HEIGHT + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_IMAGE_WIDTH + " TEXT, " +
                 ThreadEntry.COLUMN_THREAD_MEDIA_FILES + " BLOB, " +
+                ThreadEntry.COLUMN_POSITION + " INTEGER, " +
 
                 //I think this should auto overwrite dup posts if they ever come up
                 " UNIQUE (" + ThreadEntry.COLUMN_THREAD_NO + ", " + ThreadEntry.COLUMN_BOARD_NAME +
@@ -742,6 +758,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 ReplyCheck.COLUMN_THREAD_IMAGE_HEIGHT + " TEXT, " +
                 ReplyCheck.COLUMN_THREAD_IMAGE_WIDTH + " TEXT, " +
                 ReplyCheck.COLUMN_THREAD_MEDIA_FILES + " BLOB, " +
+                ReplyCheck.COLUMN_REPLY_CHECK_POSITION + " INTEGER, " +
 
                 //I think this should auto overwrite dup posts if they ever come up
                 " UNIQUE (" + ReplyCheck.COLUMN_THREAD_NO + ", " + ReplyCheck.COLUMN_BOARD_NAME +
@@ -757,7 +774,8 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 UserPosts.COLUMN_COMMENT + " TEXT NOT NULL, " +
                 UserPosts.COLUMN_NUMBER_OF_REPLIES + " INTEGER NOT NULL, " +
                 UserPosts.COLUMN_NEW_REPLY_FLAG + " INTEGER NOT NULL, " +
-                UserPosts.COLUMN_ERROR_COUNT + " INTEGER NOT NULL);";
+                UserPosts.COLUMN_ERROR_COUNT + " INTEGER NOT NULL, "  +
+                UserPosts.COLUMN_POSITION + " INTEGER NOT NULL);";
 
         final String SQL_CREATE_WATCHLIST_TABLE = "CREATE TABLE IF NOT EXISTS " + WatchlistEntry.TABLE_NAME + " (" +
                 WatchlistEntry._ID + " INTEGER PRIMARY KEY, " +
@@ -784,7 +802,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + CatalogEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ThreadEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + ReplyCheck.TABLE_NAME);
+
         if (oldVersion < 4){
             db.execSQL("DROP TABLE IF EXISTS " + BoardEntry.TABLE_NAME);
         }

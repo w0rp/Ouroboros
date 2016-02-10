@@ -175,6 +175,8 @@ public class DbContract {
         Type: BLOB
         */
         public static final String COLUMN_THREAD_MEDIA_FILES = "media_files";
+
+        public static final String COLUMN_POSITION = "position";
     }
 
     public static final class ReplyCheck implements BaseColumns{
@@ -261,6 +263,8 @@ public class DbContract {
         Type: BLOB
         */
         public static final String COLUMN_THREAD_MEDIA_FILES = "media_files";
+
+        public static final String COLUMN_REPLY_CHECK_POSITION = "position";
     }
 
     public static final class UserPosts implements BaseColumns{
@@ -282,6 +286,8 @@ public class DbContract {
         public static final String COLUMN_NEW_REPLY_FLAG = "new_reply_flag";
 
         public static final String COLUMN_ERROR_COUNT = "error_count";
+
+        public static final String COLUMN_POSITION = "position";
     }
 
     public static final class WatchlistEntry implements BaseColumns{

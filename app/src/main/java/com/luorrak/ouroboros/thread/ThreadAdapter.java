@@ -380,7 +380,6 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                     break;
                 }
                 case R.id.thread_submit_reply_button:{
-                    Log.d(LOG_TAG, "Reply button pressed " + threadObject.no);
                     Intent intent =  new Intent(context, ReplyCommentActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra(Util.INTENT_THREAD_NO, threadObject.resto);

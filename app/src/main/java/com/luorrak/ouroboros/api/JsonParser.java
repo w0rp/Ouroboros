@@ -241,14 +241,12 @@ public class JsonParser {
     public String getSubmittedBoardName(JsonObject responseJson) {
         JsonElement redirect = responseJson.get(RESPONSE_REDIRECT_URL); // \/test\/res\/1234.html#4321
         String boardName = redirect.getAsString().split("/")[1];
-        Log.d(LOG_TAG, "Response path " + boardName);
         return boardName;
     }
 
     public String getUserPostNo(JsonObject responseJson) {
         JsonElement id = responseJson.get(RESPONSE_NO); // \/test\/res\/1234.html#4321
         String userPostNo = id.getAsString();
-        Log.d(LOG_TAG, "Response userPostNo " + userPostNo);
         return userPostNo;
     }
 }

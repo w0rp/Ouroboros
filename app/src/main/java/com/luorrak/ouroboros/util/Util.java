@@ -47,6 +47,7 @@ public class Util {
     public static final int REQUEST_STORAGE_PERMISSION = 55;
     public final static String INTENT_THREAD_NO = "com.luorrak.ouroboros.THREADNO";
     public final static String INTENT_BOARD_NAME = "com.luorrak.ouroboros.BOARDNAME";
+    public final static String INTENT_THREAD_POSITION = "com.luorrak.ouroboros.THREADPOSITION";
     public final static String INTENT_REPLY_NO = "com.luorrak.ouroboros.REPLYNO";
     public final static String INTENT_REPLY_CHECKER = "com.luorrak.ouroboros.REPLYNO";
     public final static String TIM = "com.luorrak.ouroboros.TIM";
@@ -151,11 +152,10 @@ public class Util {
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("startReplyCheckerService", true);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context, REPLY_CHECKER_INTENT_ID, intent, 0);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 60*1000, 60*1000, alarmIntent);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 15*60*1000, 15*60*1000, alarmIntent);
     }
 
     public static void stopReplyCheckerService(Context context){
-        //// TODO: 2/6/16  Intent intentstop = new Intent(this, Areceiver.class);
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent senderstop = PendingIntent.getBroadcast(context,
                 REPLY_CHECKER_INTENT_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
