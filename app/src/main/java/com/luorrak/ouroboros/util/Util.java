@@ -6,15 +6,12 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v7.graphics.Palette;
 import android.view.View;
 
 import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.services.AlarmReceiver;
-import com.luorrak.ouroboros.services.ReplyCheckerService;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -55,6 +52,10 @@ public class Util {
 
     private static final int THEME_DEFAULT = 0;
     private static final int THEME_DARK = 1;
+    private static final int THEME_BLUE = 2;
+    private static final int THEME_GREY = 3;
+
+
 
     public static final int THREAD_LAYOUT_VERTICAL = 0;
     public static final int THREAD_LAYOUT_HORIZONTAL = 1;
@@ -86,6 +87,12 @@ public class Util {
                 break;
             case THEME_DARK:
                 context.setTheme(R.style.AppThemeDark);
+                break;
+            case THEME_BLUE:
+                context.setTheme(R.style.AppTheme_Blue);
+                break;
+            case THEME_GREY:
+                context.setTheme(R.style.AppTheme_Grey);
                 break;
         }
     }
