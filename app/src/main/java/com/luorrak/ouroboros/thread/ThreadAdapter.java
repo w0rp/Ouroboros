@@ -1,5 +1,6 @@
 package com.luorrak.ouroboros.thread;
 
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -33,6 +34,7 @@ import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.CommentParser;
+import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
 import com.luorrak.ouroboros.reply.ReplyCommentActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.CursorRecyclerAdapter;
@@ -124,16 +126,13 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
 
         // MediaView ///////////////////////////////////////////////////////////////////////////////
 
-        ArrayList<Media> mediaArrayList;
         if (threadViewHolder.threadObject.serializedMediaList != null) {
             threadViewHolder.threadMediaItemRecycler.setVisibility(View.VISIBLE);
-            mediaArrayList = (ArrayList<Media>) Util.deserializeObject(threadViewHolder.threadObject.serializedMediaList);
-            if (mediaArrayList.size() > 1){
+            if (threadViewHolder.threadObject.mediaArrayList.size() > 1){
                 threadViewHolder.threadMediaItemRecycler.setScrollbarFadingEnabled(false);
             }
         } else {
             threadViewHolder.threadMediaItemRecycler.setVisibility(View.GONE);
-            mediaArrayList = new ArrayList<>();
             // Youtube /////////////////////////////////////////////////////////////////////////////
             if (threadViewHolder.threadObject.embed != null){
                 createEmbedObject(threadViewHolder);
@@ -151,7 +150,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                                     if (e != null || result.getException() != null){
                                         return;
                                     }
-                                    
+
                                     if (result.getBitmapInfo().bitmap == null){
                                         return;
                                     }
@@ -183,7 +182,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadViewHolder.threadReplies.setText(threadViewHolder.threadObject.replyCount);
         }
 
-        threadViewHolder.threadMediaItemRecycler.setAdapter(new MediaAdapter(mediaArrayList, boardName, threadViewHolder.threadObject.resto, context));
+        threadViewHolder.threadMediaItemRecycler.setAdapter(new MediaAdapter(threadViewHolder.threadObject.mediaArrayList, boardName, threadViewHolder.threadObject.resto, context));
 
         // END MediaView ///////////////////////////////////////////////////////////////////////////
 
@@ -272,6 +271,8 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         threadViewHolder.threadObject.id = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_ID));
         threadViewHolder.threadObject.serializedMediaList = cursor.getBlob(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
         threadViewHolder.threadObject.replyCount = getReplyCount(threadViewHolder.threadObject.no);
+        threadViewHolder.threadObject.mediaArrayList = (threadViewHolder.threadObject.serializedMediaList != null) ?
+                (ArrayList<Media>) Util.deserializeObject(threadViewHolder.threadObject.serializedMediaList) : new ArrayList<Media>();
     }
 
     //This only works for YouTube currently
@@ -398,8 +399,12 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                     Menu m = popupMenu.getMenu();
                     final int COPY = 0;
                     final int DELETE = 1;
+                    final int OPEN_MEDIA_ITEM = 2;
                     m.add(Menu.NONE, COPY, Menu.NONE, "Copy Text");
                     m.add(Menu.NONE, DELETE, Menu.NONE, "Delete Post");
+                    if (threadObject.serializedMediaList != null){
+                        m.add(Menu.NONE, OPEN_MEDIA_ITEM, Menu.NONE, "Open Media");
+                    }
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
@@ -411,6 +416,14 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
                                 }
                                 case DELETE: {
                                     showDeletePostDialog(v, threadObject);
+                                    break;
+                                }
+                                case OPEN_MEDIA_ITEM: {
+                                    Intent intent = new Intent(context, DeepZoomActivity.class);
+                                    intent.putExtra(Util.TIM, threadObject.mediaArrayList.get(0).fileName);
+                                    intent.putExtra(Util.INTENT_THREAD_NO, threadObject.resto);
+                                    intent.putExtra(Util.INTENT_BOARD_NAME, boardName);
+                                    context.startActivity(intent);
                                     break;
                                 }
                             }
@@ -440,6 +453,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
         public String id;
         public byte[] serializedMediaList;
         public String replyCount;
+        public ArrayList<Media> mediaArrayList;
     }
 
     //Embed object /////////////////////////////////////////////////////////////////////////////////
