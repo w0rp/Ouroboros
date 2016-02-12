@@ -363,7 +363,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
                     @Override
                     public void onCompleted(Exception e, JsonObject jsonObject) {
-                        if (e == null) {
+                        if (e == null && getActivity() != null) {
                             if (jsonObject.toString().equals(oldJsonString)) {
                                 pollingInterval = pollingInterval + pollingInterval / 2;
                                 ((ThreadActivity) getActivity()).setProgressBarStatus(false);
