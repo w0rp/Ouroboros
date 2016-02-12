@@ -96,7 +96,7 @@ public class CommentParser {
      </body>
     </html>
 
-
+     <p class="body-line empty ">
      <p class=\"body-line ltr \"><a onclick=\"highlightReply('22543', event);\" href=\"\/test\/res\/22543.html#22543\">&gt;&gt;22543<\/a><\/p>
      <p class=\"body-line ltr \"><a href=\"\/irc\/res\/468.html#468\">&gt;&gt;&gt;\/irc\/468<\/a><\/p>
      <p class=\"body-line ltr \"><a href=\"https:\/\/www.ixquick.com\/\" rel=\"nofollow\" target=\"_blank\">https:\/\/www.ixquick.com\/<\/a><\/p>
@@ -128,6 +128,8 @@ public class CommentParser {
                     } else {
                         processedText = parseFormatting(bodyLine, processedText, currentBoard, resto, fragmentManager, infiniteDbHelper);
                     }
+                    processedText = TextUtils.concat(processedText, "\n");
+                } else if (bodyLine.className().equals("body-line empty")){
                     processedText = TextUtils.concat(processedText, "\n");
                 } else if (bodyLine.tagName().equals("pre")){
                     processedText = TextUtils.concat(processedText, parseCodeText(bodyLine));

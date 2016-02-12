@@ -74,8 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_below="@+id/thread_header"
-                android:paddingTop="4dp"
-                android:paddingLeft="8dp">
+                android:paddingTop="4dp">
 
                 <com.luorrak.ouroboros.thread.SnappyRecyclerView
                     android:id="@+id/thread_media_recycler"

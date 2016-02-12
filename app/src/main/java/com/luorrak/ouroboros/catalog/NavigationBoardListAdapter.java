@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.luorrak.ouroboros.R;
@@ -87,14 +88,14 @@ public class NavigationBoardListAdapter extends CursorRecyclerAdapter implements
 
     class NavigationBoardListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public Button boardNameBtn;
-        public Button deleteItemBtn;
+        public ImageButton deleteItemBtn;
         public ImageView handleView;
         public BoardObject boardObject;
 
         public NavigationBoardListViewHolder(View itemView) {
             super(itemView);
             boardNameBtn = (Button) itemView.findViewById(R.id.boardlist_boardname_button);
-            deleteItemBtn = (Button) itemView.findViewById(R.id.boardlist_delete_button);
+            deleteItemBtn = (ImageButton) itemView.findViewById(R.id.boardlist_delete_button);
             handleView = (ImageView) itemView.findViewById(R.id.boardlist_handle);
             boardObject = new BoardObject();
 

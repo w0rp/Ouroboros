@@ -1,6 +1,7 @@
 package com.luorrak.ouroboros.deepzoom;
 
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -51,6 +52,11 @@ public class DeepZoomActivity extends AppCompatActivity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Util.onActivityCreateSetTheme(this, SettingsHelper.getTheme(this));
+        // TODO: 2/12/16 figure out something better to do here besides making it black
+        if (Build.VERSION.SDK_INT >= 21){
+            getWindow().setStatusBarColor(getResources().getColor(R.color.md_black_1000));
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deepzoom);
         Ion.getDefault(getApplicationContext()).getCache().setMaxSize(150 * 1024 * 1024);

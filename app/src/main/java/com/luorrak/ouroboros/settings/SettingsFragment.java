@@ -1,12 +1,15 @@
 package com.luorrak.ouroboros.settings;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
 import com.luorrak.ouroboros.R;
+import com.luorrak.ouroboros.catalog.CatalogActivity;
 import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
@@ -41,19 +44,27 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        switch (key){
-            case "theme_preference": {
-                if (getActivity() != null){ //Edge case bug, I don't know why this happens.
-                    getActivity().recreate();
+        if (getActivity() != null) { //Messy fix, problem is old settings fragments are not being destroyed no matter what method I call. It's even surviving new activities.
+            switch (key){
+                case "theme_preference": {
+                    Intent intent = new Intent(getContext(), CatalogActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    break;
                 }
-                break;
-            }
-            case "pref_reply_checker": {
-                if (SettingsHelper.getReplyCheckerStatus(getActivity())){
-                    Util.startReplyCheckerService(getActivity());
-                } else {
-                    Util.stopReplyCheckerService(getActivity());
+                case "pref_reply_checker": {
+                    if (SettingsHelper.getReplyCheckerStatus(getActivity())){
+                        Util.startReplyCheckerService(getActivity());
+                    } else {
+                        Util.stopReplyCheckerService(getActivity());
+                    }
+                    break;
                 }
             }
         }

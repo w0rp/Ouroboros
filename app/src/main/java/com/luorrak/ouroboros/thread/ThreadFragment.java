@@ -312,15 +312,17 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
             case R.id.action_add_watchlist: {
                 Cursor cursor = infiniteDbHelper.getWatchlistCursor();
                 int count = cursor.getCount();
+                byte[] serializedMediaList;
                 cursor.close();
 
                 Cursor threadcursor = infiniteDbHelper.getThreadCursor(resto);
-                byte[] serializedMediaList = threadcursor.getBlob(threadcursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES));
-                threadcursor.close();
+                serializedMediaList = (threadcursor.getCount() > 0 ) ? threadcursor.getBlob(threadcursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_MEDIA_FILES)) : null;
 
                 infiniteDbHelper.insertWatchlistEntry(String.valueOf(getActivity().getTitle()), boardName, resto, serializedMediaList, count);
-                Snackbar.make(getView(), "Thread Added To Watchlist", Snackbar.LENGTH_LONG).show();
                 ((ThreadActivity) getActivity()).updateWatchlist();
+                Snackbar.make(getView(), "Thread Added To Watchlist", Snackbar.LENGTH_LONG).show();
+                threadcursor.close();
+
                 break;
             }
             case R.id.action_layout_vertical: {
@@ -361,7 +363,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
                     @Override
                     public void onCompleted(Exception e, JsonObject jsonObject) {
-                        if (e == null) {
+                        if (e == null && getActivity() != null) {
                             if (jsonObject.toString().equals(oldJsonString)) {
                                 pollingInterval = pollingInterval + pollingInterval / 2;
                                 ((ThreadActivity) getActivity()).setProgressBarStatus(false);

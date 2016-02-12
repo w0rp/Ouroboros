@@ -22,11 +22,11 @@
         android:textSize="16sp"
         android:background="?android:attr/selectableItemBackground"
         android:layout_weight="8"/>
-    <Button
+    <ImageButton
         android:id="@+id/boardlist_delete_button"
-        android:layout_width="30dp"
-        android:layout_height="wrap_content"
-        android:text="X"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="?attr/board_remove_icon"
         android:background="?android:attr/selectableItemBackground"
         android:layout_weight="1"/>
 </LinearLayout>

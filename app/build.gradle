@@ -8,8 +8,8 @@ android {
         applicationId "com.luorrak.ouroboros"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 24
-        versionName "0.9"
+        versionCode 25
+        versionName "0.9.1"
     }
     buildTypes {
         release {
@@ -38,5 +38,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:palette-v7:23.1.1'
-    compile 'com.android.support:preference-v7:23.1.1'
+    compile 'com.android.support:preference-v14:23.1.1'
 }
