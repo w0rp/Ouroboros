@@ -6,12 +6,14 @@
         <item name="colorAccent">@color/md_purple_500</item>
 
         <item name="toolbar_theme">@style/Toolbar</item>
+        <item name="deepzoom_toolbar">@style/Deepzoom_Toolbar</item>
         <item name="popupTheme">@style/Toolbar_Popup</item>
         <item name="window_background">@color/background_material_light</item>
         <item name="drawer_background">@color/background_material_light</item>
         <item name="card_background">@color/cardview_light_background</item>
 
         <item name="board_reorder_icon">@drawable/ic_reorder_black_18dp</item>
+        <item name="board_remove_icon">@drawable/ic_remove_circle_black_24dp</item>
         <item name="catalog_lock_icon">@drawable/ic_lock_black_24dp</item>
         <item name="catalog_sticky_icon">@drawable/ic_turned_in_black_24dp</item>
         <item name="reply_checker_read_icon">@drawable/ic_mail_black_24dp</item>
@@ -25,12 +27,14 @@
     <!-- Dark application theme. -->
     <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
         <item name="toolbar_theme">@style/Toolbar</item>
+        <item name="deepzoom_toolbar">@style/Deepzoom_Toolbar</item>
         <item name="popupTheme">@style/Toolbar_Popup_Dark</item>
         <item name="window_background">@color/background_material_dark</item>
         <item name="drawer_background">@color/background_material_dark</item>
         <item name="card_background">@color/md_grey_800</item>
 
         <item name="board_reorder_icon">@drawable/ic_reorder_white_18dp</item>
+        <item name="board_remove_icon">@drawable/ic_remove_circle_white_24dp</item>
         <item name="catalog_lock_icon">@drawable/ic_lock_white_24dp</item>
         <item name="catalog_sticky_icon">@drawable/ic_turned_in_white_24dp</item>
         <item name="reply_checker_read_icon">@drawable/ic_mail_white_24dp</item>
@@ -56,5 +60,12 @@
         <item name="android:textColor">#fff</item>
         <item name="android:textColorPrimary">#fff</item>
         <item name="android:background">?card_background</item>
+    </style>
+
+
+    <style name="Deepzoom_Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColor">#fff</item>
+        <item name="android:textColorPrimary">#fff</item>
+        <item name="android:background">@android:color/transparent</item>
     </style>
 </resources>
