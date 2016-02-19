@@ -68,6 +68,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private InfiniteDbHelper infiniteDbHelper;
     private CatalogNetworkFragment networkFragment;
     private ActionProvider shareActionProvider;
+    private ProgressBar progressBar;
 
     public CatalogFragment() {
     }
@@ -85,6 +86,8 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         super.onCreateView(inflater, container, savedInstanceState);
         infiniteDbHelper = new InfiniteDbHelper(getActivity());
         View view = inflater.inflate(R.layout.fragment_catalog, container, false);
+
+        progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.catalogList);
         int catalogViewType = SettingsHelper.getCatalogView(getActivity());
@@ -256,7 +259,6 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
     // Loading Data ////////////////////////////////////////////////////////////////////////////////
     private void getCatalogJson(final Context context, final String boardName) {
         String catalogJsonUrl = ChanUrls.getCatalogUrl(boardName);
-        final ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
         Ion.with(context)
                 .load(catalogJsonUrl)

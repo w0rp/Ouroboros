@@ -1,8 +1,5 @@
 package com.luorrak.ouroboros.catalog;
 
-import android.app.FragmentTransaction;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
@@ -15,15 +12,11 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ProgressBar;
 
 import com.koushikdutta.ion.Ion;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.ReplyChecker.ReplyCheckerFragment;
 import com.luorrak.ouroboros.miscellaneous.OpenSourceLicenseFragment;
-import com.luorrak.ouroboros.services.AlarmReceiver;
-import com.luorrak.ouroboros.services.ReplyCheckerService;
 import com.luorrak.ouroboros.settings.SettingsFragment;
 import com.luorrak.ouroboros.util.DragAndDropRecyclerView.WatchListTouchHelper;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
@@ -54,7 +47,6 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
     private String board;
     private boolean replyCheckerIntent;
     private DrawerLayout drawerLayout;
-    private ProgressBar progressBar;
     private InfiniteDbHelper infiniteDbHelper;
     private RecyclerView watchList;
     private WatchListAdapter watchListAdapter;
@@ -107,7 +99,6 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
     }
 
     private void bindViews(){
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         watchList = (RecyclerView) findViewById(R.id.watch_list);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
@@ -156,28 +147,24 @@ public class CatalogActivity extends AppCompatActivity implements NavigationView
                 BoardListFragment boardListFragment = new BoardListFragment();
                 android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, boardListFragment).commit();
-                progressBar.setVisibility(View.INVISIBLE);
                 break;
             }
             case R.id.drawer_item_settings: {
                 SettingsFragment settingsFragment = new SettingsFragment();
                 android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, settingsFragment).commit();
-                progressBar.setVisibility(View.INVISIBLE);
                 break;
             }
             case R.id.drawer_item_licences: {
                 OpenSourceLicenseFragment openSourceLicenseFragment = new OpenSourceLicenseFragment();
                 android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, openSourceLicenseFragment).commit();
-                progressBar.setVisibility(View.INVISIBLE);
                 break;
             }
             case R.id.drawer_item_replies: {
                 ReplyCheckerFragment replyCheckerFragment = new ReplyCheckerFragment();
                 android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.activity_catalog_fragment_container, replyCheckerFragment).commit();
-                progressBar.setVisibility(View.INVISIBLE);
                 break;
             }
         }

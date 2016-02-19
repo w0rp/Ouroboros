@@ -29,7 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FilterQueryProvider;
-
+import android.widget.ProgressBar;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
@@ -73,6 +73,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     private ThreadAdapter threadAdapter;
     private LinearLayoutManager layoutManager;
     private ThreadNetworkFragment networkFragment;
+    private ProgressBar progressBar;
     private String resto;
     private String boardName;
     private int threadPosition;
@@ -120,6 +121,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         networkFragment = (ThreadNetworkFragment) getFragmentManager().findFragmentByTag("Thread_Task");
         View view = inflater.inflate(R.layout.fragment_thread, container, false);
         getActivity().invalidateOptionsMenu();
+        progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         layoutManager = new LinearLayoutManager(getActivity()){
             @Override
             protected int getExtraLayoutSpace(RecyclerView.State state) {
@@ -352,7 +354,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     }
 
     private void getThreadJson(final Context context, final String boardName, final String threadNumber){
-        ((ThreadActivity) getActivity()).setProgressBarStatus(true);
+        progressBar.setVisibility(View.VISIBLE);
         final String threadJsonUrl = ChanUrls.getThreadUrl(boardName, threadNumber);
 
         Ion.with(context)
@@ -366,14 +368,14 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                         if (e == null && getActivity() != null) {
                             if (jsonObject.toString().equals(oldJsonString)) {
                                 pollingInterval = pollingInterval + pollingInterval / 2;
-                                ((ThreadActivity) getActivity()).setProgressBarStatus(false);
+                                progressBar.setVisibility(View.INVISIBLE);
                             } else {
                                 restartStatusCheck();
                                 oldJsonString = jsonObject.toString();
                                 networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadPosition, firstRequest, recyclerView, threadAdapter);
                             }
                         } else {
-                            ((ThreadActivity) getActivity()).setProgressBarStatus(false);
+                            progressBar.setVisibility(View.INVISIBLE);
                             Snackbar.make(getView(), "Error retrieving thread", Snackbar.LENGTH_LONG).show();
                         }
                         firstRequest = false;
