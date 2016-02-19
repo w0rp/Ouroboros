@@ -147,11 +147,19 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         if (boardName != null){
             handler = new Handler();
             pollingInterval = 10000;
-            threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getFragmentManager(), boardName, getActivity(), infiniteDbHelper);
-            threadAdapter.setHasStableIds(true);
-            threadAdapter.hasStableIds();
-            recyclerView.setAdapter(threadAdapter);
-            recyclerView.scrollToPosition(threadPosition);
+
+            view.post(new Runnable() {
+                @Override
+                public void run() {
+                    int h = recyclerView.getHeight();
+                    int w = recyclerView.getWidth();
+                    threadAdapter = new ThreadAdapter(infiniteDbHelper.getThreadCursor(resto), getFragmentManager(), boardName, getActivity(), infiniteDbHelper, w, h);
+                    threadAdapter.setHasStableIds(true);
+                    threadAdapter.hasStableIds();
+                    recyclerView.setAdapter(threadAdapter);
+                    recyclerView.scrollToPosition(threadPosition);
+                }
+            });
         }
 
         return view;
@@ -365,18 +373,20 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
                     @Override
                     public void onCompleted(Exception e, JsonObject jsonObject) {
-                        if (e == null && getActivity() != null) {
-                            if (jsonObject.toString().equals(oldJsonString)) {
-                                pollingInterval = pollingInterval + pollingInterval / 2;
-                                progressBar.setVisibility(View.INVISIBLE);
+                        if (getActivity() != null){
+                            if (e == null) {
+                                if (jsonObject.toString().equals(oldJsonString)) {
+                                    pollingInterval = pollingInterval + pollingInterval / 2;
+                                    progressBar.setVisibility(View.INVISIBLE);
+                                } else {
+                                    restartStatusCheck();
+                                    oldJsonString = jsonObject.toString();
+                                    networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadPosition, firstRequest, recyclerView, threadAdapter);
+                                }
                             } else {
-                                restartStatusCheck();
-                                oldJsonString = jsonObject.toString();
-                                networkFragment.beginTask(jsonObject, infiniteDbHelper, boardName, resto, threadPosition, firstRequest, recyclerView, threadAdapter);
+                                progressBar.setVisibility(View.INVISIBLE);
+                                Snackbar.make(getView(), "Error retrieving thread", Snackbar.LENGTH_LONG).show();
                             }
-                        } else {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            Snackbar.make(getView(), "Error retrieving thread", Snackbar.LENGTH_LONG).show();
                         }
                         firstRequest = false;
                     }

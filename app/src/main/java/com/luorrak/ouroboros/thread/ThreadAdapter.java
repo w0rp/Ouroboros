@@ -1,6 +1,5 @@
 package com.luorrak.ouroboros.thread;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -16,7 +15,6 @@ import android.text.Html;
 import android.text.Spannable;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,13 +70,17 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
     private String boardName;
     private Context context;
     private InfiniteDbHelper infiniteDbHelper;
+    private int parentWidth;
+    private int parentHeight;
 
-    public ThreadAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName, Context context, InfiniteDbHelper infiniteDbHelper) {
+    public ThreadAdapter(Cursor cursor, FragmentManager fragmentManager, String boardName, Context context, InfiniteDbHelper infiniteDbHelper, int parentWidth, int parentHeight) {
         super(cursor);
         this.fragmentManager = fragmentManager;
         this.boardName = boardName;
         this.context = context;
         this.infiniteDbHelper = infiniteDbHelper;
+        this.parentWidth = parentWidth;
+        this.parentHeight = parentHeight;
     }
 
     @Override
@@ -182,7 +184,7 @@ public class ThreadAdapter extends CursorRecyclerAdapter {
             threadViewHolder.threadReplies.setText(threadViewHolder.threadObject.replyCount);
         }
 
-        threadViewHolder.threadMediaItemRecycler.setAdapter(new MediaAdapter(threadViewHolder.threadObject.mediaArrayList, boardName, threadViewHolder.threadObject.resto, context));
+        threadViewHolder.threadMediaItemRecycler.setAdapter(new MediaAdapter(threadViewHolder.threadObject.mediaArrayList, boardName, threadViewHolder.threadObject.resto, context, parentWidth, parentHeight));
 
         // END MediaView ///////////////////////////////////////////////////////////////////////////
 

@@ -36,11 +36,11 @@ public class CardDialogFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState){
-        InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());
+        final InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());
 
         String postNo;
         String repliesPostNo;
-        String boardName;
+        final String boardName;
 
         if(getArguments().getString("postNo") != null){
             postNo = getArguments().getString("postNo");
@@ -52,16 +52,36 @@ public class CardDialogFragment extends Fragment {
             cursor = infiniteDbHelper.getReplies(repliesPostNo);
         }
 
-        View view = inflater.inflate(R.layout.fragment_thread, container, false);
+        final View view = inflater.inflate(R.layout.fragment_card_dialog, container, false);
         view.setBackgroundColor(Color.argb(77, 00, 00, 00));
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.postList);
+        //// TODO: 2/19/16 recyclerview expands beyond it's card bounds. Fix this or work around it
+        /*
+        LinearLayout background = (LinearLayout) view.findViewById(R.id.card_dialog_background);
+        background.setLongClickable(true);
+        background.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                getActivity().onBackPressed();
+                return true;
+            }
+        });
+        */
+
+        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.postList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        ThreadAdapter threadAdapter = new ThreadAdapter(cursor, getFragmentManager(), boardName, getActivity(), infiniteDbHelper);
+
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                int h = recyclerView.getHeight();
+                int w = recyclerView.getWidth();
+                ThreadAdapter threadAdapter = new ThreadAdapter(cursor, getFragmentManager(), boardName, getActivity(), infiniteDbHelper, w, h);
+                recyclerView.setAdapter(threadAdapter);
+            }
+        });
 
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(threadAdapter);
-
         return view;
     }
 
@@ -86,8 +106,4 @@ public class CardDialogFragment extends Fragment {
         cardDialogFragment.setArguments(args);
         return cardDialogFragment;
     }
-
-
-
-
 }

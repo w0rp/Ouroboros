@@ -21,17 +21,14 @@ package com.luorrak.ouroboros.thread;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -80,13 +77,17 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     private int maxImgWidth;
     private int maxImgHeight;
     private int minImgHeight;
+    private int parentWidth;
+    private int parentHeight;
 
 
-    public MediaAdapter(ArrayList<Media> mediaItems, String boardName, String resto, Context context) {
+    public MediaAdapter(ArrayList<Media> mediaItems, String boardName, String resto, Context context, int parentWidth, int parentHeight) {
         this.mediaItems = mediaItems;
         this.boardName = boardName;
         this.resto = resto;
         this.context = context;
+        this.parentWidth = parentWidth;
+        this.parentHeight = parentHeight;
     }
 
     @Override
@@ -102,7 +103,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         final Media media = mediaItems.get(position);
         mediaViewHolder.playButton.setVisibility(View.GONE);
 
-        updateImageBounds();
+        updateImageBounds(parentWidth, parentHeight);
         final int[] size = new int[2]; calcSize(size, Double.parseDouble(media.height), Double.parseDouble(media.width));
 
         final int threadValue = SettingsHelper.getThreadView(context);
@@ -284,18 +285,10 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     }
 
     //Adapted from Chanobol
-    private void updateImageBounds() {
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-        int screenWidth, screenHeight;
-        Point size = new Point();
-        display.getSize(size);
-        screenWidth = size.x;
-        screenHeight = size.y;
-
-        maxImgWidth = (int) (screenWidth * .987);
-        maxImgHeight = (int) (screenHeight * 0.8);
-        minImgHeight = (int) (screenHeight * 0.15);
+    private void updateImageBounds(int parentWidth, int parentHeight) {
+        maxImgWidth = (int) (parentWidth * 0.987);
+        maxImgHeight = (int) (parentHeight * 0.8);
+        minImgHeight = (int) (parentHeight * 0.15);
     }
 }
 
