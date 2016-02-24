@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -143,17 +144,45 @@ public class ThreadNetworkFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             Cursor cursor = infiniteDbHelper.getThreadCursor(resto);
             String threadSubject = cursor.getString(cursor.getColumnIndex(DbContract.ThreadEntry.COLUMN_THREAD_SUB));
-            activity.setTitle(threadSubject != null ? threadSubject : "/" + boardName + "/" + resto);
+            int replyCount = cursor.getCount();
             cursor.close();
+            updateToolbar(threadSubject);
+            newPostSnackBar(replyCount);
+            threadAdapter.changeCursor(infiniteDbHelper.getThreadCursor(resto));
+
+            if (firstRequest){
+                recyclerView.scrollToPosition(threadPosition);
+            }
+        }
+
+        private void updateToolbar(String threadSubject){
+            activity.setTitle(threadSubject != null ? threadSubject : "/" + boardName + "/" + resto);
 
             ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progress_bar);
             if (progressBar != null){
                 progressBar.setVisibility(View.INVISIBLE);
             }
-            threadAdapter.changeCursor(infiniteDbHelper.getThreadCursor(resto));
+        }
 
-            if (firstRequest){
-                recyclerView.scrollToPosition(threadPosition);
+        private void newPostSnackBar(int replyCount){
+            Cursor cursor = infiniteDbHelper.getThreadReplyCountCursor(resto);
+            int oldReplycount = 0;
+            if ((cursor != null) && (cursor.getCount() > 0)){
+                oldReplycount = cursor.getInt(cursor.getColumnIndex(DbContract.ThreadReplyCountTracker.REPLY_COUNT));
+            }
+            cursor.close();
+
+            if (replyCount > oldReplycount){
+                int newReplies = replyCount - oldReplycount;
+                final int finalOldReplycount = oldReplycount;
+                Snackbar.make(recyclerView, String.valueOf(newReplies) + " New Replies", Snackbar.LENGTH_LONG)
+                        .setAction("VIEW", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                recyclerView.scrollToPosition(finalOldReplycount);
+                            }
+                        }).show();
+                infiniteDbHelper.updateThreadReplyCount(boardName, resto, replyCount);
             }
         }
     }

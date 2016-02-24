@@ -323,4 +323,14 @@ public class DbContract {
         */
         public static final String WATCHLIST_ORDER = "watchlist_order";
     }
+
+    public static final class ThreadReplyCountTracker implements BaseColumns {
+        public static final String TABLE_NAME = "thread_reply_count_tracker";
+
+        public static final String BOARD_NAME = "board_name";
+
+        public static final String RESTO = "resto";
+
+        public static final String REPLY_COUNT = "reply_count";
+    }
 }

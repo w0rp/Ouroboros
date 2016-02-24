@@ -11,10 +11,11 @@ import android.util.Log;
 
 import com.luorrak.ouroboros.util.DbContract.BoardEntry;
 import com.luorrak.ouroboros.util.DbContract.CatalogEntry;
+import com.luorrak.ouroboros.util.DbContract.ReplyCheck;
 import com.luorrak.ouroboros.util.DbContract.ThreadEntry;
+import com.luorrak.ouroboros.util.DbContract.ThreadReplyCountTracker;
 import com.luorrak.ouroboros.util.DbContract.UserPosts;
 import com.luorrak.ouroboros.util.DbContract.WatchlistEntry;
-import com.luorrak.ouroboros.util.DbContract.ReplyCheck;
 
 /**
  * Ouroboros - An 8chan browser
@@ -36,7 +37,7 @@ import com.luorrak.ouroboros.util.DbContract.ReplyCheck;
 public class InfiniteDbHelper extends SQLiteOpenHelper{
 
     private final String LOG_TAG = InfiniteDbHelper.class.getSimpleName();
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
     private static final String DATABASE_NAME = "cache.db";
     private SQLiteDatabase db = getWritableDatabase();
     public static final int trueFlag = 1;
@@ -680,6 +681,42 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 new String[] {String.valueOf(boardListCount)}
         );
     }
+
+    // THREAD REPLY COUNT TABLE ////////////////////////////////////////////////////////////////////
+
+    public Cursor getThreadReplyCountCursor(String resto) {
+        Cursor cursor = db.query(
+                ThreadReplyCountTracker.TABLE_NAME, //table name
+                null, //columns to search
+                ThreadReplyCountTracker.RESTO + "=?", //where clause
+                new String[]{resto}, //where arguements
+                null, //Group by
+                null, //having
+                null //orderby
+        );
+        
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public void updateThreadReplyCount(String boardName, String resto, int newReplyCount){
+        ContentValues values = new ContentValues();
+        values.put(ThreadReplyCountTracker.BOARD_NAME, boardName);
+        values.put(ThreadReplyCountTracker.RESTO, resto);
+        values.put(ThreadReplyCountTracker.REPLY_COUNT, newReplyCount);
+
+        int rowsUpdated = db.updateWithOnConflict(ThreadReplyCountTracker.TABLE_NAME,
+                    values, //values
+                    ThreadReplyCountTracker.BOARD_NAME + "= ? AND " + ThreadReplyCountTracker.RESTO + " = ?", //where
+                    new String[]{boardName, resto},
+                    SQLiteDatabase.CONFLICT_FAIL);//where args
+        if (rowsUpdated == 0) {
+            db.insert(ThreadReplyCountTracker.TABLE_NAME,
+                    null,
+                    values);
+        }
+    }
+
     // Database Lifecycle Functions ////////////////////////////////////////////////////////////////
 
     @Override
@@ -690,7 +727,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 BoardEntry.COLUMN_BOARDS + " TEXT UNIQUE NOT NULL, " +
                 BoardEntry.BOARD_ORDER +" INTEGER NOT NULL);";
 
-        final String SQL_CREATE_CATALOG_TABLE = " CREATE TABLE " + CatalogEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_CATALOG_TABLE = " CREATE TABLE IF NOT EXISTS " + CatalogEntry.TABLE_NAME + " (" +
 
                 CatalogEntry._ID + " INTEGER PRIMARY KEY, " +
 
@@ -714,7 +751,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 " UNIQUE (" + CatalogEntry.COLUMN_CATALOG_NO + ", " + CatalogEntry.COLUMN_BOARD_NAME +
                 ") ON CONFLICT REPLACE);";
 
-        final String SQL_CREATE_THREAD_TABLE = "CREATE TABLE " + ThreadEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_THREAD_TABLE = "CREATE TABLE IF NOT EXISTS " + ThreadEntry.TABLE_NAME + " (" +
                 ThreadEntry._ID + " INTEGER PRIMARY KEY, " +
 
                 //Foreign Key for board name
@@ -739,7 +776,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 " UNIQUE (" + ThreadEntry.COLUMN_THREAD_NO + ", " + ThreadEntry.COLUMN_BOARD_NAME +
                 ") ON CONFLICT IGNORE);";
 
-        final String SQL_CREATE_REPLY_CHECK_TABLE = "CREATE TABLE " + ReplyCheck.TABLE_NAME + " (" +
+        final String SQL_CREATE_REPLY_CHECK_TABLE = "CREATE TABLE IF NOT EXISTS " + ReplyCheck.TABLE_NAME + " (" +
                 ReplyCheck._ID + " INTEGER PRIMARY KEY, " +
 
                 //Foreign Key for board name
@@ -786,6 +823,12 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 WatchlistEntry.COLUMN_MEDIA_FILES + " BLOB, " +
                 WatchlistEntry.WATCHLIST_ORDER + " INTEGER NOT NULL);";
 
+        final String SQL_CREATE_THREAD_REPLY_COUNT_TABLE = "CREATE TABLE IF NOT EXISTS " + ThreadReplyCountTracker.TABLE_NAME + " (" +
+                ThreadReplyCountTracker._ID + " INTEGER PRIMARY KEY, " +
+                ThreadReplyCountTracker.BOARD_NAME + " TEXT NOT NULL, " +
+                ThreadReplyCountTracker.RESTO + " TEXT NOT NULL, " +
+                ThreadReplyCountTracker.REPLY_COUNT + " INTEGER NOT NULL);";
+
         Log.d(LOG_TAG, "SQL STRINGS");
         Log.d(LOG_TAG, SQL_CREATE_BOARD_TABLE);
         Log.d(LOG_TAG, SQL_CREATE_CATALOG_TABLE);
@@ -796,6 +839,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         db.execSQL(SQL_CREATE_REPLY_CHECK_TABLE);
         db.execSQL(SQL_CREATE_USER_POSTS_TABLE);
         db.execSQL(SQL_CREATE_WATCHLIST_TABLE);
+        db.execSQL(SQL_CREATE_THREAD_REPLY_COUNT_TABLE);
     }
 
     @Override
