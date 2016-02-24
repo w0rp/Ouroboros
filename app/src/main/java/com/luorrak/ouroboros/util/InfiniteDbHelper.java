@@ -694,7 +694,7 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
                 null, //having
                 null //orderby
         );
-        
+
         cursor.moveToFirst();
         return cursor;
     }
