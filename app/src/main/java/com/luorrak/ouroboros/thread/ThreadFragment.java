@@ -116,7 +116,7 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState){
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         infiniteDbHelper = new InfiniteDbHelper(getActivity());
         networkFragment = (ThreadNetworkFragment) getFragmentManager().findFragmentByTag("Thread_Task");
         View view = inflater.inflate(R.layout.fragment_thread, container, false);
@@ -157,18 +157,14 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                     threadAdapter.setHasStableIds(true);
                     threadAdapter.hasStableIds();
                     recyclerView.setAdapter(threadAdapter);
-                    recyclerView.scrollToPosition(threadPosition);
+                    if (firstRequest){
+                        recyclerView.scrollToPosition(threadPosition);
+                    }
                 }
             });
         }
 
         return view;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        startStatusCheck();
     }
 
     // Life Cycle //////////////////////////////////////////////////////////////////////////////////

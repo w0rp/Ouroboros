@@ -52,7 +52,8 @@ public class ThreadActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private RecyclerView watchList;
     private WatchListAdapter watchListAdapter;
-    ThreadFragment threadFragment;
+    private ThreadFragment threadFragment;
+    private int threadDepth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +75,17 @@ public class ThreadActivity extends AppCompatActivity {
         int threadPosition = getIntent().getIntExtra(Util.INTENT_THREAD_POSITION, 0);
 
         if (savedInstanceState != null){
-            threadFragment = (ThreadFragment) getFragmentManager().getFragment(savedInstanceState, "threadFragment");
-        } else {
+            threadDepth = savedInstanceState.getInt("threadDepth");
+            threadFragment = (ThreadFragment) getFragmentManager().getFragment(savedInstanceState, "threadDepth" + String.valueOf(threadDepth));
+        }
+
+        if (threadFragment == null) {
+            threadDepth = 0;
             threadFragment = new ThreadFragment().newInstance(resto, boardName, threadPosition);
         }
 
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
+        fragmentTransaction.replace(R.id.placeholder_card, threadFragment, "threadDepth" + String.valueOf(threadDepth))
                 .commit();
 
         //Watchlist Layout
@@ -129,11 +134,9 @@ public class ThreadActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("threadDepth", threadDepth);
+        getFragmentManager().putFragment(outState, "threadDepth" + String.valueOf(threadDepth), threadFragment);
         super.onSaveInstanceState(outState);
-        if (threadFragment.isAdded()){
-            getFragmentManager().putFragment(outState, "threadFragment", threadFragment);
-        }
-
     }
 
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////
@@ -155,6 +158,11 @@ public class ThreadActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
        if(getFragmentManager().getBackStackEntryCount() > 0) {
+           String fragmentTag = getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName();
+           if (fragmentTag.equals("threadDepth" + String.valueOf(threadDepth))) {
+               threadDepth = threadDepth - 1;
+               threadFragment = (ThreadFragment) getFragmentManager().findFragmentByTag("threadDepth" + String.valueOf(threadDepth));
+           }
            getFragmentManager().popBackStack();
        } else {
            this.finish();
@@ -198,9 +206,10 @@ public class ThreadActivity extends AppCompatActivity {
         //clear dialog fragments
         fragmentManager.popBackStack("threadDialog", FragmentManager.POP_BACK_STACK_INCLUSIVE);
         if (!threadNo.equals("0")){
-            ThreadFragment threadFragment = new ThreadFragment().newInstance(threadNo, boardName);
+            threadDepth = threadDepth + 1;
+            threadFragment = new ThreadFragment().newInstance(threadNo, boardName);
             fragmentTransaction.replace(R.id.placeholder_card, threadFragment)
-                    .addToBackStack("thread")
+                    .addToBackStack("threadDepth" + String.valueOf(threadDepth))
                     .commit();
         } else {
             Intent intent = new Intent(this, CatalogActivity.class);
