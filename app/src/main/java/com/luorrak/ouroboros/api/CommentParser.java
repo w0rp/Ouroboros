@@ -119,14 +119,14 @@ public class CommentParser {
                 limit++;
 
                 if (bodyLine.className().equals("body-line ltr quote")){
-                    processedText = TextUtils.concat(processedText, parseGreenText(new SpannableString(bodyLine.text())));
+                    processedText = TextUtils.concat(processedText, parseGreenText(new SpannableString(parseFormatting(bodyLine, currentBoard, resto, fragmentManager, infiniteDbHelper))));
                     processedText = TextUtils.concat(processedText, "\n");
                 } else if (bodyLine.className().equals("body-line ltr")){
                     if (bodyLine.children().size() == 0){
                         //Normal Text
                         processedText = TextUtils.concat(processedText, parseNormalText(new SpannableString(bodyLine.text())));
                     } else {
-                        processedText = parseFormatting(bodyLine, processedText, currentBoard, resto, fragmentManager, infiniteDbHelper);
+                        processedText = TextUtils.concat(processedText, parseFormatting(bodyLine, currentBoard, resto, fragmentManager, infiniteDbHelper));
                     }
                     processedText = TextUtils.concat(processedText, "\n");
                 } else if (bodyLine.className().equals("body-line empty")){
@@ -166,38 +166,39 @@ public class CommentParser {
     }
 
 
-    private CharSequence parseFormatting(Element bodyLine, CharSequence processedText, String currentBoard, String resto, FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper){
+    private CharSequence parseFormatting(Element bodyLine, String currentBoard, String resto, FragmentManager fragmentManager, InfiniteDbHelper infiniteDbHelper){
+        CharSequence parsedText = "";
         for (Node childNode : bodyLine.childNodes()){
             if (childNode instanceof TextNode){
-                processedText = TextUtils.concat(processedText, parseNormalText(new SpannableString(((TextNode) childNode).text())));
+                parsedText = TextUtils.concat(parsedText, parseNormalText(new SpannableString(((TextNode) childNode).text())));
             } else if (childNode instanceof Element){
                 Element childElement = (Element) childNode;
                 switch(childElement.tagName()){
                     default:
-                        processedText = TextUtils.concat(processedText, parseNormalText(new SpannableString(childElement.text())));
+                        parsedText = TextUtils.concat(parsedText, parseNormalText(new SpannableString(childElement.text())));
                         break;
                     case "span":
                         CharSequence spanText = parseSpanText(childElement);
-                        processedText = TextUtils.concat(processedText, spanText);
+                        parsedText = TextUtils.concat(parsedText, spanText);
                         break;
                     case "em":
-                        processedText = TextUtils.concat(processedText, parseItalicText(new SpannableString(childElement.text())));
+                        parsedText = TextUtils.concat(parsedText, parseItalicText(new SpannableString(childElement.text())));
                         break;
                     case "strong":
-                        processedText = TextUtils.concat(processedText, parseBoldText(new SpannableString(childElement.text())));
+                        parsedText = TextUtils.concat(parsedText, parseBoldText(new SpannableString(childElement.text())));
                         break;
                     case "u":
-                        processedText = TextUtils.concat(processedText, parseUnderlineText(new SpannableString(childElement.text())));
+                        parsedText = TextUtils.concat(parsedText, parseUnderlineText(new SpannableString(childElement.text())));
                         break;
                     case "s":
-                        processedText = TextUtils.concat(processedText, parseStrikethroughText(new SpannableString(childElement.text())));
+                        parsedText = TextUtils.concat(parsedText, parseStrikethroughText(new SpannableString(childElement.text())));
                         break;
                     case "a":
-                        processedText = TextUtils.concat(processedText, parseAnchorText(childElement, currentBoard, resto, fragmentManager, infiniteDbHelper));
+                        parsedText = TextUtils.concat(parsedText, parseAnchorText(childElement, currentBoard, resto, fragmentManager, infiniteDbHelper));
                 }
             }
         }
-        return processedText;
+        return parsedText;
     }
     private CharSequence parseNormalText(SpannableString normalText){
        return normalText;
