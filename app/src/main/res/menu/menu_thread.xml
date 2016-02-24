@@ -1,17 +1,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_scroll_bottom"
+    <item android:id="@+id/action_reply"
         android:orderInCategory="100"
-        android:title="Scroll"
+        android:title="Reply"
+        android:icon="@drawable/ic_reply_white_24dp"
+        app:showAsAction="collapseActionView|ifRoom"
+        android:visible="false"/>
+
+    <item android:id="@+id/action_scroll_bottom"
+        android:orderInCategory="110"
+        android:title="Go to Bottom"
         android:icon="@drawable/ic_arrow_down_white_24dp"
         app:showAsAction="collapseActionView|ifRoom"
         android:visible="false"/>
 
-    <item android:id="@+id/action_reply"
-        android:orderInCategory="110"
-        android:title="Reply"
-        android:icon="@drawable/ic_reply_white_24dp"
+    <item android:id="@+id/action_scroll_top"
+        android:orderInCategory="115"
+        android:title="Go to Top"
+        android:icon="@drawable/ic_arrow_upward_white_24dp"
         app:showAsAction="collapseActionView|ifRoom"
         android:visible="false"/>
 

@@ -193,7 +193,8 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem scrollButton = menu.findItem(R.id.action_scroll_bottom);
+        MenuItem goToBottomButton = menu.findItem(R.id.action_scroll_bottom);
+        MenuItem goToTopButton = menu.findItem(R.id.action_scroll_top);
         MenuItem replyButton = menu.findItem(R.id.action_reply);
         MenuItem watchlistButton = menu.findItem(R.id.action_add_watchlist);
         MenuItem refreshButton = menu.findItem(R.id.action_refresh);
@@ -230,7 +231,8 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
         MenuItemCompat.setOnActionExpandListener(searchButton, this);
 
         refreshButton.setVisible(true);
-        scrollButton.setVisible(true);
+        goToBottomButton.setVisible(true);
+        goToTopButton.setVisible(true);
         replyButton.setVisible(true);
         galleryButton.setVisible(true);
         saveAllImagesButton.setVisible(true);
@@ -272,6 +274,10 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
             }
             case R.id.action_scroll_bottom:{
                 recyclerView.scrollToPosition(threadAdapter.getItemCount() - 1);
+                break;
+            }
+            case R.id.action_scroll_top: {
+                recyclerView.scrollToPosition(0);
                 break;
             }
             case R.id.action_reply:{
