@@ -114,13 +114,15 @@ public class BoardListFragment extends Fragment implements OnStartDragListener {
                                                 .setCallback(new FutureCallback<Response<String>>() {
                                                     @Override
                                                     public void onCompleted(Exception e, Response<String> stringResponse) {
-                                                        if (e != null || stringResponse.getHeaders().code() == 404){
-                                                            Snackbar.make(getView(), "Server Error! Does board exist?", Snackbar.LENGTH_LONG).show();
-                                                            return;
+                                                        if (getActivity() != null){
+                                                            if (e != null || stringResponse.getHeaders().code() == 404){
+                                                                Snackbar.make(getView(), "Server Error! Does board exist?", Snackbar.LENGTH_LONG).show();
+                                                                return;
+                                                            }
+                                                            InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());
+                                                            infiniteDbHelper.insertBoardEntry(boardName, boardListAdapter.getCursor().getCount());
+                                                            boardListAdapter.changeCursor(infiniteDbHelper.getBoardCursor());
                                                         }
-                                                        InfiniteDbHelper infiniteDbHelper = new InfiniteDbHelper(getActivity());
-                                                        infiniteDbHelper.insertBoardEntry(boardName, boardListAdapter.getCursor().getCount());
-                                                        boardListAdapter.changeCursor(infiniteDbHelper.getBoardCursor());
                                                     }
                                                 });
                                     }

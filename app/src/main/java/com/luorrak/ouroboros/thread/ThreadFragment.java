@@ -157,9 +157,6 @@ public class ThreadFragment extends Fragment implements MenuItemCompat.OnActionE
                     threadAdapter.setHasStableIds(true);
                     threadAdapter.hasStableIds();
                     recyclerView.setAdapter(threadAdapter);
-                    if (firstRequest){
-                        recyclerView.scrollToPosition(threadPosition);
-                    }
                 }
             });
         }
