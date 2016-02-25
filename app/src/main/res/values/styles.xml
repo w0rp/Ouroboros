@@ -85,6 +85,8 @@
     <style name="Deepzoom_Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:textColor">#fff</item>
         <item name="android:textColorPrimary">#fff</item>
-        <item name="android:background">@android:color/transparent</item>
+        <item name="android:background">@null</item>
+        <!-- Support library compatibility -->
+        <item name="background">@null</item>
     </style>
 </resources>
