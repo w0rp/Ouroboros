@@ -74,19 +74,27 @@ public class ThreadActivity extends AppCompatActivity {
         String boardName = getIntent().getStringExtra(Util.INTENT_BOARD_NAME);
         int threadPosition = getIntent().getIntExtra(Util.INTENT_THREAD_POSITION, 0);
 
+        boolean threadVisible = false;
         if (savedInstanceState != null){
             threadDepth = savedInstanceState.getInt("threadDepth");
+            int backstackCount = getFragmentManager().getBackStackEntryCount();
+            if (backstackCount > 0){
+                if (getFragmentManager().getBackStackEntryAt(backstackCount - 1).getName().equals("threadDepth" + String.valueOf(threadDepth))){
+                    threadVisible = true;
+                }
+            }
             threadFragment = (ThreadFragment) getFragmentManager().getFragment(savedInstanceState, "threadDepth" + String.valueOf(threadDepth));
-        }
-
-        if (threadFragment == null) {
+        } else {
             threadDepth = 0;
             threadFragment = new ThreadFragment().newInstance(resto, boardName, threadPosition);
+            threadVisible = true;
         }
 
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.placeholder_card, threadFragment, "threadDepth" + String.valueOf(threadDepth))
-                .commit();
+        if (threadVisible){
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.placeholder_card, threadFragment, "threadDepth" + String.valueOf(threadDepth))
+                    .commit();
+        }
 
         //Watchlist Layout
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
