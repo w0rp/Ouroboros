@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
@@ -55,9 +56,7 @@ public class CardDialogFragment extends Fragment {
         final View view = inflater.inflate(R.layout.fragment_card_dialog, container, false);
         view.setBackgroundColor(Color.argb(77, 00, 00, 00));
 
-        //// TODO: 2/19/16 recyclerview expands beyond it's card bounds. Fix this or work around it
-        /*
-        LinearLayout background = (LinearLayout) view.findViewById(R.id.card_dialog_background);
+        FrameLayout background = (FrameLayout) view.findViewById(R.id.card_dialog_background);
         background.setLongClickable(true);
         background.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -66,7 +65,7 @@ public class CardDialogFragment extends Fragment {
                 return true;
             }
         });
-        */
+
 
         final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.postList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());

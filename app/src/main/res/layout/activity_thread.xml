@@ -33,8 +33,7 @@
             <FrameLayout
                 android:id="@+id/placeholder_card"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/progress_bar">
+                android:layout_height="match_parent">
             </FrameLayout>
         </LinearLayout>
     </android.support.design.widget.CoordinatorLayout>

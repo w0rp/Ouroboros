@@ -45,6 +45,7 @@ public class SnappyLinearLayoutManager extends LinearLayoutManager implements Sn
     public SnappyLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
         super(context, orientation, reverseLayout);
         calculateDeceleration(context);
+        setAutoMeasureEnabled(false);
     }
 
     private void calculateDeceleration(Context context) {
