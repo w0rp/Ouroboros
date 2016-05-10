@@ -57,10 +57,8 @@ public class NetworkHelper {
     private final String LOG_TAG = NetworkHelper.class.getSimpleName();
     private boolean needDNSBLCaptcha = false;
     private boolean genericCaptcha = false;
-    private Reply reply;
     public void postReply(final Context context, final Reply reply, final SharedPreferences sharedPreferences,
                           final JsonParser jsonParser, final InfiniteDbHelper infiniteDbHelper, final View view){
-        this.reply = reply;
         String postUrl = ChanUrls.getReplyUrl();
         String referalUrl = ChanUrls.getThreadHtmlUrl(reply.board, reply.resto);
 
@@ -78,6 +76,7 @@ public class NetworkHelper {
                     .tryGet();
             needDNSBLCaptcha = false;
         }
+
         ArrayList<Part> parameters = new ArrayList<Part>();
         parameters.add(new StringPart("board", reply.board));
         parameters.add(new StringPart("name", reply.name));
@@ -152,8 +151,6 @@ public class NetworkHelper {
                                 Snackbar.make(view, jsonObjectResponse.getResult().get("error").getAsString(), Snackbar.LENGTH_LONG).show();
                                 return;
                             }
-
-                            Snackbar.make(view, "Data posted successfully", Snackbar.LENGTH_LONG).show();
 
                             boardName = jsonParser.getSubmittedBoardName(jsonObjectResponse.getResult());
                             userPostNo = jsonParser.getUserPostNo(jsonObjectResponse.getResult());
@@ -251,13 +248,6 @@ public class NetworkHelper {
         Ion.with(imageView)
                 .load(imageUrl)
                 .withBitmapInfo();
-    }
-
-    public void getImageWithCrossfade(ImageView imageView, String imageUrl) {
-        Ion.with(imageView)
-                .smartSize(true)
-                .crossfade(true)
-                .load(imageUrl);
     }
 
     public void downloadFile(String boardName, String tim, String ext, Context context){
