@@ -23,6 +23,7 @@ public class ChanUrls {
 
     private static final String SCHEME = "https";
     private static final String DOMAIN_NAME = "8ch.net";
+    private static final String POST_SUBDOMAIN_NAME = "sys.8ch.net";
     private static final String CATALOG_ENDPOINT = "catalog.json"; //http(s)://siteurl/board/catalog.json
     private static final String THREAD_FOLDER = "res"; //http(s):///siteurl/board/res/threadnumber.json
     private static final String THREAD_ENDPOINT = ".json";
@@ -101,7 +102,7 @@ public class ChanUrls {
     public static String getReplyUrl(){
         Uri.Builder builder = new Uri.Builder();
         builder.scheme(SCHEME) //https://8ch.net/post.php
-                .authority(DOMAIN_NAME)
+                .authority(POST_SUBDOMAIN_NAME)
                 .appendPath(POST_ENDPOINT)
                 .build();
         return builder.toString();

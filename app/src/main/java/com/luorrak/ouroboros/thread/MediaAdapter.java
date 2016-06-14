@@ -39,7 +39,6 @@ import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.deepzoom.DeepZoomActivity;
 import com.luorrak.ouroboros.util.ChanUrls;
 import com.luorrak.ouroboros.util.Media;
-import com.luorrak.ouroboros.util.NetworkHelper;
 import com.luorrak.ouroboros.util.SettingsHelper;
 import com.luorrak.ouroboros.util.Util;
 
@@ -98,7 +97,6 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
 
     @Override
     public void onBindViewHolder(MediaViewHolder holder, int position) {
-        NetworkHelper networkHelper = new NetworkHelper();
         final MediaViewHolder mediaViewHolder = holder;
         final Media media = mediaItems.get(position);
         mediaViewHolder.playButton.setVisibility(View.GONE);

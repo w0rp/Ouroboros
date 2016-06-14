@@ -191,7 +191,6 @@ public class ReplyCommentFragment extends Fragment {
 
             reply.password = SettingsHelper.getPostPassword(getContext());
 
-            //Add networking call to post data.
             networkHelper.postReply(getActivity(), reply, sharedPreferences, new JsonParser(), new InfiniteDbHelper(getActivity()), getView());
         }
         return super.onOptionsItemSelected(item);
@@ -211,15 +210,10 @@ public class ReplyCommentFragment extends Fragment {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case Util.REQUEST_STORAGE_PERMISSION: {
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     selectFile();
-                    // permission was granted, yay! Do the task you need to do.
                 } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                     Snackbar.make(getView(), "Requires Permission", Snackbar.LENGTH_LONG).show();
                 }
                 break;

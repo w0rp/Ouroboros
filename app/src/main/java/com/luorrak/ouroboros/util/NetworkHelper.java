@@ -19,7 +19,6 @@ import android.widget.ProgressBar;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.async.http.body.FilePart;
 import com.koushikdutta.async.http.body.Part;
 import com.koushikdutta.async.http.body.StringPart;
 import com.koushikdutta.ion.Ion;
@@ -98,10 +97,10 @@ public class NetworkHelper {
         if (reply.filePath != null){
             for (int i = 0; i < reply.filePath.size(); i++){
                 if (i == 0){
-                    parameters.add(new FilePart("file", new File(reply.filePath.get(i))));
+                    parameters.add(new CustomFilePart("file", new File(reply.filePath.get(i))));
                 } else {
                     int fileNumber = i + 1;
-                    parameters.add(new FilePart("file" + fileNumber, new File(reply.filePath.get(i))));
+                    parameters.add(new CustomFilePart("file" + fileNumber, new File(reply.filePath.get(i))));
                 }
             }
         }
@@ -113,6 +112,7 @@ public class NetworkHelper {
         Ion.with(context)
                 .load(postUrl)
                 .setHeader("Referer", referalUrl)
+                .setHeader("Origin", "https://8ch.net")
                 .addMultipartParts(parameters)
                 .asJsonObject()
                 .withResponse()
