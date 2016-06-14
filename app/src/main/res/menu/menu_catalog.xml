@@ -18,11 +18,29 @@
         android:visible="false"/>
 
     <item android:id="@+id/action_refresh"
-        android:orderInCategory="160"
+        android:orderInCategory="150"
         android:title="Refresh"
         android:icon="@drawable/ic_refresh_white_24dp"
         app:showAsAction="collapseActionView|ifRoom"
         android:visible="false"/>
+
+    <item android:id="@+id/action_sort_by"
+        android:orderInCategory="160"
+        android:title="Sort By"
+        app:showAsAction="never"
+        android:visible="false">
+        <menu>
+            <item
+                android:id="@+id/action_sort_by_bump_order"
+                android:title="Bump Order" />
+            <item
+                android:id="@+id/action_sort_by_creation_date"
+                android:title="Creation Date" />
+            <item
+                android:id="@+id/action_sort_by_reply_count"
+                android:title="Reply Count" />
+        </menu>
+    </item>
 
     <item android:id="@+id/action_external_browser"
         android:orderInCategory="180"

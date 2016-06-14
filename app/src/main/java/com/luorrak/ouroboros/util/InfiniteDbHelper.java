@@ -82,25 +82,49 @@ public class InfiniteDbHelper extends SQLiteOpenHelper{
         }
     }
 
-    public Cursor getCatalogCursor(){
-        Cursor cursor = db.query(
-                CatalogEntry.TABLE_NAME, //table name
-                null, //columns to search
-                null, //where clause
-                null, //where arguements
-                null, //Group by
-                null, //having
-                null //orderby
-        );
+    public Cursor getCatalogCursor(String sortBy){
+        Cursor cursor;
+        if (sortBy.equals(SettingsHelper.BUMP_ORDER)){
+            cursor = db.query(
+                    CatalogEntry.TABLE_NAME, //table name
+                    null, //columns to search
+                    null, //where clause
+                    null, //where arguements
+                    null, //Group by
+                    null, //having
+                    null //orderby
+            );
+        } else if (sortBy.equals(SettingsHelper.CREATION_DATE)){
+            cursor = db.query(
+                    CatalogEntry.TABLE_NAME, //table name
+                    null, //columns to search
+                    null, //where clause
+                    null, //where arguements
+                    null, //Group by
+                    null, //having
+                    CatalogEntry.COLUMN_CATALOG_NO + " DESC" //orderby
+            );
+        } else {
+            //SettingsHelper.REPLY_COUNT
+            cursor = db.query(
+                    CatalogEntry.TABLE_NAME, //table name
+                    null, //columns to search
+                    null, //where clause
+                    null, //where arguements
+                    null, //Group by
+                    null, //having
+                    CatalogEntry.COLUMN_CATALOG_REPLIES +" DESC" //orderby
+            );
+        }
 
         cursor.moveToFirst();
         return cursor;
     }
 
-    public Cursor searchCatalogForThread(String searchString) {
+    public Cursor searchCatalogForThread(String searchString, String sortBy) {
         Cursor cursor;
         if (searchString == null || searchString.length() == 0){
-            cursor = getCatalogCursor();
+            cursor = getCatalogCursor(sortBy);
         } else {
             cursor = db.query(
                     CatalogEntry.TABLE_NAME, //table name

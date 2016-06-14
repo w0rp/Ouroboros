@@ -123,7 +123,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
 
         catalogAdapter = new CatalogAdapter(
-                infiniteDbHelper.getCatalogCursor(),
+                getSortedCursor(),
                 boardName,
                 infiniteDbHelper,
                 getActivity());
@@ -142,10 +142,12 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
         MenuItem openExternalButton = menu.findItem(R.id.action_external_browser);
         MenuItem menuLayout = menu.findItem(R.id.action_menu_layout);
         MenuItem shareButton = menu.findItem(R.id.menu_item_share);
+        MenuItem sortBy = menu.findItem(R.id.action_sort_by);
 
         replyButton.setVisible(true);
         openExternalButton.setVisible(true);
         menuLayout.setVisible(true);
+        sortBy.setVisible(true);
         shareButton.setVisible(true);
         shareActionProvider = MenuItemCompat.getActionProvider(shareButton);
 
@@ -166,7 +168,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 catalogAdapter.setFilterQueryProvider(new FilterQueryProvider() {
                     @Override
                     public Cursor runQuery(CharSequence constraint) {
-                        return infiniteDbHelper.searchCatalogForThread(constraint.toString());
+                        return infiniteDbHelper.searchCatalogForThread(constraint.toString(), SettingsHelper.getSortByMethod(getContext()));
                     }
                 });
                 catalogAdapter.getFilter().filter(newText);
@@ -200,6 +202,21 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 startActivity(Intent.createChooser(shareIntent, "Share via"));
                 break;
             }
+            case R.id.action_sort_by_bump_order:{
+                SettingsHelper.setSortByMethod(getContext(), SettingsHelper.BUMP_ORDER);
+                catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor(SettingsHelper.getSortByMethod(getContext())));
+                break;
+            }
+            case R.id.action_sort_by_creation_date: {
+                SettingsHelper.setSortByMethod(getContext(), SettingsHelper.CREATION_DATE);
+                catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor(SettingsHelper.getSortByMethod(getContext())));
+                break;
+            }
+            case R.id.action_sort_by_reply_count: {
+                SettingsHelper.setSortByMethod(getContext(), SettingsHelper.REPLY_COUNT);
+                catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor(SettingsHelper.getSortByMethod(getContext())));
+                break;
+            }
             case R.id.action_layout_grid: {
                 SettingsHelper.setCatalogView(getActivity(), Util.CATALOG_LAYOUT_GRID);
                 CatalogFragment catalogFragment = new CatalogFragment().newInstance(boardName);
@@ -218,6 +235,12 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private Cursor getSortedCursor(){
+        String sortByMethod = SettingsHelper.getSortByMethod(getActivity());
+        Cursor cursor = infiniteDbHelper.getCatalogCursor(sortByMethod);
+        return cursor;
     }
 
     private void setActionBarTitle(String title){
@@ -277,7 +300,7 @@ public class CatalogFragment extends Fragment implements SwipeRefreshLayout.OnRe
                             }
                         }
 
-                        catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());
+                        catalogAdapter.changeCursor(getSortedCursor());
                     }
                 });
     }

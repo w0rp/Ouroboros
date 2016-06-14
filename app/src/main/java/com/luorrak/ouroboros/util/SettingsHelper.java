@@ -61,6 +61,23 @@ public class SettingsHelper {
         return Integer.valueOf(catalogGridColumns);
     }
 
+    public final static String BUMP_ORDER = "0";
+    public final static String CREATION_DATE = "1";
+    public final static String  REPLY_COUNT = "3";
+
+    public static void setSortByMethod(Context context, String sortMethod) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("sort_by", sortMethod);
+        editor.apply();
+    }
+
+    public static String getSortByMethod(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String sort_by = sharedPreferences.getString("sort_by", BUMP_ORDER);
+        return sort_by;
+    }
+
     public static String getDefaultName(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getString("default_name", "");
