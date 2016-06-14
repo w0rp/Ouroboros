@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.luorrak.ouroboros.R;
 import com.luorrak.ouroboros.api.JsonParser;
 import com.luorrak.ouroboros.util.InfiniteDbHelper;
+import com.luorrak.ouroboros.util.SettingsHelper;
 
 /**
  * Ouroboros - An 8chan browser
@@ -133,7 +134,7 @@ public class CatalogNetworkFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor());
+            catalogAdapter.changeCursor(infiniteDbHelper.getCatalogCursor(SettingsHelper.getSortByMethod(getContext())));
             swipeRefreshLayout = (SwipeRefreshLayout) activity.findViewById(R.id.catalog_swipe_container);
             ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progress_bar);
             if(swipeRefreshLayout != null) {
