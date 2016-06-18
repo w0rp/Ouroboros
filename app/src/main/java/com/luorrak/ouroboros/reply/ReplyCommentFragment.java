@@ -26,6 +26,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -101,7 +103,8 @@ public class ReplyCommentFragment extends Fragment {
         replyNo = getActivity().getIntent().getStringExtra(Util.INTENT_REPLY_NO);
 
         EditText nameText = (EditText) view.findViewById(R.id.post_comment_editText_name);
-        EditText emailText = (EditText) view.findViewById(R.id.post_comment_editText_email);
+        final EditText emailText = (EditText) view.findViewById(R.id.post_comment_editText_email);
+        CheckBox sageBox = (CheckBox) view.findViewById(R.id.post_comment_checkBox_sage);
         EditText subjetText = (EditText) view.findViewById(R.id.post_comment_editText_subject);
         EditText commentText = (EditText) view.findViewById(R.id.post_comment_editText_comment);
 
@@ -117,8 +120,12 @@ public class ReplyCommentFragment extends Fragment {
         emailText.addTextChangedListener(new SaveReplyText(sharedPreferences, SaveReplyText.emailEditTextKey));
         subjetText.addTextChangedListener(new SaveReplyText(sharedPreferences, SaveReplyText.subjectEditTextKey));
         commentText.addTextChangedListener(new SaveReplyText(sharedPreferences, SaveReplyText.commentEditTextKey));
-
-
+        sageBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                reply.sage = isChecked;
+            }
+        });
 
         if (replyNo != null){
             if (commentText.getText().toString().equals("")){
