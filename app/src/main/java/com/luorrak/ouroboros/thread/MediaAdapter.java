@@ -122,6 +122,11 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                 break;
             }
             case Util.THREAD_LAYOUT_HORIZONTAL: {
+                mediaViewHolder.mediaImage.getLayoutParams().height =
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 75, context.getResources().getDisplayMetrics());
+                mediaViewHolder.mediaImage.getLayoutParams().width =
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 75, context.getResources().getDisplayMetrics());
+                mediaViewHolder.mediaImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 break;
             }
         }
