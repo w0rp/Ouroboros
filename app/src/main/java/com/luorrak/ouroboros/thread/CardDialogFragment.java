@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,10 +71,13 @@ public class CardDialogFragment extends Fragment {
         final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.postList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
+        final DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
         view.post(new Runnable() {
             @Override
             public void run() {
-                int h = recyclerView.getHeight();
+                int h = metrics.heightPixels;
                 int w = recyclerView.getWidth();
                 ThreadAdapter threadAdapter = new ThreadAdapter(cursor, getFragmentManager(), boardName, getActivity(), infiniteDbHelper, w, h);
                 recyclerView.setAdapter(threadAdapter);

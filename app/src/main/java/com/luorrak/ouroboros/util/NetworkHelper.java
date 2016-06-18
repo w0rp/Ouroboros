@@ -76,6 +76,8 @@ public class NetworkHelper {
             needDNSBLCaptcha = false;
         }
 
+        reply.email = reply.sage ? "sage" : reply.email;
+
         ArrayList<Part> parameters = new ArrayList<Part>();
         parameters.add(new StringPart("board", reply.board));
         parameters.add(new StringPart("name", reply.name));

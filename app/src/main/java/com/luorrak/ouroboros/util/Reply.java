@@ -24,6 +24,7 @@ import java.util.ArrayList;
 public class Reply{
     public String name = "";
     public String email = "";
+    public boolean sage = false;
     public String subject = "";
     public String comment = "";
     public String board = "";
